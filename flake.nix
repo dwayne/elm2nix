@@ -2,6 +2,7 @@
   outputs = { self, nixpkgs }:
     let
       system = "x86_64-linux";
+
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
@@ -9,7 +10,8 @@
         name = "dev";
 
         packages = [
-          pkgs.jq
+          pkgs.haskell.compiler.ghc9102
+          pkgs.cabal-install
         ];
 
         shellHook = ''

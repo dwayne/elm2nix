@@ -1,0 +1,11 @@
+cabal-version: 3.0
+name: elm2nix
+version: 0.1.0.0
+
+executable elm2nix
+    main-is: Main.hs
+
+    default-language: Haskell2010
+    build-depends:
+        base,
+        aeson
