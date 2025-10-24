@@ -10,6 +10,7 @@ import qualified Data.Char as Char
 import qualified Data.Text as Text
 
 import Data.Aeson.Types (Key, Parser, parseEither, parseFail)
+import Data.Foldable.WithIndex (ifoldl)
 import Data.Function ((&))
 import Data.Text (Text)
 
@@ -36,6 +37,19 @@ data Dependency
 type Author = Text
 type Package = Text
 type Version = Text
+
+
+dependenciesParser :: String -> Json.Value -> Parser [Dependency]
+dependenciesParser name =
+    Json.withObject name $ \o ->
+        --
+        -- 1. Object = KeyMap Value
+        -- 2. For each key and value in the KeyMap we want to apply dependencyParser
+        -- 3. And collect them into a list, i.e. [Parser Dependency]
+        -- 4. Convert [Parser Dependency] to Parser [Dependency] as required
+        --
+        ifoldl (\key accum value -> dependencyParser key value : accum) [] o
+            & sequence
 
 
 dependencyParser :: Key -> Json.Value -> Parser Dependency
