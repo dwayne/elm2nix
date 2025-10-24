@@ -24,9 +24,27 @@ directDependencies =
         & KM.insert "elm/url" (Json.String "1.0.0")
 
 
+data Dependency
+    = Dependency
+        { author :: Author
+        , package :: Package
+        , version :: Version
+        }
+    deriving Show
+
+
 type Author = Text
 type Package = Text
 type Version = Text
+
+
+dependencyParser :: Key -> Json.Value -> Parser Dependency
+dependencyParser key value = do
+    toDependency <$> authorPackageParser key <*> versionParser value
+    where
+        toDependency :: ( Author, Package ) -> Version -> Dependency
+        toDependency ( author, package ) version =
+            Dependency author package version
 
 
 authorPackageParser :: Key -> Parser (Author, Package)
