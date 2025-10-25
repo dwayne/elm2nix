@@ -9,11 +9,35 @@ import qualified Data.Aeson.KeyMap as KM
 import qualified Data.Char as Char
 import qualified Data.Text as Text
 
-import Data.Aeson.Types ((.:), Key, Parser, parseEither, parseFail)
+import Data.Aeson.Types ((.:), (.:?), (.!=), Key, Parser, parseEither, parseFail)
 import Data.Foldable.WithIndex (ifoldl)
 import Data.Function ((&))
 import Data.Text (Text)
 
+
+
+elmJsonParser2 :: Json.Value -> Parser [Dependency]
+elmJsonParser2 =
+    Json.withObject "elm.json" $ \o ->
+        let
+            dependencies =
+                ((o .: "dependencies") >>= Json.withObject "dependencies" (\o ->
+                    (++) <$> ((o .: "direct") >>= dependenciesParser "dependencies.direct")
+                         <*> ((o .: "indirect") >>= dependenciesParser "dependencies.indirect"))
+                )
+
+            testDependencies =
+                ((o .:? "test-dependencies" .!= emptyObject) >>= Json.withObject "test-dependencies" (\o ->
+                    (++) <$> ((o .:? "direct" .!= emptyObject) >>= dependenciesParser "test-dependencies.direct")
+                         <*> ((o .:? "indirect" .!= emptyObject) >>= dependenciesParser "test-dependencies.indirect"))
+                )
+        in
+        (++) <$> dependencies <*> testDependencies
+
+
+emptyObject :: Json.Value
+emptyObject =
+    Json.Object KM.empty
 
 --
 -- Q: How to get the dependencies from direct and indirect and combine them all into one?
