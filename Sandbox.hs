@@ -15,14 +15,36 @@ import Data.Function ((&))
 import Data.Text (Text)
 
 
-directDependencies :: Json.Object
-directDependencies =
-    KM.empty
-        & KM.insert "elm/browser" (Json.String "1.0.2")
-        & KM.insert "elm/core" (Json.String "1.0.5")
-        & KM.insert "elm/html" (Json.String "1.0.0")
-        & KM.insert "elm/json" (Json.String "1.1.3")
-        & KM.insert "elm/url" (Json.String "1.0.0")
+elmJson :: Json.Value
+elmJson =
+    Json.Object $ KM.fromList
+        [ ( "type", Json.String "application" )
+        , ( "dependencies"
+          , Json.Object $ KM.fromList
+                [ ( "direct", dependenciesDirect )
+                , ( "indirect", dependenciesIndirect )
+                ]
+          )
+        ]
+
+
+dependenciesDirect :: Json.Value
+dependenciesDirect =
+    Json.Object $ KM.fromList
+        [ ( "elm/browser", Json.String "1.0.2" )
+        , ( "elm/core", Json.String "1.0.5" )
+        , ( "elm/html", Json.String "1.0.0" )
+        , ( "elm/json", Json.String "1.1.3" )
+        , ( "elm/url", Json.String "1.0.0" )
+        ]
+
+
+dependenciesIndirect :: Json.Value
+dependenciesIndirect =
+    Json.Object $ KM.fromList
+        [ ( "elm/time", Json.String "1.0.0" )
+        , ( "elm/virtual-dom", Json.String "1.0.3" )
+        ]
 
 
 data Dependency
