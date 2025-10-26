@@ -4,16 +4,55 @@ module ElmJson where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Key as Key
+import qualified Data.Aeson.KeyMap as KeyMap
 import qualified Data.Char as Char
+import qualified Data.Set as Set
 import qualified Data.Text as Text
 
-import Data.Aeson.Types (Key, Parser, Value, parseFail)
+import Data.Aeson.Types ((<?>), JSONPathElement(..), Key, Object, Parser, Value, parseFail)
+import Data.Foldable.WithIndex (ifoldl)
+import Data.Set (Set)
+import Data.String (fromString)
 import Data.Text (Text)
 import Numeric.Natural (Natural)
 import Text.Read (readMaybe)
 
 import Dependency (Author, Dependency(..), Package)
 import Version (Version(..))
+
+
+dependenciesDirect :: Value
+dependenciesDirect =
+    Json.Object $ KeyMap.fromList
+        [ ( "elm/browser", Json.String "1.0.2" )
+        , ( "elm/core", Json.String "1.0.5" )
+        , ( "elm/html", Json.String "1.0.0" )
+        , ( "elm/json", Json.String "1.1.3" )
+        , ( "elm/url", Json.String "1.0.0" )
+        ]
+
+
+dependenciesIndirect :: Value
+dependenciesIndirect =
+    Json.Object $ KeyMap.fromList
+        [ ( "elm/time", Json.String "1.0.0" )
+        , ( "elm/virtual-dom", Json.String "1.0.3" )
+        ]
+
+
+dependenciesParser :: String -> Value -> Parser (Set Dependency)
+dependenciesParser name =
+    Json.withObject name reduceWithContext
+    where
+        reduceWithContext :: Object -> Parser (Set Dependency)
+        reduceWithContext o =
+            reduce o <?> Key (fromString name)
+
+        reduce :: Object -> Parser (Set Dependency)
+        reduce =
+            fmap Set.fromList
+            . sequence
+            . ifoldl (\k ds v -> dependencyParser k v <?> Key k : ds) []
 
 
 dependencyParser :: Key -> Value -> Parser Dependency

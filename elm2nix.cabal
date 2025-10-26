@@ -9,5 +9,6 @@ executable elm2nix
     build-depends:
         aeson,
         base,
+        containers,
         indexed-traversable,
         text
