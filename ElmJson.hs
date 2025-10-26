@@ -12,8 +12,17 @@ import Data.Text (Text)
 import Numeric.Natural (Natural)
 import Text.Read (readMaybe)
 
-import Dependency (Author, Package)
+import Dependency (Author, Dependency(..), Package)
 import Version (Version(..))
+
+
+dependencyParser :: Key -> Value -> Parser Dependency
+dependencyParser key value =
+    toDependency <$> authorPackageParser key <*> versionParser value
+    where
+        toDependency :: ( Author, Package ) -> Version -> Dependency
+        toDependency ( author, package ) version =
+            Dependency author package version
 
 
 authorPackageParser :: Key -> Parser (Author, Package)
