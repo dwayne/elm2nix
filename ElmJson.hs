@@ -3,14 +3,44 @@
 module ElmJson where
 
 import qualified Data.Aeson as Json
+import qualified Data.Aeson.Key as Key
 import qualified Data.Char as Char
 import qualified Data.Text as Text
 
-import Data.Aeson.Types (Parser, Value, parseFail)
+import Data.Aeson.Types (Key, Parser, Value, parseFail)
 import Data.Text (Text)
 import Numeric.Natural (Natural)
 import Text.Read (readMaybe)
+
+import Dependency (Author, Package)
 import Version (Version(..))
+
+
+authorPackageParser :: Key -> Parser (Author, Package)
+authorPackageParser =
+    --
+    -- Expected format:
+    --
+    -- 1. author/package
+    -- 2. author must be non-empty
+    -- 3. package must be non-empty
+    --
+    parse . Text.breakOn "/" . Key.toText
+    where
+        parse ( author, slashPackage ) =
+            case Text.uncons slashPackage of
+                Just ( '/', package ) ->
+                    if Text.null author then
+                        parseFail "author is empty"
+
+                    else if Text.null package then
+                        parseFail "package is empty"
+
+                    else
+                        pure ( author, package )
+
+                _ ->
+                    parseFail "/ is missing"
 
 
 versionParser :: Value -> Parser Version

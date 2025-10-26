@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Dependency (Dependency(..)) where
+module Dependency (Author, Dependency(..), Package) where
 
 import Data.Text (Text)
 import Version (Version(..))
