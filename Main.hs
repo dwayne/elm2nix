@@ -8,10 +8,12 @@ import Data.Aeson (Value)
 import Data.Bifunctor (first)
 import System.IO.Error (isDoesNotExistError)
 
+import qualified ElmJson
+
 
 main :: IO ()
 main =
-    decodeFile "elm.json" >>= either print print
+    decodeFile "elm.json" >>= either print printDependencies
 
 
 data DecodeFileError
@@ -33,3 +35,8 @@ decodeFile path =
         handleNotFound :: Bool -> Maybe DecodeFileError
         handleNotFound b =
             if b then Just (FileNotFound path) else Nothing
+
+
+printDependencies :: Value -> IO ()
+printDependencies =
+    either print print . ElmJson.getDependencies

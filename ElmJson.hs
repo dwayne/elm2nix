@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module ElmJson where
+module ElmJson (getDependencies) where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Key as Key
@@ -9,7 +9,7 @@ import qualified Data.Char as Char
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 
-import Data.Aeson.Types ((<?>), (.:?), (.!=), JSONPathElement(..), Key, Object, Parser, Value, parseFail)
+import Data.Aeson.Types ((<?>), (.:?), (.!=), JSONPathElement(..), Key, Object, Parser, Value, parseEither, parseFail)
 import Data.Foldable.WithIndex (ifoldl)
 import Data.Set (Set)
 import Data.String (fromString)
@@ -63,6 +63,12 @@ dependenciesIndirect =
 
 
 -- Implementation
+
+
+getDependencies :: Value -> Either String (Set Dependency)
+getDependencies =
+    parseEither elmJsonParser
+
 
 
 elmJsonParser :: Value -> Parser (Set Dependency)
