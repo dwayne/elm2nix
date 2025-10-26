@@ -9,7 +9,7 @@ import qualified Data.Char as Char
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 
-import Data.Aeson.Types ((<?>), JSONPathElement(..), Key, Object, Parser, Value, parseFail)
+import Data.Aeson.Types ((<?>), (.:?), (.!=), JSONPathElement(..), Key, Object, Parser, Value, parseFail)
 import Data.Foldable.WithIndex (ifoldl)
 import Data.Set (Set)
 import Data.String (fromString)
@@ -19,6 +19,28 @@ import Text.Read (readMaybe)
 
 import Dependency (Author, Dependency(..), Package)
 import Version (Version(..))
+
+
+-- Example
+
+
+elmJson :: Value
+elmJson =
+    Json.Object $ KeyMap.fromList
+        [ ( "type", Json.String "application" )
+        , ( "dependencies"
+          , Json.Object $ KeyMap.fromList
+                [ ( "direct", dependenciesDirect )
+                , ( "indirect", dependenciesIndirect )
+                ]
+          )
+        , ( "test-dependencies"
+          , Json.Object $ KeyMap.fromList
+                [ ( "direct", emptyObject )
+                , ( "indirect", emptyObject )
+                ]
+          )
+        ]
 
 
 dependenciesDirect :: Value
@@ -38,6 +60,33 @@ dependenciesIndirect =
         [ ( "elm/time", Json.String "1.0.0" )
         , ( "elm/virtual-dom", Json.String "1.0.3" )
         ]
+
+
+-- Implementation
+
+
+elmJsonParser :: Value -> Parser (Set Dependency)
+elmJsonParser =
+    Json.withObject "elmJson" $ \o ->
+        Set.union <$> withDirectAndIndirect "dependencies" o <*> withDirectAndIndirect "test-dependencies" o
+
+
+withDirectAndIndirect :: Key -> Object -> Parser (Set Dependency)
+withDirectAndIndirect key parent =
+    let
+        name =
+            Key.toString key
+    in
+    ((parent .:? key .!= emptyObject) >>= Json.withObject name (\o ->
+        Set.union
+            <$> ((o .:? "direct" .!= emptyObject) >>= (\v -> dependenciesParser "direct" v <?> Key key))
+            <*> ((o .:? "indirect" .!= emptyObject) >>= (\v -> dependenciesParser "indirect" v <?> Key key))
+    ))
+
+
+emptyObject :: Value
+emptyObject =
+    Json.Object KeyMap.empty
 
 
 dependenciesParser :: String -> Value -> Parser (Set Dependency)
