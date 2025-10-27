@@ -11,6 +11,7 @@
 
         packages = [
           pkgs.haskell.compiler.ghc9102
+          pkgs.hlint
           pkgs.cabal-install
         ];
 

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Elm2Nix.Dependency (Author, Dependency(..), Package) where
 
 import Data.Text (Text)

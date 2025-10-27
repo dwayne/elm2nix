@@ -11,6 +11,7 @@ import qualified Data.Text as Text
 
 import Data.Aeson.Types ((<?>), (.:?), (.!=), JSONPathElement(..), Key, Object, Parser, Value, parseEither, parseFail)
 import Data.Foldable.WithIndex (ifoldl)
+import Data.Maybe (fromMaybe)
 import Data.Set (Set)
 import Data.String (fromString)
 import Data.Text (Text)
@@ -115,8 +116,8 @@ dependencyParser key value =
     toDependency <$> authorPackageParser key <*> versionParser value
     where
         toDependency :: ( Author, Package ) -> Version -> Dependency
-        toDependency ( author, package ) version =
-            Dependency author package version
+        toDependency ( author, package ) =
+            Dependency author package
 
 
 authorPackageParser :: Key -> Parser (Author, Package)
@@ -196,4 +197,4 @@ versionFromText t =
 
         readNatural :: Text -> Natural
         readNatural =
-            maybe 0 id . readMaybe . Text.unpack
+            fromMaybe 0 . readMaybe . Text.unpack
