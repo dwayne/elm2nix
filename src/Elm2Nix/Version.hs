@@ -1,4 +1,4 @@
-module Version (Version(..)) where
+module Elm2Nix.Version (Version(..)) where
 
 import Numeric.Natural (Natural)
 

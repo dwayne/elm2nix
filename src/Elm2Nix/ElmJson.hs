@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module ElmJson (getDependencies) where
+module Elm2Nix.ElmJson (getDependencies) where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Key as Key
@@ -17,8 +17,8 @@ import Data.Text (Text)
 import Numeric.Natural (Natural)
 import Text.Read (readMaybe)
 
-import Dependency (Author, Dependency(..), Package)
-import Version (Version(..))
+import Elm2Nix.Dependency (Author, Dependency(..), Package)
+import Elm2Nix.Version (Version(..))
 
 
 -- Example

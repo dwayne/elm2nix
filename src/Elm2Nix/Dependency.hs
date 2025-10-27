@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Dependency (Author, Dependency(..), Package) where
+module Elm2Nix.Dependency (Author, Dependency(..), Package) where
 
 import Data.Text (Text)
-import Version (Version(..))
+
+import Elm2Nix.Version (Version(..))
 
 
 type Author = Text

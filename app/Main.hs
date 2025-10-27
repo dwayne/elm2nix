@@ -8,7 +8,7 @@ import Data.Aeson (Value)
 import Data.Bifunctor (first)
 import System.IO.Error (isDoesNotExistError)
 
-import qualified ElmJson
+import qualified Elm2Nix.ElmJson as ElmJson
 
 
 main :: IO ()
