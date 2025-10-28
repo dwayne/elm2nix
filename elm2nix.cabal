@@ -36,6 +36,7 @@ test-suite elm2nix-tests
     hs-source-dirs: tests
     main-is: Spec.hs
     other-modules:
+        Test.Elm2Nix.Dependency
         Test.Elm2Nix.Version
 
     default-language: Haskell2010
