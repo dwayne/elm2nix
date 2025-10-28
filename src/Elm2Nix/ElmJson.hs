@@ -22,59 +22,15 @@ import Elm2Nix.Dependency (Author, Dependency(..), Package)
 import Elm2Nix.Version (Version(..))
 
 
--- Example
-
-
-elmJson :: Value
-elmJson =
-    Json.Object $ KeyMap.fromList
-        [ ( "type", Json.String "application" )
-        , ( "dependencies"
-          , Json.Object $ KeyMap.fromList
-                [ ( "direct", dependenciesDirect )
-                , ( "indirect", dependenciesIndirect )
-                ]
-          )
-        , ( "test-dependencies"
-          , Json.Object $ KeyMap.fromList
-                [ ( "direct", emptyObject )
-                , ( "indirect", emptyObject )
-                ]
-          )
-        ]
-
-
-dependenciesDirect :: Value
-dependenciesDirect =
-    Json.Object $ KeyMap.fromList
-        [ ( "elm/browser", Json.String "1.0.2" )
-        , ( "elm/core", Json.String "1.0.5" )
-        , ( "elm/html", Json.String "1.0.0" )
-        , ( "elm/json", Json.String "1.1.3" )
-        , ( "elm/url", Json.String "1.0.0" )
-        ]
-
-
-dependenciesIndirect :: Value
-dependenciesIndirect =
-    Json.Object $ KeyMap.fromList
-        [ ( "elm/time", Json.String "1.0.0" )
-        , ( "elm/virtual-dom", Json.String "1.0.3" )
-        ]
-
-
--- Implementation
-
-
 getDependencies :: Value -> Either String (Set Dependency)
 getDependencies =
-    parseEither elmJsonParser
+    parseEither elmDotJsonParser
 
 
 
-elmJsonParser :: Value -> Parser (Set Dependency)
-elmJsonParser =
-    Json.withObject "elmJson" $ \o ->
+elmDotJsonParser :: Value -> Parser (Set Dependency)
+elmDotJsonParser =
+    Json.withObject "elm.json" $ \o ->
         Set.union <$> withDirectAndIndirect "dependencies" o <*> withDirectAndIndirect "test-dependencies" o
 
 
