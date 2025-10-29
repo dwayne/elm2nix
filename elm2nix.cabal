@@ -9,14 +9,18 @@ library
         Elm2Nix.Dependency,
         Elm2Nix.ElmJson,
         Elm2Nix.Version
+    other-modules:
+        Elm2Nix.Lib.Nix
 
     default-language: Haskell2010
     build-depends:
         aeson,
         base,
+        bytestring,
         containers,
         indexed-traversable,
-        text
+        text,
+        typed-process
 
 
 executable elm2nix
