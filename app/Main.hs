@@ -1,20 +1,8 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main (main) where
 
-import qualified Data.Aeson.Encode.Pretty as Json
-import qualified Data.ByteString.Lazy as LBS
-import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
+import qualified Elm2Nix.ElmLock as ElmLock
 
 
 main :: IO ()
 main =
-    FOD.fromFile "elm.json" >>= either print (LBS.writeFile "elm.lock" . Json.encodePretty' config)
-
-
-config :: Json.Config
-config =
-    Json.defConfig
-        { Json.confCompare = Json.keyOrder [ "author", "package", "version", "sha256" ]
-        , Json.confTrailingNewline = True
-        }
+    ElmLock.generateLockFile "elm.json" "elm.lock" >>= either print (const $ putStrLn "Generated elm.lock!")
