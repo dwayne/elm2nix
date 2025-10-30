@@ -9,7 +9,7 @@ import qualified Data.Char as Char
 import qualified Data.Set as Set
 import qualified Data.Text as Text
 
-import Data.Aeson.Types ((<?>), (.:?), (.!=), JSONPathElement(..), Key, Object, Parser, Value, parseEither, parseFail)
+import Data.Aeson.Types ((<?>), (.:?), (.!=), JSONPathElement(..), Key, Object, Parser, Value, emptyObject, parseEither, parseFail)
 import Data.Foldable.WithIndex (ifoldl)
 import Data.Maybe (fromMaybe)
 import Data.Set (Set)
@@ -25,7 +25,6 @@ import Elm2Nix.Data.Version (Version(..))
 getDependencies :: Value -> Either String (Set Dependency)
 getDependencies =
     parseEither elmDotJsonParser
-
 
 
 elmDotJsonParser :: Value -> Parser (Set Dependency)
@@ -45,11 +44,6 @@ withDirectAndIndirect key parent =
             <$> ((o .:? "direct" .!= emptyObject) >>= (\v -> dependenciesParser "direct" v <?> Key key))
             <*> ((o .:? "indirect" .!= emptyObject) >>= (\v -> dependenciesParser "indirect" v <?> Key key))
     ))
-
-
-emptyObject :: Value
-emptyObject =
-    Json.Object KeyMap.empty
 
 
 dependenciesParser :: String -> Value -> Parser (Set Dependency)
