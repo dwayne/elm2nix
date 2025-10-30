@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 
 module Elm2Nix.Data.FixedOutputDerivation
@@ -6,8 +7,10 @@ module Elm2Nix.Data.FixedOutputDerivation
     , FromFileError, fromFile
     ) where
 
+import qualified Data.Aeson as Json
 import qualified Data.Set as Set
 
+import Data.Aeson (ToJSON(..), (.=))
 import Data.Bifunctor (first)
 import Data.Either (partitionEithers)
 import Data.Function ((&))
@@ -32,6 +35,23 @@ data FixedOutputDerivation
         , path :: FilePath
         }
     deriving (Eq, Show)
+
+
+instance ToJSON FixedOutputDerivation where
+    toJSON (FixedOutputDerivation author package version hash _) =
+        Json.object
+            [ "author" .= author
+            , "package" .= package
+            , "version" .= version
+            , "hash" .= hash
+            ]
+
+    toEncoding (FixedOutputDerivation author package version hash _) =
+        Json.pairs $
+            "author" .= author <>
+            "package" .= package <>
+            "version" .= version <>
+            "hash" .= hash
 
 
 data FromFileError
