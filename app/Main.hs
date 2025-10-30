@@ -1,42 +1,11 @@
 module Main (main) where
 
-import qualified Data.Aeson as Json
-
-import Control.Exception (tryJust)
-import Control.Monad (join)
 import Data.Aeson (Value)
-import Data.Bifunctor (first)
-import System.IO.Error (isDoesNotExistError)
 
+import qualified Elm2Nix.Lib.Json as Json
 import qualified Elm2Nix.ElmJson as ElmJson
 
 
 main :: IO ()
 main =
-    decodeFile "elm.json" >>= either print printDependencies
-
-
-data DecodeFileError
-    = FileNotFound FilePath
-    | JsonError String
-    deriving Show
-
-
-decodeFile :: FilePath -> IO (Either DecodeFileError Value)
-decodeFile path =
-    fmap join
-        $ tryJust (handleNotFound . isDoesNotExistError)
-        $ eitherDecodeFileStrict path
-    where
-        eitherDecodeFileStrict :: FilePath -> IO (Either DecodeFileError Value)
-        eitherDecodeFileStrict =
-            fmap (first JsonError) . Json.eitherDecodeFileStrict
-
-        handleNotFound :: Bool -> Maybe DecodeFileError
-        handleNotFound b =
-            if b then Just (FileNotFound path) else Nothing
-
-
-printDependencies :: Value -> IO ()
-printDependencies =
-    either print print . ElmJson.getDependencies
+    Json.decodeFile "elm.json" >>= either print (either print print . ElmJson.getDependencies)
