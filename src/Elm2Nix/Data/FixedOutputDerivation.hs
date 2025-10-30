@@ -43,7 +43,7 @@ instance ToJSON FixedOutputDerivation where
             [ "author" .= author
             , "package" .= package
             , "version" .= version
-            , "hash" .= hash
+            , "sha256" .= hash
             ]
 
     toEncoding (FixedOutputDerivation author package version hash _) =
@@ -51,7 +51,7 @@ instance ToJSON FixedOutputDerivation where
             "author" .= author <>
             "package" .= package <>
             "version" .= version <>
-            "hash" .= hash
+            "sha256" .= hash
 
 
 data FromFileError
