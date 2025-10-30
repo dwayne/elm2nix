@@ -8,7 +8,7 @@ module Elm2Nix.Lib.Nix
 
 import qualified Data.ByteString.Lazy.Char8 as LBS
 
-import System.Process.Typed
+import System.Process.Typed (ExitCode(ExitSuccess), ProcessConfig, readProcess, proc)
 
 
 data NixPrefetchUrlOutput
