@@ -1,13 +1,13 @@
-module Test.Elm2Nix.Version (main) where
+module Test.Elm2Nix.Data.Version (main) where
 
 import Test.Hspec
 
-import Elm2Nix.Version (Version(..))
+import Elm2Nix.Data.Version (Version(..))
 
 
 main :: IO ()
 main = hspec $
-    describe "Elm2Nix.Version" $ do
+    describe "Elm2Nix.Data.Version" $ do
         showSpec
         orderSpec
 

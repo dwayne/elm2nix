@@ -12,9 +12,9 @@ import Data.Bifunctor (second)
 import Data.Text (Text)
 import Test.Hspec
 
-import Elm2Nix.Dependency (Dependency(..))
+import Elm2Nix.Data.Dependency (Dependency(..))
+import Elm2Nix.Data.Version (Version(..))
 import Elm2Nix.ElmJson (getDependencies)
-import Elm2Nix.Version (Version(..))
 
 
 main :: IO ()

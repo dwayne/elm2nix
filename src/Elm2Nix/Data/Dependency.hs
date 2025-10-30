@@ -1,8 +1,8 @@
-module Elm2Nix.Dependency (Author, Dependency(..), Package) where
+module Elm2Nix.Data.Dependency (Author, Dependency(..), Package) where
 
 import Data.Text (Text)
 
-import Elm2Nix.Version (Version(..))
+import Elm2Nix.Data.Version (Version(..))
 
 
 type Author = Text

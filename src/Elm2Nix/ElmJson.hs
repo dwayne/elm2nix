@@ -18,8 +18,8 @@ import Data.Text (Text)
 import Numeric.Natural (Natural)
 import Text.Read (readMaybe)
 
-import Elm2Nix.Dependency (Author, Dependency(..), Package)
-import Elm2Nix.Version (Version(..))
+import Elm2Nix.Data.Dependency (Author, Dependency(..), Package)
+import Elm2Nix.Data.Version (Version(..))
 
 
 getDependencies :: Value -> Either String (Set Dependency)
