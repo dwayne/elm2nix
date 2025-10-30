@@ -21,7 +21,8 @@ library
         containers,
         indexed-traversable,
         text,
-        typed-process
+        typed-process,
+        unliftio
 
 
 executable elm2nix

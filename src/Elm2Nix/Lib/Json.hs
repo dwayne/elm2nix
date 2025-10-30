@@ -14,7 +14,7 @@ import System.IO.Error (isDoesNotExistError)
 
 data DecodeFileError
     = FileNotFound FilePath
-    | JsonError String
+    | SyntaxError String
     deriving (Eq, Show)
 
 
@@ -26,7 +26,7 @@ decodeFile path =
     where
         eitherDecodeFileStrict :: FilePath -> IO (Either DecodeFileError Value)
         eitherDecodeFileStrict =
-            fmap (first JsonError) . Json.eitherDecodeFileStrict
+            fmap (first SyntaxError) . Json.eitherDecodeFileStrict
 
         handleNotFound :: Bool -> Maybe DecodeFileError
         handleNotFound b =

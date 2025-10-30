@@ -1,11 +1,8 @@
 module Main (main) where
 
-import Data.Aeson (Value)
-
-import qualified Elm2Nix.Lib.Json as Json
-import qualified Elm2Nix.ElmJson as ElmJson
+import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 
 
 main :: IO ()
 main =
-    Json.decodeFile "elm.json" >>= either print (either print print . ElmJson.getDependencies)
+    FOD.fromFile "elm.json" >>= either print print
