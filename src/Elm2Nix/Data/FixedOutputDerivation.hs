@@ -70,6 +70,10 @@ fromFile filePath = do
                 Right dependencies ->
                     dependencies
                         & Set.toAscList
+                        --
+                        -- Do I need to compile the program in a special way to
+                        -- get concurrency?
+                        --
                         & pooledMapConcurrently (\d -> first (d,) <$> fromDependency d)
                         & fmap (resolve . partitionEithers)
 
