@@ -1,9 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Elm2Nix.Data.Name
-    ( Author
-    , Name
-    , Package
+    ( Name, Author, Package
+    , elmCore
     , fromText
     , toString
     ) where
@@ -27,6 +26,11 @@ instance Show Name where
 
 type Author = Text
 type Package = Text
+
+
+elmCore :: Name
+elmCore =
+    Name "elm" "core"
 
 
 fromText :: Text -> Either String Name

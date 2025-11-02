@@ -47,6 +47,7 @@ test-suite elm2nix-tests
     main-is: Spec.hs
     other-modules:
         Test.Elm2Nix.Data.Dependency,
+        Test.Elm2Nix.Data.Name,
         Test.Elm2Nix.Data.Version,
         Test.Elm2Nix.ElmJson
 
