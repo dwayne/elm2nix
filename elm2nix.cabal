@@ -8,6 +8,7 @@ library
     exposed-modules:
         Elm2Nix.Data.Dependency,
         Elm2Nix.Data.FixedOutputDerivation,
+        Elm2Nix.Data.Name,
         Elm2Nix.Data.Version,
         Elm2Nix.ElmJson,
         Elm2Nix.ElmLock,
