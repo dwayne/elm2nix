@@ -11,7 +11,7 @@ main :: IO ()
 main = hspec $
     describe "Elm2Nix.Data.Name" $ do
         fromTextSpec
-        toStringSpec
+        toTextSpec
 
 
 fromTextSpec :: Spec
@@ -30,8 +30,8 @@ fromTextSpec =
             show <$> Name.fromText "elm/core" `shouldBe` Right "elm/core"
 
 
-toStringSpec :: Spec
-toStringSpec =
-    describe "toString" $
+toTextSpec :: Spec
+toTextSpec =
+    describe "toText" $
         it "combines author and package with the separator" $
-            Name.toString "-" Name.elmCore `shouldBe` "elm-core"
+            Name.toText "-" Name.elmCore `shouldBe` "elm-core"

@@ -2,9 +2,9 @@
 
 module Elm2Nix.Data.Name
     ( Name, Author, Package
-    , elmCore
+    , elmBrowser, elmCore, elmHtml
     , fromText
-    , toString
+    , toText, toString
     ) where
 
 import qualified Data.Text as Text
@@ -28,9 +28,19 @@ type Author = Text
 type Package = Text
 
 
+elmBrowser :: Name
+elmBrowser =
+    Name "elm" "browser"
+
+
 elmCore :: Name
 elmCore =
     Name "elm" "core"
+
+
+elmHtml :: Name
+elmHtml =
+    Name "elm" "html"
 
 
 fromText :: Text -> Either String Name
@@ -54,6 +64,11 @@ fromText t =
             Left "/ is missing"
 
 
+toText :: Text -> Name -> Text
+toText separator (Name author package) =
+    author <> separator <> package
+
+
 toString :: Text -> Name -> String
-toString separator (Name author package) =
-    Text.unpack $ author <> separator <> package
+toString separator =
+    Text.unpack . toText separator
