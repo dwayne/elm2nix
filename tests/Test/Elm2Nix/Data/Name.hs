@@ -27,7 +27,7 @@ fromTextSpec =
             Name.fromText "elmcore" `shouldBe` Left "/ is missing"
 
         it "returns a Name when the input is valid" $
-            show <$> Name.fromText "elm/core" `shouldBe` Right "elm/core"
+            Name.fromText "elm/core" `shouldBe` Right Name.elmCore
 
 
 toTextSpec :: Spec
