@@ -1,37 +1,27 @@
-module Elm2Nix.Data.Dependency
-    ( Author
-    , Dependency(..)
-    , Package
-    , toName
-    , toUrl
-    ) where
+{-# LANGUAGE OverloadedStrings #-}
 
-import qualified Data.Text as Text
+module Elm2Nix.Data.Dependency (Dependency(..), toUrl) where
 
-import Data.Text (Text)
+import qualified Elm2Nix.Data.Name as Name
 
+import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version(..))
 import Elm2Nix.Lib.Nix (Url)
 
 
-type Author = Text
-type Package = Text
-
-
 data Dependency
     = Dependency
-        { author :: Author
-        , package :: Package
+        { name :: Name
         , version :: Version
         }
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
 
 
-toName :: Dependency -> String
-toName (Dependency author package version) =
-    Text.unpack author ++ "-" ++ Text.unpack package ++ "-" ++ show version
+instance Show Dependency where
+    show (Dependency name version) =
+        Name.toString "-" name ++ "-" ++ show version
 
 
 toUrl :: Dependency -> Url
-toUrl (Dependency author package version) =
-    "https://github.com/" ++ Text.unpack author ++ "/" ++ Text.unpack package ++ "/archive/" ++ show version ++ ".tar.gz"
+toUrl (Dependency name version) =
+    "https://github.com/" ++ show name ++ "/archive/" ++ show version ++ ".tar.gz"

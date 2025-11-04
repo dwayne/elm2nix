@@ -2,7 +2,7 @@
 
 module Elm2Nix.Data.Name
     ( Name, Author, Package
-    , elmBrowser, elmCore, elmHtml
+    , elmBrowser, elmCore, elmHtml, elmJson
     , fromText
     , toText, toString
     ) where
@@ -41,6 +41,11 @@ elmCore =
 elmHtml :: Name
 elmHtml =
     Name "elm" "html"
+
+
+elmJson :: Name
+elmJson =
+    Name "elm" "json"
 
 
 fromText :: Text -> Either String Name

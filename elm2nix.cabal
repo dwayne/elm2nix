@@ -6,14 +6,14 @@ version: 0.1.0.0
 library
     hs-source-dirs: src
     exposed-modules:
-        -- Elm2Nix.Data.Dependency,
+        Elm2Nix.Data.Dependency,
         -- Elm2Nix.Data.FixedOutputDerivation,
         Elm2Nix.Data.Name,
         Elm2Nix.Data.Version,
         -- Elm2Nix.ElmJson,
         -- Elm2Nix.ElmLock,
         -- Elm2Nix.Lib.Json,
-        -- Elm2Nix.Lib.Nix,
+        Elm2Nix.Lib.Nix
         -- Binary
 
     ghc-options: -Wall -Wno-name-shadowing
@@ -50,7 +50,7 @@ test-suite elm2nix-tests
     hs-source-dirs: tests
     main-is: Spec.hs
     other-modules:
-        -- Test.Elm2Nix.Data.Dependency,
+        Test.Elm2Nix.Data.Dependency,
         Test.Elm2Nix.Data.Name,
         Test.Elm2Nix.Data.Version
         -- Test.Elm2Nix.ElmJson
