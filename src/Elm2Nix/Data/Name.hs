@@ -3,7 +3,7 @@
 module Elm2Nix.Data.Name
     ( Name, Author, Package
     , elmBrowser, elmCore, elmHtml, elmJson
-    , fromText
+    , FromTextError(..), fromText
     , toText, toString
     ) where
 
@@ -14,18 +14,18 @@ import Data.Text (Text)
 
 data Name
     = Name
-        { author :: Author
-        , package :: Package
+        { _author :: Author
+        , _package :: Package
         }
     deriving (Eq, Ord)
 
 
-instance Show Name where
-    show = toString "/"
-
-
 type Author = Text
 type Package = Text
+
+
+instance Show Name where
+    show = toString "/"
 
 
 elmBrowser :: Name
@@ -48,7 +48,14 @@ elmJson =
     Name "elm" "json"
 
 
-fromText :: Text -> Either String Name
+data FromTextError
+    = EmptyAuthor
+    | EmptyPackage
+    | MissingForwardSlash
+    deriving (Eq, Show)
+
+
+fromText :: Text -> Either FromTextError Name
 fromText t =
     let
         ( author, slashPackage ) =
@@ -57,16 +64,16 @@ fromText t =
     case Text.uncons slashPackage of
         Just ( '/', package ) ->
             if Text.null author then
-                Left "author is empty"
+                Left EmptyAuthor
 
             else if Text.null package then
-                Left "package is empty"
+                Left EmptyPackage
 
             else
                 Right $ Name author package
 
         _ ->
-            Left "/ is missing"
+            Left MissingForwardSlash
 
 
 toText :: Text -> Name -> Text

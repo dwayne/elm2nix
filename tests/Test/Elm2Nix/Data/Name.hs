@@ -17,21 +17,23 @@ main = hspec $
 fromTextSpec :: Spec
 fromTextSpec =
     describe "fromText" $ do
-        it "requires a non-empty author" $
-            Name.fromText "/core" `shouldBe` Left "author is empty"
+        describe "valid input" $
+            it "example 1" $
+                Name.fromText "elm/core" `shouldBe` Right Name.elmCore
 
-        it "requires a non-empty package" $
-            Name.fromText "elm/" `shouldBe` Left "package is empty"
+        describe "invalid input" $ do
+            it "when author is empty" $
+                Name.fromText "/core" `shouldBe` Left Name.EmptyAuthor
 
-        it "requires a /" $
-            Name.fromText "elmcore" `shouldBe` Left "/ is missing"
+            it "when package is empty" $
+                Name.fromText "elm/" `shouldBe` Left Name.EmptyPackage
 
-        it "returns a Name when the input is valid" $
-            Name.fromText "elm/core" `shouldBe` Right Name.elmCore
+            it "when / is missing" $
+                Name.fromText "elmcore" `shouldBe` Left Name.MissingForwardSlash
 
 
 toTextSpec :: Spec
 toTextSpec =
     describe "toText" $
-        it "combines author and package with the separator" $
+        it "example 1" $
             Name.toText "-" Name.elmCore `shouldBe` "elm-core"
