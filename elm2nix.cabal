@@ -8,6 +8,7 @@ library
     exposed-modules:
         Elm2Nix.Data.Dependency,
         -- Elm2Nix.Data.FixedOutputDerivation,
+        Elm2Nix.Data.ElmJson,
         Elm2Nix.Data.Name,
         Elm2Nix.Data.Version,
         -- Elm2Nix.ElmJson,
@@ -51,9 +52,9 @@ test-suite elm2nix-tests
     main-is: Spec.hs
     other-modules:
         Test.Elm2Nix.Data.Dependency,
+        Test.Elm2Nix.Data.ElmJson,
         Test.Elm2Nix.Data.Name,
         Test.Elm2Nix.Data.Version
-        -- Test.Elm2Nix.ElmJson
 
     ghc-options: -Wall -Wno-name-shadowing
 
@@ -61,6 +62,7 @@ test-suite elm2nix-tests
     build-depends:
         aeson,
         base,
+        bytestring,
         containers,
         elm2nix,
         hspec,
