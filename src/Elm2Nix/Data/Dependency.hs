@@ -5,7 +5,7 @@ module Elm2Nix.Data.Dependency (Dependency(..), toUrl) where
 import qualified Elm2Nix.Data.Name as Name
 
 import Elm2Nix.Data.Name (Name)
-import Elm2Nix.Data.Version (Version(..))
+import Elm2Nix.Data.Version (Version)
 import Elm2Nix.Lib.Nix (Url)
 
 
