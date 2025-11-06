@@ -53,7 +53,8 @@ test-suite elm2nix-tests
         Test.Elm2Nix.Data.Dependency,
         Test.Elm2Nix.Data.ElmJson,
         Test.Elm2Nix.Data.Name,
-        Test.Elm2Nix.Data.Version
+        Test.Elm2Nix.Data.Version,
+        Test.Elm2Nix.Lib.Nix
 
     ghc-options: -Wall -Wno-name-shadowing
 
