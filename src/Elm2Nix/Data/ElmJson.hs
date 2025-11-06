@@ -4,10 +4,11 @@ module Elm2Nix.Data.ElmJson (ElmJson, fromDependencies, toDependencies) where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Key as Key
+import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 
 import Data.Aeson.Key (Key)
-import Data.Aeson.Types ((.:), FromJSON, Object, Parser, Value, parseFail)
+import Data.Aeson.Types ((<?>), (.:?), FromJSON, JSONPathElement(..), Object, Parser, Value, emptyObject, parseFail)
 import Data.Set (Set)
 import Data.Traversable.WithIndex (itraverse)
 
@@ -23,7 +24,11 @@ newtype ElmJson
     = ElmJson
         { _dependencies :: Set Dependency
         }
-    deriving (Eq, Show)
+    deriving (Eq)
+
+
+instance Show ElmJson where
+    show (ElmJson dependencies) = show dependencies
 
 
 instance FromJSON ElmJson where
@@ -33,17 +38,19 @@ instance FromJSON ElmJson where
 elmJsonParser :: Value -> Parser ElmJson
 elmJsonParser =
     Json.withObject "ElmJson" $ \o ->
-        ElmJson <$> (Set.union <$> directAndIndirectParser "dependencies" o <*> directAndIndirectParser "test-dependencies" o)
+        ElmJson <$> (
+            Set.union
+                <$> optional o "dependencies" directAndIndirectParser
+                <*> optional o "test-dependencies" directAndIndirectParser
+        )
 
 
-directAndIndirectParser :: String -> Object -> Parser (Set Dependency)
-directAndIndirectParser field o =
-    let
-        key = Key.fromString field
-    in
-    (o .: key) >>= Json.withObject "DirectAndIndirect" (\di ->
-        Set.union <$> (di .: "direct" >>= dependenciesParser) <*> (di .: "indirect" >>= dependenciesParser)
-    )
+directAndIndirectParser :: Value -> Parser (Set Dependency)
+directAndIndirectParser =
+    Json.withObject "DirectAndIndirect" $ \o ->
+        Set.union
+            <$> optional o "direct" dependenciesParser
+            <*> optional o "indirect" dependenciesParser
 
 
 dependenciesParser :: Value -> Parser (Set Dependency)
@@ -53,7 +60,12 @@ dependenciesParser =
 
 dependencyParser :: Key -> Value -> Parser Dependency
 dependencyParser key value =
-    Dependency <$> nameParser key <*> versionParser value
+    (Dependency <$> nameParser key <*> versionParser value) <?> Key key
+
+
+optional :: Object -> Key -> (Value -> Parser a) -> Parser a
+optional o key f =
+    (o .:? key >>= f . Maybe.fromMaybe emptyObject) <?> Key key
 
 
 nameParser :: Key -> Parser Name
@@ -67,7 +79,7 @@ nameParser =
 
 versionParser :: Value -> Parser Version
 versionParser =
-    Json.withText "Version" $ maybe (parseFail "invalid") pure . Version.fromText
+    Json.withText "Version" $ maybe (parseFail "invalid version") pure . Version.fromText
 
 
 fromDependencies :: [Dependency] -> ElmJson
