@@ -12,7 +12,7 @@ library
         Elm2Nix.Data.Name,
         Elm2Nix.Data.Version,
         -- Elm2Nix.ElmLock,
-        -- Elm2Nix.Lib.Json,
+        Elm2Nix.Lib.Json,
         Elm2Nix.Lib.Nix
         -- Binary
 
@@ -54,7 +54,9 @@ test-suite test
         Test.Elm2Nix.Data.ElmJson,
         Test.Elm2Nix.Data.Name,
         Test.Elm2Nix.Data.Version,
-        Test.Elm2Nix.Lib.Nix
+        Test.Elm2Nix.Lib.Json,
+        Test.Elm2Nix.Lib.Nix,
+        Test.Fixture
 
     ghc-options: -Wall -Wno-name-shadowing
 

@@ -7,7 +7,7 @@ import qualified Data.Aeson as Json
 
 import Control.Exception (tryJust)
 import Control.Monad (join)
-import Data.Aeson (Value)
+import Data.Aeson (FromJSON)
 import Data.Bifunctor (first)
 import System.IO.Error (isDoesNotExistError)
 
@@ -18,13 +18,13 @@ data DecodeFileError
     deriving (Eq, Show)
 
 
-decodeFile :: FilePath -> IO (Either DecodeFileError Value)
+decodeFile :: FromJSON a => FilePath -> IO (Either DecodeFileError a)
 decodeFile path =
     fmap join
         $ tryJust (handleNotFound . isDoesNotExistError)
         $ eitherDecodeFileStrict path
     where
-        eitherDecodeFileStrict :: FilePath -> IO (Either DecodeFileError Value)
+        eitherDecodeFileStrict :: FromJSON a => FilePath -> IO (Either DecodeFileError a)
         eitherDecodeFileStrict =
             fmap (first SyntaxError) . Json.eitherDecodeFileStrict
 

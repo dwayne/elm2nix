@@ -1,0 +1,7 @@
+{
+    "dependencies": {
+        "direct": {
+            "elmbrowser": "1.0.2"
+        }
+    }
+}

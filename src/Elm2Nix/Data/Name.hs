@@ -2,7 +2,7 @@
 
 module Elm2Nix.Data.Name
     ( Name, Author, Package
-    , elmBrowser, elmCore, elmHtml, elmJson
+    , elmBrowser, elmCore, elmHtml, elmJson, elmTime, elmUrl, elmVirtualDom
     , FromTextError(..), fromText
     , toText, toString
     ) where
@@ -46,6 +46,21 @@ elmHtml =
 elmJson :: Name
 elmJson =
     Name "elm" "json"
+
+
+elmTime :: Name
+elmTime =
+    Name "elm" "time"
+
+
+elmUrl :: Name
+elmUrl =
+    Name "elm" "url"
+
+
+elmVirtualDom :: Name
+elmVirtualDom =
+    Name "elm" "virtual-dom"
 
 
 data FromTextError

@@ -4,6 +4,7 @@ import qualified Test.Elm2Nix.Data.Dependency as Dependency
 import qualified Test.Elm2Nix.Data.ElmJson as ElmJson
 import qualified Test.Elm2Nix.Data.Name as Name
 import qualified Test.Elm2Nix.Data.Version as Version
+import qualified Test.Elm2Nix.Lib.Json as Json
 import qualified Test.Elm2Nix.Lib.Nix as Nix
 
 
@@ -14,3 +15,4 @@ main = do
     Dependency.main
     ElmJson.main
     Nix.main
+    Json.main
