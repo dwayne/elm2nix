@@ -44,10 +44,10 @@ executable elm2nix
         elm2nix
 
 
-test-suite elm2nix-tests
+test-suite test
     type: exitcode-stdio-1.0
 
-    hs-source-dirs: tests
+    hs-source-dirs: test
     main-is: Spec.hs
     other-modules:
         Test.Elm2Nix.Data.Dependency,
