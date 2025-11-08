@@ -4,6 +4,7 @@ module Elm2Nix.Data.Name
     ( Name, Author, Package
     , elmBrowser, elmCore, elmHtml, elmJson, elmTime, elmUrl, elmVirtualDom
     , FromTextError(..), fromText
+    , toAuthor, toPackage
     , toText, toString
     ) where
 
@@ -89,6 +90,14 @@ fromText t =
 
         _ ->
             Left MissingForwardSlash
+
+
+toAuthor :: Name -> Author
+toAuthor (Name author _) = author
+
+
+toPackage :: Name -> Package
+toPackage (Name _ package) = package
 
 
 toText :: Text -> Name -> Text

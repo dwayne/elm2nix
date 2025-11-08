@@ -86,5 +86,5 @@ fromDependencies :: [Dependency] -> ElmJson
 fromDependencies = ElmJson . Set.fromList
 
 
-toDependencies :: ElmJson -> Set Dependency
-toDependencies (ElmJson dependencies) = dependencies
+toDependencies :: ElmJson -> [Dependency]
+toDependencies (ElmJson dependencies) = Set.toAscList dependencies

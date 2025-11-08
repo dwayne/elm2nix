@@ -2,104 +2,86 @@
 {-# LANGUAGE TupleSections #-}
 
 module Elm2Nix.Data.FixedOutputDerivation
-    ( FixedOutputDerivation(..)
-    , FromDependencyError, fromDependency
-    , FromFileError, fromFile
+    ( FixedOutputDerivation
+    , FromDependencyError, fromDependency, fromNameAndVersion
+    , FromDependenciesError, fromDependencies, fromElmJson
     ) where
 
 import qualified Data.Aeson as Json
-import qualified Data.Set as Set
 
 import Data.Aeson (ToJSON(..), (.=))
 import Data.Bifunctor (first)
 import Data.Either (partitionEithers)
-import Data.Function ((&))
 import UnliftIO.Async (pooledMapConcurrently)
 
 import qualified Elm2Nix.Data.Dependency as Dependency
-import qualified Elm2Nix.ElmJson as ElmJson
-import qualified Elm2Nix.Lib.Json as Json
+import qualified Elm2Nix.Data.ElmJson as ElmJson
 
-import Elm2Nix.Data.Dependency (Author, Dependency(..), Package)
+import Elm2Nix.Data.Dependency (Dependency(..))
+import Elm2Nix.Data.ElmJson (ElmJson)
+import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
-import Elm2Nix.Lib.Json (DecodeFileError)
 import Elm2Nix.Lib.Nix (NixPrefetchUrlError, NixPrefetchUrlOutput(..), Sha256, nixPrefetchUrl)
 
 
 data FixedOutputDerivation
     = FixedOutputDerivation
-        { author :: Author
-        , package :: Package
-        , version :: Version
+        { dependency :: Dependency
         , hash :: Sha256
         , path :: FilePath
         }
-    deriving (Eq, Show)
+    deriving (Eq, Ord, Show)
 
 
 instance ToJSON FixedOutputDerivation where
-    toJSON (FixedOutputDerivation author package version hash _) =
+    toJSON (FixedOutputDerivation dependency hash _) =
         Json.object
-            [ "author" .= author
-            , "package" .= package
-            , "version" .= version
+            [ "author" .= Dependency.toAuthor dependency
+            , "package" .= Dependency.toPackage dependency
+            , "version" .= show (Dependency.toVersion dependency)
             , "sha256" .= hash
             ]
 
-    toEncoding (FixedOutputDerivation author package version hash _) =
+    toEncoding (FixedOutputDerivation dependency hash _) =
         Json.pairs $
-            "author" .= author <>
-            "package" .= package <>
-            "version" .= version <>
+            "author" .= Dependency.toAuthor dependency <>
+            "package" .= Dependency.toPackage dependency <>
+            "version" .= show (Dependency.toVersion dependency) <>
             "sha256" .= hash
-
-
-data FromFileError
-    = DecodeFileError DecodeFileError
-    | JsonError String
-    | NixPrefetchUrlErrors [( Dependency, NixPrefetchUrlError )]
-    deriving (Eq, Show)
-
-
-fromFile :: FilePath -> IO (Either FromFileError [FixedOutputDerivation])
-fromFile filePath = do
-    result <- Json.decodeFile filePath
-    case result of
-        Right value ->
-            case ElmJson.getDependencies value of
-                Right dependencies ->
-                    dependencies
-                        & Set.toAscList
-                        --
-                        -- Do I need to compile the program in a special way to
-                        -- get concurrency?
-                        --
-                        & pooledMapConcurrently (\d -> first (d,) <$> fromDependency d)
-                        & fmap (resolve . partitionEithers)
-
-                Left err ->
-                    return $ Left $ JsonError err
-
-        Left err ->
-            return $ Left $ DecodeFileError err
-
-    where
-        resolve :: ( [( Dependency, NixPrefetchUrlError )], [FixedOutputDerivation] ) -> Either FromFileError [FixedOutputDerivation]
-        resolve ( errors, fods ) =
-            if null errors then
-                Right fods
-
-            else
-                Left $ NixPrefetchUrlErrors errors
 
 
 type FromDependencyError = NixPrefetchUrlError
 
 
 fromDependency :: Dependency -> IO (Either FromDependencyError FixedOutputDerivation)
-fromDependency dependency@(Dependency author package version) =
-    fmap convert <$> nixPrefetchUrl (Dependency.toUrl dependency) (Dependency.toName dependency)
+fromDependency dependency =
+    fmap convert <$> nixPrefetchUrl (Dependency.toUrl dependency) (Dependency.toString dependency)
     where
         convert :: NixPrefetchUrlOutput -> FixedOutputDerivation
         convert (NixPrefetchUrlOutput hash path) =
-            FixedOutputDerivation author package version hash path
+            FixedOutputDerivation dependency hash path
+
+
+fromNameAndVersion :: Name -> Version -> IO (Either FromDependencyError FixedOutputDerivation)
+fromNameAndVersion name = fromDependency . Dependency name
+
+
+type FromDependenciesError = [( Dependency, NixPrefetchUrlError )]
+
+
+fromDependencies :: [Dependency] -> IO (Either FromDependenciesError [FixedOutputDerivation])
+fromDependencies =
+    fmap (resolve . partitionEithers) . pooledMapConcurrently (\d -> first (d,) <$> fromDependency d)
+    where
+        resolve :: ( FromDependenciesError, [FixedOutputDerivation] ) -> Either FromDependenciesError [FixedOutputDerivation]
+        resolve ( err, fods ) =
+            if null err then
+                Right fods
+
+            else
+                Left err
+
+
+fromElmJson :: ElmJson -> IO (Either FromDependenciesError [FixedOutputDerivation])
+fromElmJson =
+    fromDependencies . ElmJson.toDependencies
