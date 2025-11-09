@@ -25,8 +25,18 @@ type Author = Text
 type Package = Text
 
 
+
+-- INSTANCES
+
+
+
 instance Show Name where
     show = toString "/"
+
+
+
+-- CONSTRUCT
+
 
 
 elmBrowser :: Name
@@ -90,6 +100,11 @@ fromText t =
 
         _ ->
             Left MissingForwardSlash
+
+
+
+-- CONVERT
+
 
 
 toAuthor :: Name -> Author

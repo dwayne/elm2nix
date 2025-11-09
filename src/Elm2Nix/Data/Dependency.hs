@@ -2,7 +2,7 @@
 
 module Elm2Nix.Data.Dependency
     ( Dependency(..)
-    , toName, toAuthor, toPackage, toVersion
+    , toAuthor, toPackage
     , toString
     , toUrl
     ) where
@@ -16,30 +16,34 @@ import Elm2Nix.Lib.Nix (Url)
 
 data Dependency
     = Dependency
-        { name :: Name
-        , version :: Version
+        { toName :: Name
+        , toVersion :: Version
         }
     deriving (Eq, Ord)
+
+
+
+-- INSTANCES
+
 
 
 instance Show Dependency where
     show = toString
 
 
-toName :: Dependency -> Name
-toName (Dependency name _) = name
+
+-- CONVERT
+
 
 
 toAuthor :: Dependency -> Author
-toAuthor (Dependency name _) = Name.toAuthor name
+toAuthor (Dependency name _) =
+    Name.toAuthor name
 
 
 toPackage :: Dependency -> Package
-toPackage (Dependency name _) = Name.toPackage name
-
-
-toVersion :: Dependency -> Version
-toVersion (Dependency _ version) = version
+toPackage (Dependency name _) =
+    Name.toPackage name
 
 
 toString :: Dependency -> String

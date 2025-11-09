@@ -32,7 +32,13 @@ library
         unliftio
 
 
+common threaded
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N
+
+
 executable elm2nix
+    import: threaded
+
     hs-source-dirs: app
     main-is: Main.hs
 
@@ -45,6 +51,8 @@ executable elm2nix
 
 
 test-suite test
+    import: threaded
+
     type: exitcode-stdio-1.0
 
     hs-source-dirs: test

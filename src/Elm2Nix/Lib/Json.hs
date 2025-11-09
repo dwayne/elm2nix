@@ -1,7 +1,4 @@
-module Elm2Nix.Lib.Json
-    ( DecodeFileError(..)
-    , decodeFile
-    ) where
+module Elm2Nix.Lib.Json (DecodeFileError(..), decodeFile) where
 
 import qualified Data.Aeson as Json
 

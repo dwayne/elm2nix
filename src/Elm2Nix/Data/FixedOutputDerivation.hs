@@ -27,28 +27,38 @@ import Elm2Nix.Lib.Nix (NixPrefetchUrlError, NixPrefetchUrlOutput(..), Sha256, n
 
 data FixedOutputDerivation
     = FixedOutputDerivation
-        { dependency :: Dependency
-        , hash :: Sha256
-        , path :: FilePath
+        { _dependency :: Dependency
+        , _hash :: Sha256
+        , _path :: FilePath
         }
     deriving (Eq, Ord, Show)
+
+
+
+-- INSTANCES
+
 
 
 instance ToJSON FixedOutputDerivation where
     toJSON (FixedOutputDerivation dependency hash _) =
         Json.object
-            [ "author" .= Dependency.toAuthor dependency
+            [ "author"  .= Dependency.toAuthor dependency
             , "package" .= Dependency.toPackage dependency
             , "version" .= show (Dependency.toVersion dependency)
-            , "sha256" .= hash
+            , "sha256"  .= hash
             ]
 
     toEncoding (FixedOutputDerivation dependency hash _) =
         Json.pairs $
-            "author" .= Dependency.toAuthor dependency <>
+            "author"  .= Dependency.toAuthor dependency <>
             "package" .= Dependency.toPackage dependency <>
             "version" .= show (Dependency.toVersion dependency) <>
-            "sha256" .= hash
+            "sha256"  .= hash
+
+
+
+-- CONSTRUCT
+
 
 
 type FromDependencyError = NixPrefetchUrlError
@@ -56,10 +66,10 @@ type FromDependencyError = NixPrefetchUrlError
 
 fromDependency :: Dependency -> IO (Either FromDependencyError FixedOutputDerivation)
 fromDependency dependency =
-    fmap convert <$> nixPrefetchUrl (Dependency.toUrl dependency) (Dependency.toString dependency)
+    fmap toFOD <$> nixPrefetchUrl (Dependency.toUrl dependency) (Dependency.toString dependency)
     where
-        convert :: NixPrefetchUrlOutput -> FixedOutputDerivation
-        convert (NixPrefetchUrlOutput hash path) =
+        toFOD :: NixPrefetchUrlOutput -> FixedOutputDerivation
+        toFOD (NixPrefetchUrlOutput hash path) =
             FixedOutputDerivation dependency hash path
 
 
@@ -84,8 +94,12 @@ fromDependencies =
 
 
 fromElmJson :: ElmJson -> IO (Either FromDependenciesError [FixedOutputDerivation])
-fromElmJson =
-    fromDependencies . ElmJson.toDependencies
+fromElmJson = fromDependencies . ElmJson.toDependencies
+
+
+
+-- CONVERT
+
 
 
 toDependency :: FixedOutputDerivation -> Dependency

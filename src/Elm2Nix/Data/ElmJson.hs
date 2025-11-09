@@ -27,6 +27,11 @@ newtype ElmJson
     deriving (Eq)
 
 
+
+-- INSTANCES
+
+
+
 instance Show ElmJson where
     show (ElmJson dependencies) = show dependencies
 
@@ -82,8 +87,18 @@ versionParser =
     Json.withText "Version" $ maybe (parseFail "invalid version") pure . Version.fromText
 
 
+
+-- CONSTRUCT
+
+
+
 fromDependencies :: [Dependency] -> ElmJson
 fromDependencies = ElmJson . Set.fromList
+
+
+
+-- CONVERT
+
 
 
 toDependencies :: ElmJson -> [Dependency]

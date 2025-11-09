@@ -12,16 +12,26 @@ import Data.Word (Word16)
 
 data Version
     = Version
-        { major :: {-# UNPACK #-} !Word16
-        , minor :: {-# UNPACK #-} !Word16
-        , patch :: {-# UNPACK #-} !Word16
+        { toMajor :: {-# UNPACK #-} !Word16
+        , toMinor :: {-# UNPACK #-} !Word16
+        , toPatch :: {-# UNPACK #-} !Word16
         }
     deriving (Eq, Ord)
+
+
+
+-- INSTANCES
+
 
 
 instance Show Version where
     show (Version major minor patch) =
         show major ++ "." ++ show minor ++ "." ++ show patch
+
+
+
+-- CONSTRUCT
+
 
 
 fromText :: Text -> Maybe Version
