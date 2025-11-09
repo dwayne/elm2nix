@@ -5,6 +5,7 @@ module Elm2Nix.Data.FixedOutputDerivation
     ( FixedOutputDerivation
     , FromDependencyError, fromDependency, fromNameAndVersion
     , FromDependenciesError, fromDependencies, fromElmJson
+    , toDependency, toHash, toPath
     ) where
 
 import qualified Data.Aeson as Json
@@ -85,3 +86,15 @@ fromDependencies =
 fromElmJson :: ElmJson -> IO (Either FromDependenciesError [FixedOutputDerivation])
 fromElmJson =
     fromDependencies . ElmJson.toDependencies
+
+
+toDependency :: FixedOutputDerivation -> Dependency
+toDependency (FixedOutputDerivation dependency _ _) = dependency
+
+
+toHash :: FixedOutputDerivation -> Sha256
+toHash (FixedOutputDerivation _ hash _) = hash
+
+
+toPath :: FixedOutputDerivation -> FilePath
+toPath (FixedOutputDerivation _ _ path) = path

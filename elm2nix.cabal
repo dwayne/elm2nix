@@ -52,6 +52,7 @@ test-suite test
     other-modules:
         Test.Elm2Nix.Data.Dependency,
         Test.Elm2Nix.Data.ElmJson,
+        Test.Elm2Nix.Data.FixedOutputDerivation,
         Test.Elm2Nix.Data.Name,
         Test.Elm2Nix.Data.Version,
         Test.Elm2Nix.Lib.Json,

@@ -18,7 +18,7 @@
         shellHook = ''
           export PROJECT_ROOT="$PWD"
           export PS1="($name) $PS1"
-          export HSPEC_SKIP="nixPrefetchUrl"
+          export HSPEC_SKIP="network"
         '';
       };
     };
