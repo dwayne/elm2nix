@@ -6,12 +6,12 @@ version: 0.1.0.0
 library
     hs-source-dirs: src
     exposed-modules:
+        Elm2Nix,
         Elm2Nix.Data.Dependency,
         Elm2Nix.Data.ElmJson,
         Elm2Nix.Data.FixedOutputDerivation,
         Elm2Nix.Data.Name,
         Elm2Nix.Data.Version,
-        -- Elm2Nix.ElmLock,
         Elm2Nix.Lib.Json,
         Elm2Nix.Lib.Nix
         -- Binary
