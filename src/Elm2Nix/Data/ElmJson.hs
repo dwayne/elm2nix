@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Elm2Nix.Data.ElmJson (ElmJson, fromDependencies, toDependencies) where
+module Elm2Nix.Data.ElmJson (ElmJson, fromList, toAscList, toSet) where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Key as Key
@@ -92,8 +92,8 @@ versionParser =
 
 
 
-fromDependencies :: [Dependency] -> ElmJson
-fromDependencies = ElmJson . Set.fromList
+fromList :: [Dependency] -> ElmJson
+fromList = ElmJson . Set.fromList
 
 
 
@@ -101,5 +101,9 @@ fromDependencies = ElmJson . Set.fromList
 
 
 
-toDependencies :: ElmJson -> [Dependency]
-toDependencies (ElmJson dependencies) = Set.toAscList dependencies
+toAscList :: ElmJson -> [Dependency]
+toAscList (ElmJson dependencies) = Set.toAscList dependencies
+
+
+toSet :: ElmJson -> Set Dependency
+toSet (ElmJson dependencies) = dependencies

@@ -47,7 +47,7 @@ eitherDecodeSpec =
                         \}                                      "
 
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             , Dependency Name.elmCore (Version 1 0 5)
                             , Dependency Name.elmHtml (Version 1 0 0)
@@ -76,7 +76,7 @@ eitherDecodeSpec =
                         \}                                      "
 
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             , Dependency Name.elmCore (Version 1 0 5)
                             , Dependency Name.elmHtml (Version 1 0 0)
@@ -101,7 +101,7 @@ eitherDecodeSpec =
                         \}                                      "
 
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             , Dependency Name.elmCore (Version 1 0 5)
                             ]
@@ -123,7 +123,7 @@ eitherDecodeSpec =
                         \}                                      "
 
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             , Dependency Name.elmCore (Version 1 0 5)
                             ]
@@ -142,7 +142,7 @@ eitherDecodeSpec =
                         \}                                      "
 
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             ]
                 in
@@ -159,7 +159,7 @@ eitherDecodeSpec =
                         \}                       "
 
                     elmJson =
-                        ElmJson.fromDependencies []
+                        ElmJson.fromList []
                 in
                 eitherDecode input `shouldBe` Right elmJson
 
@@ -171,14 +171,14 @@ eitherDecodeSpec =
                         \    }                   \
                         \}                       "
 
-                    elmJson = ElmJson.fromDependencies []
+                    elmJson = ElmJson.fromList []
                 in
                 eitherDecode input `shouldBe` Right elmJson
 
             it "example 8" $
                 let
                     input = "{}"
-                    elmJson = ElmJson.fromDependencies []
+                    elmJson = ElmJson.fromList []
                 in
                 eitherDecode input `shouldBe` Right elmJson
 
@@ -205,7 +205,7 @@ eitherDecodeSpec =
                         \}                                      "
 
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             , Dependency Name.elmCore (Version 1 0 5)
                             , Dependency Name.elmHtml (Version 1 0 0)
@@ -229,7 +229,7 @@ eitherDecodeSpec =
                         \}                                      "
 
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             ]
                 in

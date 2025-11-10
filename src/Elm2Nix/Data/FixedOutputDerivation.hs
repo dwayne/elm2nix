@@ -94,7 +94,7 @@ fromDependencies =
 
 
 fromElmJson :: ElmJson -> IO (Either FromDependenciesError [FixedOutputDerivation])
-fromElmJson = fromDependencies . ElmJson.toDependencies
+fromElmJson = fromDependencies . ElmJson.toAscList
 
 
 

@@ -24,7 +24,7 @@ decodeFileSpec =
             it "example 1" $
                 let
                     elmJson =
-                        ElmJson.fromDependencies
+                        ElmJson.fromList
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             , Dependency Name.elmCore (Version 1 0 5)
                             , Dependency Name.elmHtml (Version 1 0 0)
