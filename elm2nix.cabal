@@ -15,7 +15,6 @@ library
         Elm2Nix.Data.Version,
         Elm2Nix.Lib.Json,
         Elm2Nix.Lib.Nix
-        -- Binary
 
     ghc-options: -Wall -Wno-name-shadowing
 
