@@ -2,6 +2,9 @@
 
 module Test.Elm2Nix.Data.Name (main) where
 
+import qualified Data.Binary as Binary
+import qualified Data.ByteString.Lazy as LBS
+
 import Test.Hspec
 
 import qualified Elm2Nix.Data.Name as Name
@@ -12,6 +15,7 @@ main = hspec $
     describe "Elm2Nix.Data.Name" $ do
         fromTextSpec
         toTextSpec
+        binarySerializationSpec
 
 
 fromTextSpec :: Spec
@@ -37,3 +41,15 @@ toTextSpec =
     describe "toText" $
         it "example 1" $
             Name.toText "-" Name.elmCore `shouldBe` "elm-core"
+
+
+binarySerializationSpec :: Spec
+binarySerializationSpec =
+    describe "binary serialization" $ do
+        describe "encode" $
+            it "example 1" $
+                Binary.encode Name.elmCore `shouldBe` LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x63, 0x6F, 0x72, 0x65]
+
+        describe "decode" $
+            it "example 1" $
+                Binary.decode (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Name.elmHtml

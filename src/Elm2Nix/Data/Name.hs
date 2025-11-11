@@ -8,8 +8,13 @@ module Elm2Nix.Data.Name
     , toText, toString
     ) where
 
+import qualified Data.ByteString as BS
 import qualified Data.Text as Text
+import qualified Data.Text.Encoding as TE
 
+import Data.Binary (Binary(..), Get, Put, getWord8, putWord8)
+import Data.Binary.Get (getByteString)
+import Data.Binary.Put (putByteString)
 import Data.Text (Text)
 
 
@@ -32,6 +37,23 @@ type Package = Text
 
 instance Show Name where
     show = toString "/"
+
+
+instance Binary Name where
+    put (Name author project) = putText author <> putText project
+    get = Name <$> getText <*> getText
+
+
+putText :: Text -> Put
+putText t =
+    putWord8 (fromIntegral $ BS.length bs) <> putByteString bs
+    where
+        bs = TE.encodeUtf8 t
+
+
+getText :: Get Text
+getText =
+    getWord8 >>= fmap TE.decodeUtf8 . getByteString . fromIntegral
 
 
 
