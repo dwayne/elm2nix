@@ -20,8 +20,16 @@ import Elm2Nix.Data.Version (Version)
 
 data RegistryDat
     = RegistryDat
+        --
+        -- _count    - The number of unique dependencies in _packages
+        -- _packages - Maps the name of a package to its versions where
+        --             the versions are in descending order
+        --
+        -- For e.g. if _packages = fromList [ ( elm/browser, [ 1.0.2, 1.0.1, 1.0.0 ] ), ( elm/core, [ 1.0.5, 1.0.0 ] ) ]
+        -- then _count = 5.
+        --
         { _count :: !Int
-        , _packages :: !(Map Name (Set Version))
+        , _packages :: !(Map Name [Version])
         }
     deriving (Eq, Show)
 
@@ -41,7 +49,7 @@ fromList = fromSet . Set.fromList
 
 fromSet :: Set Dependency -> RegistryDat
 fromSet =
-    uncurry RegistryDat . foldr insert ( 0, Map.empty )
+    uncurry RegistryDat . fmap (Map.map Set.toDescList) . foldr insert ( 0, Map.empty )
     where
         insert :: Dependency -> ( Int, Map Name (Set Version) ) -> ( Int, Map Name (Set Version) )
         insert (Dependency name version) ( count, packages ) =
@@ -57,5 +65,5 @@ toCount :: RegistryDat -> Int
 toCount (RegistryDat count _) = count
 
 
-toPackages :: RegistryDat -> Map Name (Set Version)
+toPackages :: RegistryDat -> Map Name [Version]
 toPackages (RegistryDat _ packages) = packages

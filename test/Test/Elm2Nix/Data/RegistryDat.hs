@@ -3,7 +3,6 @@ module Test.Elm2Nix.Data.RegistryDat (main) where
 import Test.Hspec
 
 import qualified Data.Map as Map
-import qualified Data.Set as Set
 
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
@@ -34,9 +33,9 @@ fromListSpec =
 
                 expectedPackages =
                     Map.fromList
-                        [ ( Name.elmBrowser, Set.singleton (Version 1 0 2) )
-                        , ( Name.elmCore, Set.singleton (Version 1 0 5) )
-                        , ( Name.elmHtml, Set.singleton (Version 1 0 0) )
+                        [ ( Name.elmBrowser, [ Version 1 0 2 ] )
+                        , ( Name.elmCore, [ Version 1 0 5 ] )
+                        , ( Name.elmHtml, [ Version 1 0 0 ] )
                         ]
             in do
             RegistryDat.toCount registryDat `shouldBe` expectedCount
@@ -59,8 +58,8 @@ fromListSpec =
 
                 expectedPackages =
                     Map.fromList
-                        [ ( Name.elmBrowser, Set.fromList [ Version 1 0 0, Version 1 0 1, Version 1 0 2 ] )
-                        , ( Name.elmCore, Set.fromList [ Version 1 0 0, Version 1 0 5 ] )
+                        [ ( Name.elmBrowser, [ Version 1 0 2, Version 1 0 1, Version 1 0 0 ] )
+                        , ( Name.elmCore, [ Version 1 0 5, Version 1 0 0 ] )
                         ]
             in do
             RegistryDat.toCount registryDat `shouldBe` expectedCount
