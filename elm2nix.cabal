@@ -75,6 +75,7 @@ test-suite test
     build-depends:
         aeson,
         base,
+        binary,
         bytestring,
         containers,
         elm2nix,

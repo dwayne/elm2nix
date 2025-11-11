@@ -6,6 +6,8 @@ import qualified Data.Char as Char
 import qualified Data.Text as Text
 
 import Control.Applicative (liftA3)
+import Control.Monad (liftM3)
+import Data.Binary (Binary(..), getWord8, putWord8)
 import Data.Text (Text)
 import Data.Word (Word16)
 
@@ -27,6 +29,28 @@ data Version
 instance Show Version where
     show (Version major minor patch) =
         show major ++ "." ++ show minor ++ "." ++ show patch
+
+
+instance Binary Version where
+    put (Version major minor patch) =
+        if major < 256 && minor < 256 && patch < 256 then do
+            putWord8 (fromIntegral major)
+            putWord8 (fromIntegral minor)
+            putWord8 (fromIntegral patch)
+        else do
+            putWord8 255
+            put major
+            put minor
+            put patch
+
+    get = do
+        word <- getWord8
+        if word == 255 then
+            liftM3 Version get get get
+        else do
+            minor <- fmap fromIntegral getWord8
+            patch <- fmap fromIntegral getWord8
+            return (Version (fromIntegral word) minor patch)
 
 
 
