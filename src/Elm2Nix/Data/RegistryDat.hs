@@ -7,6 +7,7 @@ module Elm2Nix.Data.RegistryDat
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 
+import Data.Binary (Binary(..))
 import Data.Map (Map)
 import Data.Set (Set)
 
@@ -29,9 +30,39 @@ data RegistryDat
         -- then _count = 5.
         --
         { _count :: !Int
-        , _packages :: !(Map Name [Version])
+        , _packages :: !(Map Name Versions)
         }
     deriving (Eq, Show)
+
+
+--
+-- N.B. This type is primarily used so that we can provide a different binary serialization of the list type.
+--
+newtype Versions =
+    Versions
+        { toVersions :: [Version]
+        }
+    deriving (Eq, Show)
+
+
+
+-- INSTANCES
+
+
+
+instance Binary RegistryDat where
+    put (RegistryDat count packages) = put count >> put packages
+    get = RegistryDat <$> get <*> get
+
+
+instance Binary Versions where
+    put (Versions (v : vs)) = put v >> put vs
+    --
+    -- It should be non-empty by construction. If this occurs then there's an error in your logic.
+    --
+    put _ = error "logic error: no versions found"
+
+    get = Versions <$> ((:) <$> get <*> get)
 
 
 
@@ -49,7 +80,7 @@ fromList = fromSet . Set.fromList
 
 fromSet :: Set Dependency -> RegistryDat
 fromSet =
-    uncurry RegistryDat . fmap (Map.map Set.toDescList) . foldr insert ( 0, Map.empty )
+    uncurry RegistryDat . fmap (Map.map (Versions . Set.toDescList)) . foldr insert ( 0, Map.empty )
     where
         insert :: Dependency -> ( Int, Map Name (Set Version) ) -> ( Int, Map Name (Set Version) )
         insert (Dependency name version) ( count, packages ) =
@@ -66,4 +97,4 @@ toCount (RegistryDat count _) = count
 
 
 toPackages :: RegistryDat -> Map Name [Version]
-toPackages (RegistryDat _ packages) = packages
+toPackages (RegistryDat _ packages) = Map.map toVersions packages
