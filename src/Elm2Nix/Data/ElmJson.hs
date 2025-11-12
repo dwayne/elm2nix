@@ -20,10 +20,7 @@ import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
 
 
-newtype ElmJson
-    = ElmJson
-        { _dependencies :: Set Dependency
-        }
+newtype ElmJson = ElmJson (Set Dependency)
     deriving (Eq)
 
 
@@ -84,7 +81,7 @@ nameParser =
 
 versionParser :: Value -> Parser Version
 versionParser =
-    Json.withText "Version" $ maybe (parseFail "invalid version") pure . Version.fromText
+    Json.withText "Version" $ \t -> maybe (parseFail $ "version is invalid: " ++ show t) pure (Version.fromText t)
 
 
 

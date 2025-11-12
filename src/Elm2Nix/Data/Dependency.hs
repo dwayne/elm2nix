@@ -1,24 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Elm2Nix.Data.Dependency
-    ( Dependency(..)
-    , toAuthor, toPackage
-    , toString
-    , toUrl
-    ) where
+module Elm2Nix.Data.Dependency (Dependency(..), toString, toUrl) where
 
 import qualified Elm2Nix.Data.Name as Name
 
-import Elm2Nix.Data.Name (Name, Author, Package)
+import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
 import Elm2Nix.Lib.Nix (Url)
 
 
 data Dependency
-    = Dependency
-        { toName :: Name
-        , toVersion :: Version
-        }
+    = Dependency Name Version
     deriving (Eq, Ord)
 
 
@@ -34,16 +26,6 @@ instance Show Dependency where
 
 -- CONVERT
 
-
-
-toAuthor :: Dependency -> Author
-toAuthor (Dependency name _) =
-    Name.toAuthor name
-
-
-toPackage :: Dependency -> Package
-toPackage (Dependency name _) =
-    Name.toPackage name
 
 
 toString :: Dependency -> String

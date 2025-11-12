@@ -48,7 +48,16 @@ binarySerializationSpec =
     describe "binary serialization" $ do
         describe "encode" $
             it "example 1" $
-                Binary.encode Name.elmCore `shouldBe` LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x63, 0x6F, 0x72, 0x65]
+                let
+                    expectedByteString =
+                        LBS.pack
+                            [ 0x03                   -- length of the UTF-8 encoding of "elm" (mod 256)
+                            , 0x65, 0x6C, 0x6D       -- UTF-8 encoding of "elm"
+                            , 0x04                   -- length of the UTF-8 encoding of "core" (mod 256)
+                            , 0x63, 0x6F, 0x72, 0x65 -- UTF-8 encoding of "core"
+                            ]
+                in
+                Binary.encode Name.elmCore `shouldBe` expectedByteString
 
         describe "decode" $
             it "example 1" $

@@ -260,7 +260,7 @@ eitherDecodeSpec =
                         \    }                                 \
                         \}                                     "
                 in
-                eitherDecode input `shouldBe` Left "Error in $.dependencies.direct['elm/browser']: invalid version"
+                eitherDecode input `shouldBe` Left "Error in $.dependencies.direct['elm/browser']: version is invalid: \"10.2\""
 
             it "example 3" $
                 let

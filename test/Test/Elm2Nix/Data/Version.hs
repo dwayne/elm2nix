@@ -62,11 +62,11 @@ binarySerializationSpec =
     describe "binary serialization" $ do
         describe "encode" $ do
             describe "when major, minor, and patch are all less than 256" $
-                it "example 1" $
+                it "encodes using 8-bits each" $
                     Binary.encode (Version 1 2 3) `shouldBe` LBS.pack [0x01, 0x02, 0x03]
 
             describe "when major is 256 or more" $
-                it "example 1" $
+                it "encodes using a 255 tag followed by 16-bits each" $
                     Binary.encode (Version 256 2 3) `shouldBe` LBS.pack [0xFF, 0x01, 0x00, 0x00, 0x02, 0x00, 0x03]
 
         describe "decode" $ do
@@ -77,7 +77,7 @@ binarySerializationSpec =
                 Binary.decode (LBS.pack [0xFF, 0x01, 0x01, 0x00, 0x00, 0xFF, 0xFF]) `shouldBe` Version 257 0 65535
 
         describe "when major is 255" $
-            it "example 1" $
+            it "does the wrong thing" $
                 --
                 -- A possible bug.
                 --

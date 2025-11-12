@@ -17,6 +17,7 @@ import UnliftIO.Async (pooledMapConcurrently)
 
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
+import qualified Elm2Nix.Data.Name as Name
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
@@ -40,19 +41,19 @@ data FixedOutputDerivation
 
 
 instance ToJSON FixedOutputDerivation where
-    toJSON (FixedOutputDerivation dependency hash _) =
+    toJSON (FixedOutputDerivation (Dependency name version) hash _) =
         Json.object
-            [ "author"  .= Dependency.toAuthor dependency
-            , "package" .= Dependency.toPackage dependency
-            , "version" .= show (Dependency.toVersion dependency)
+            [ "author"  .= Name.toAuthor name
+            , "package" .= Name.toPackage name
+            , "version" .= show version
             , "sha256"  .= hash
             ]
 
-    toEncoding (FixedOutputDerivation dependency hash _) =
+    toEncoding (FixedOutputDerivation (Dependency name version) hash _) =
         Json.pairs $
-            "author"  .= Dependency.toAuthor dependency <>
-            "package" .= Dependency.toPackage dependency <>
-            "version" .= show (Dependency.toVersion dependency) <>
+            "author"  .= Name.toAuthor name <>
+            "package" .= Name.toPackage name <>
+            "version" .= show version <>
             "sha256"  .= hash
 
 

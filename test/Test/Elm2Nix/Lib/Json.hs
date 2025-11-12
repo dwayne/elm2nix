@@ -44,10 +44,10 @@ decodeFileSpec =
                 (decodeFile =<< Fixture.file "name-missing-forward-slash.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct.elmbrowser: / is missing")
 
             it "when version is incorrectly formatted" $
-                (decodeFile =<< Fixture.file "version-incorrect-format.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct['elm/browser']: invalid version")
+                (decodeFile =<< Fixture.file "version-incorrect-format.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct['elm/browser']: version is invalid: \"1.0\"")
 
             it "when version has a part with leading zeros" $
-                (decodeFile =<< Fixture.file "version-leading-zeros.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct['elm/browser']: invalid version")
+                (decodeFile =<< Fixture.file "version-leading-zeros.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct['elm/browser']: version is invalid: \"1.0.02\"")
 
 
 
