@@ -1,8 +1,29 @@
 module Main (main) where
 
 import qualified Elm2Nix
+import qualified Elm2Nix.CLI as CLI
 
 
 main :: IO ()
-main =
-    Elm2Nix.writeElmLockFile Elm2Nix.Expanded "test/data/elm.json" "elm.lock" >>= either print (const $ putStrLn "Generated elm.lock!")
+main = do
+    --
+    -- TODO: Handle unexpected exceptions
+    --
+    cli <- CLI.runIO
+    case cli of
+        CLI.Lock (CLI.LockOptions compact input output) ->
+            let
+                format =
+                    if compact then
+                        Elm2Nix.Compact
+
+                    else
+                        Elm2Nix.Expanded
+            in
+            --
+            -- TODO:
+            --
+            -- - Fail with non-zero error code
+            -- - Display human-readable error messages
+            --
+            Elm2Nix.writeElmLockFile format input output >>= either print (const $ return ())

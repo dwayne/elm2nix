@@ -7,6 +7,7 @@ library
     hs-source-dirs: src
     exposed-modules:
         Elm2Nix,
+        Elm2Nix.CLI,
         Elm2Nix.Data.Dependency,
         Elm2Nix.Data.ElmJson,
         Elm2Nix.Data.FixedOutputDerivation,
@@ -27,6 +28,7 @@ library
         bytestring,
         containers,
         indexed-traversable,
+        optparse-applicative,
         text,
         typed-process,
         unliftio
