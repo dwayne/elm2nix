@@ -27,3 +27,15 @@ main = do
             -- - Display human-readable error messages
             --
             Elm2Nix.writeElmLockFile format input output >>= either print (const $ return ())
+
+        CLI.Registry (CLI.Generate (CLI.GenerateOptions input output)) ->
+            --
+            -- TODO: Implement generate
+            --
+            print input >> print output
+
+        CLI.Registry (CLI.View (CLI.ViewOptions input)) ->
+            --
+            -- TODO: Implement view
+            --
+            print input
