@@ -40,15 +40,20 @@ decodeFileSpec =
             it "when the file does not exist" $
                 decodeFile "path/to/missing/elm.json" `shouldReturn` Left (Json.FileNotFound "path/to/missing/elm.json")
 
-            it "when / is missing" $
-                (decodeFile =<< Fixture.file "name-missing-forward-slash.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct.elmbrowser: / is missing")
+            it "when / is missing" $ do
+                path <- Fixture.file "name-missing-forward-slash.json"
+                Left (Json.SyntaxError _ details) <- decodeFile path
+                details `shouldBe` "Error in $.dependencies.direct.elmbrowser: / is missing"
 
-            it "when version is incorrectly formatted" $
-                (decodeFile =<< Fixture.file "version-incorrect-format.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct['elm/browser']: version is invalid: \"1.0\"")
+            it "when version is incorrectly formatted" $ do
+                path <- Fixture.file "version-incorrect-format.json"
+                Left (Json.SyntaxError _ details) <- decodeFile path
+                details `shouldBe` "Error in $.dependencies.direct['elm/browser']: version is invalid: \"1.0\""
 
-            it "when version has a part with leading zeros" $
-                (decodeFile =<< Fixture.file "version-leading-zeros.json") `shouldReturn` Left (Json.SyntaxError "Error in $.dependencies.direct['elm/browser']: version is invalid: \"1.0.02\"")
-
+            it "when version has a part with leading zeros" $ do
+                path <- Fixture.file "version-leading-zeros.json"
+                Left (Json.SyntaxError _ details) <- decodeFile path
+                details `shouldBe` "Error in $.dependencies.direct['elm/browser']: version is invalid: \"1.0.02\""
 
 
 decodeFile :: FilePath -> IO (Either Json.DecodeFileError ElmJson)
