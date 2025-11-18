@@ -11,7 +11,7 @@ import System.IO.Error (isDoesNotExistError)
 
 data DecodeFileError
     = FileNotFound FilePath
-    | SyntaxError String
+    | SyntaxError FilePath String
     deriving (Eq, Show)
 
 
@@ -19,11 +19,11 @@ decodeFile :: FromJSON a => FilePath -> IO (Either DecodeFileError a)
 decodeFile path =
     fmap join
         $ tryJust (handleNotFound . isDoesNotExistError)
-        $ eitherDecodeFileStrict path
+        $ eitherDecodeFileStrict
     where
-        eitherDecodeFileStrict :: FromJSON a => FilePath -> IO (Either DecodeFileError a)
+        eitherDecodeFileStrict :: FromJSON a => IO (Either DecodeFileError a)
         eitherDecodeFileStrict =
-            fmap (first SyntaxError) . Json.eitherDecodeFileStrict
+            first (SyntaxError path) <$> Json.eitherDecodeFileStrict path
 
         handleNotFound :: Bool -> Maybe DecodeFileError
         handleNotFound b =

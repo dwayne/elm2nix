@@ -1,5 +1,11 @@
 module Main (main) where
 
+import qualified Data.Text.IO as T
+
+import Data.Text (Text)
+import System.Exit (exitFailure)
+import System.IO (stderr)
+
 import qualified Elm2Nix
 import qualified Elm2Nix.CLI as CLI
 
@@ -20,22 +26,17 @@ main = do
                     else
                         Elm2Nix.Expanded
             in
-            --
-            -- TODO:
-            --
-            -- - Fail with non-zero error code
-            -- - Display human-readable error messages
-            --
-            Elm2Nix.writeElmLockFile format input output >>= either print (const $ return ())
+            Elm2Nix.writeElmLockFile format input output >>= either (die . Elm2Nix.writeElmLockFileErrorToText) return
 
         CLI.Registry (CLI.Generate (CLI.GenerateOptions input output)) ->
-            --
-            -- TODO: Implement generate
-            --
-            print input >> print output
+            Elm2Nix.writeRegistryDatFile input output >>= either (die . Elm2Nix.writeRegistryDatFileErrorToText) return
 
         CLI.Registry (CLI.View (CLI.ViewOptions input)) ->
             --
-            -- TODO: Implement view
+            -- TODO: Implement Elm2Nix.viewRegistryDatFile
             --
             print input
+
+
+die :: Text -> IO ()
+die t = T.hPutStrLn stderr t >> exitFailure
