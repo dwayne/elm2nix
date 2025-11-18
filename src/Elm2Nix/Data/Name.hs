@@ -9,7 +9,7 @@ module Elm2Nix.Data.Name
     ) where
 
 import qualified Data.ByteString as BS
-import qualified Data.Text as Text
+import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
 
 import Data.Binary (Binary(..), Get, Put, getWord8, putWord8)
@@ -107,14 +107,14 @@ fromText :: Text -> Either FromTextError Name
 fromText t =
     let
         ( author, slashPackage ) =
-            Text.breakOn "/" t
+            T.breakOn "/" t
     in
-    case Text.uncons slashPackage of
+    case T.uncons slashPackage of
         Just ( '/', package ) ->
-            if Text.null author then
+            if T.null author then
                 Left EmptyAuthor
 
-            else if Text.null package then
+            else if T.null package then
                 Left EmptyPackage
 
             else
@@ -144,4 +144,4 @@ toText separator (Name author package) =
 
 toString :: Text -> Name -> String
 toString separator =
-    Text.unpack . toText separator
+    T.unpack . toText separator

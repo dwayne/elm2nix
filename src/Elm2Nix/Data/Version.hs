@@ -3,7 +3,7 @@
 module Elm2Nix.Data.Version (Version(..), fromText) where
 
 import qualified Data.Char as Char
-import qualified Data.Text as Text
+import qualified Data.Text as T
 
 import Control.Applicative (liftA3)
 import Control.Monad (liftM3)
@@ -67,7 +67,7 @@ fromText t =
     -- 2. MAJOR, MINOR, and PATCH must each represent 16-bit unsigned integers: 0, 1, 2, ..., 65535
     -- 3. Leading zeros are not allowed
     --
-    case Text.splitOn "." t of
+    case T.splitOn "." t of
         [ x, y, z ] ->
             liftA3 Version (readWord16 x) (readWord16 y) (readWord16 z)
 
@@ -81,7 +81,7 @@ readWord16 t =
         Just 0
 
     else
-        case Text.uncons t of
+        case T.uncons t of
             Just (  d, s ) | d /= '0' && Char.isDigit d ->
                 --
                 -- It starts with a non-zero digit
@@ -97,7 +97,7 @@ readWord16 t =
 
 readWord16Helper :: Int -> Text -> Maybe Word16
 readWord16Helper n t =
-    case Text.uncons t of
+    case T.uncons t of
         Just ( d, s ) ->
             if Char.isDigit d then
                 let

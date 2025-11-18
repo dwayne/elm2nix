@@ -1,6 +1,6 @@
 module Main (main) where
 
-import qualified Data.Text.IO as T
+import qualified Data.Text.IO as TIO
 
 import Data.Text (Text)
 import System.Exit (exitFailure)
@@ -39,4 +39,4 @@ main = do
 
 
 die :: Text -> IO ()
-die t = T.hPutStrLn stderr t >> exitFailure
+die t = TIO.hPutStrLn stderr t >> exitFailure
