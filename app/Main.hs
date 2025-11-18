@@ -18,15 +18,7 @@ main = do
     cli <- CLI.runIO
     case cli of
         CLI.Lock (CLI.LockOptions compact input output) ->
-            let
-                format =
-                    if compact then
-                        Elm2Nix.Compact
-
-                    else
-                        Elm2Nix.Expanded
-            in
-            Elm2Nix.writeElmLockFile format input output >>= either (die . Elm2Nix.writeElmLockFileErrorToText) return
+            Elm2Nix.writeElmLockFile compact input output >>= either (die . Elm2Nix.writeElmLockFileErrorToText) return
 
         CLI.Registry (CLI.Generate (CLI.GenerateOptions input output)) ->
             Elm2Nix.writeRegistryDatFile input output >>= either (die . Elm2Nix.writeRegistryDatFileErrorToText) return

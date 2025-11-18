@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Elm2Nix
-    ( Format(..), WriteElmLockFileError(..), writeElmLockFile
+    ( WriteElmLockFileError(..), writeElmLockFile
     , WriteRegistryDatFileError, writeRegistryDatFile
     , writeElmLockFileErrorToText, writeRegistryDatFileErrorToText
     ) where
@@ -23,20 +23,14 @@ import qualified Elm2Nix.Lib.Nix as Nix
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
 
 
-data Format
-    = Compact
-    | Expanded
-    deriving (Eq, Show)
-
-
 data WriteElmLockFileError
     = DecodeFileError Json.DecodeFileError
     | FromDependenciesError FOD.FromDependenciesError
     deriving (Eq, Show)
 
 
-writeElmLockFile :: Format -> FilePath -> FilePath -> IO (Either WriteElmLockFileError ())
-writeElmLockFile format input output = do
+writeElmLockFile :: Bool -> FilePath -> FilePath -> IO (Either WriteElmLockFileError ())
+writeElmLockFile compact input output = do
     result1 <- Json.decodeFile input
     case result1 of
         Right elmJson -> do
@@ -44,12 +38,11 @@ writeElmLockFile format input output = do
             case result2 of
                 Right fods ->
                     fmap Right $
-                        case format of
-                            Compact ->
-                                encodeCompact output fods
+                        if compact then
+                            encodeCompact output fods
 
-                            Expanded ->
-                                encodeExpanded output fods
+                        else
+                            encodeExpanded output fods
 
                 Left err ->
                     return $ Left $ FromDependenciesError err
