@@ -1,11 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Elm2Nix
-    ( WriteElmLockFileError(..), writeElmLockFile
-    , WriteRegistryDatFileError, writeRegistryDatFile
-    , writeElmLockFileErrorToText, writeRegistryDatFileErrorToText
-    , ViewRegistryDatFileError, viewRegistryDatFile
-    , viewRegistryDatFileErrorToText
+    ( writeElmLockFile
+    , WriteElmLockFileError(..), writeElmLockFileErrorToText
+    , writeRegistryDatFile
+    , WriteRegistryDatFileError, writeRegistryDatFileErrorToText
+    , viewRegistryDatFile
+    , ViewRegistryDatFileError, viewRegistryDatFileErrorToText
     ) where
 
 import qualified Data.Aeson as Json
@@ -26,6 +27,11 @@ import qualified Elm2Nix.Lib.Json as Json
 import qualified Elm2Nix.Lib.Nix as Nix
 
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
+
+
+
+-- writeElmLockFile
+
 
 
 data WriteElmLockFileError
@@ -72,20 +78,6 @@ encodeExpanded output =
                 }
 
 
-type WriteRegistryDatFileError = Json.DecodeFileError
-
-
-writeRegistryDatFile :: FilePath -> FilePath -> IO (Either WriteRegistryDatFileError ())
-writeRegistryDatFile input output = do
-    result <- Json.decodeFile input
-    case result of
-        Right elmJson ->
-            Right <$> Binary.encodeFile output (RegistryDat.fromElmJson elmJson)
-
-        Left err ->
-            return $ Left err
-
-
 writeElmLockFileErrorToText :: WriteElmLockFileError -> Text
 writeElmLockFileErrorToText err =
     case err of
@@ -94,10 +86,6 @@ writeElmLockFileErrorToText err =
 
         FromDependenciesError err ->
             fromDependenciesErrorToText err
-
-
-writeRegistryDatFileErrorToText :: WriteRegistryDatFileError -> Text
-writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText
 
 
 jsonDecodeFileErrorToText :: Json.DecodeFileError -> Text
@@ -123,6 +111,34 @@ nixPrefetchUrlErrorToText err =
 
         Nix.BadOutput details ->
             "nix-prefetch-url got unexpected output: " <> T.pack details
+
+
+
+-- writeRegistryDatFile
+
+
+
+type WriteRegistryDatFileError = Json.DecodeFileError
+
+
+writeRegistryDatFile :: FilePath -> FilePath -> IO (Either WriteRegistryDatFileError ())
+writeRegistryDatFile input output = do
+    result <- Json.decodeFile input
+    case result of
+        Right elmJson ->
+            Right <$> Binary.encodeFile output (RegistryDat.fromElmJson elmJson)
+
+        Left err ->
+            return $ Left err
+
+
+writeRegistryDatFileErrorToText :: WriteRegistryDatFileError -> Text
+writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText
+
+
+
+-- viewRegistryDatFile
+
 
 
 type ViewRegistryDatFileError = Binary.DecodeFileError
