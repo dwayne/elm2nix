@@ -11,7 +11,7 @@ import System.IO.Error (isDoesNotExistError)
 
 data DecodeFileError
     = FileNotFound FilePath
-    | SyntaxError FilePath String -- FIXME: Rename to DecodeError
+    | DecodeError FilePath String
     deriving (Eq, Show)
 
 
@@ -21,7 +21,7 @@ decodeFile path =
     where
         decodeFileOrFail :: Binary a => IO (Either DecodeFileError a)
         decodeFileOrFail =
-            first (SyntaxError path . snd) <$> Binary.decodeFileOrFail path
+            first (DecodeError path . snd) <$> Binary.decodeFileOrFail path
 
         handleNotFound :: Bool -> Maybe DecodeFileError
         handleNotFound b =

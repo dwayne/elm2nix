@@ -42,7 +42,7 @@ decodeFileSpec =
 
             it "when the file is corrupted" $ do
                 path <- Fixture.file "corrupted.dat"
-                Left (Binary.SyntaxError _ details) <- decodeFile path
+                Left (Binary.DecodeError _ details) <- decodeFile path
                 details `shouldBe` "not enough bytes"
 
 

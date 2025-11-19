@@ -160,5 +160,5 @@ binaryDecodeFileErrorToText err =
         Binary.FileNotFound path ->
             "File not found: " <> T.pack path
 
-        Binary.SyntaxError path details ->
+        Binary.DecodeError path details ->
             "Syntax error in " <> T.pack path <> ": " <> T.pack details
