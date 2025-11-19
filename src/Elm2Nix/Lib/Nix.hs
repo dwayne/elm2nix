@@ -6,7 +6,7 @@ module Elm2Nix.Lib.Nix
     , nixPrefetchUrl
     ) where
 
-import qualified Data.ByteString.Lazy.Char8 as LBS
+import qualified Data.ByteString.Lazy.Char8 as LBS -- FIXME: Rename to Char8
 
 import System.Process.Typed (ExitCode(ExitSuccess), ProcessConfig, readProcess, proc)
 

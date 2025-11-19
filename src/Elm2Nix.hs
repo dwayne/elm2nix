@@ -4,19 +4,24 @@ module Elm2Nix
     ( WriteElmLockFileError(..), writeElmLockFile
     , WriteRegistryDatFileError, writeRegistryDatFile
     , writeElmLockFileErrorToText, writeRegistryDatFileErrorToText
+    , ViewRegistryDatFileError, viewRegistryDatFile
+    , viewRegistryDatFileErrorToText
     ) where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Encode.Pretty as Json
-import qualified Data.Binary as Binary
+import qualified Data.Binary as Binary hiding (decodeFile)
 import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString.Lazy.Char8 as LBS -- FIXME: Rename to Char8
 import qualified Data.Text as T
 
 import Data.Text (Text)
+import System.IO (stdout)
 
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
+import qualified Elm2Nix.Lib.Binary as Binary
 import qualified Elm2Nix.Lib.Json as Json
 import qualified Elm2Nix.Lib.Nix as Nix
 
@@ -85,18 +90,18 @@ writeElmLockFileErrorToText :: WriteElmLockFileError -> Text
 writeElmLockFileErrorToText err =
     case err of
         DecodeFileError err ->
-            decodeFileErrorToText err
+            jsonDecodeFileErrorToText err
 
         FromDependenciesError err ->
             fromDependenciesErrorToText err
 
 
 writeRegistryDatFileErrorToText :: WriteRegistryDatFileError -> Text
-writeRegistryDatFileErrorToText = decodeFileErrorToText
+writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText
 
 
-decodeFileErrorToText :: Json.DecodeFileError -> Text
-decodeFileErrorToText err =
+jsonDecodeFileErrorToText :: Json.DecodeFileError -> Text
+jsonDecodeFileErrorToText err =
     case err of
         Json.FileNotFound path ->
             "File not found: " <> T.pack path
@@ -118,3 +123,42 @@ nixPrefetchUrlErrorToText err =
 
         Nix.BadOutput details ->
             "nix-prefetch-url got unexpected output: " <> T.pack details
+
+
+type ViewRegistryDatFileError = Binary.DecodeFileError
+
+
+viewRegistryDatFile :: Bool -> FilePath -> IO (Either ViewRegistryDatFileError ())
+viewRegistryDatFile compact input = do
+    result <- Binary.decodeFile input
+    case result of
+        Right registryDat ->
+            let
+                allPackages =
+                    RegistryDat.toAllPackages registryDat
+
+                ( put, encode ) =
+                    if compact then
+                        ( LBS.hPut, Json.encode )
+
+                    else
+                        ( LBS.hPutStrLn, Json.encodePretty )
+            in
+            Right <$> put stdout (encode allPackages)
+
+        Left err ->
+            return $ Left err
+
+
+viewRegistryDatFileErrorToText :: ViewRegistryDatFileError -> Text
+viewRegistryDatFileErrorToText = binaryDecodeFileErrorToText
+
+
+binaryDecodeFileErrorToText :: Binary.DecodeFileError -> Text
+binaryDecodeFileErrorToText err =
+    case err of
+        Binary.FileNotFound path ->
+            "File not found: " <> T.pack path
+
+        Binary.SyntaxError path details ->
+            "Syntax error in " <> T.pack path <> ": " <> T.pack details

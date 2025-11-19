@@ -11,7 +11,7 @@ import System.IO.Error (isDoesNotExistError)
 
 data DecodeFileError
     = FileNotFound FilePath
-    | SyntaxError FilePath String
+    | SyntaxError FilePath String -- FIXME: Rename to DecodeError
     deriving (Eq, Show)
 
 

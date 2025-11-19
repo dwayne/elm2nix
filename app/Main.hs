@@ -25,9 +25,9 @@ main = do
 
         CLI.Registry (CLI.View (CLI.ViewOptions input)) ->
             --
-            -- TODO: Implement Elm2Nix.viewRegistryDatFile
+            -- TODO: Add a compact option
             --
-            print input
+            Elm2Nix.viewRegistryDatFile False input >>= either (die . Elm2Nix.viewRegistryDatFileErrorToText) return
 
 
 die :: Text -> IO ()
