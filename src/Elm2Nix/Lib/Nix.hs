@@ -6,7 +6,7 @@ module Elm2Nix.Lib.Nix
     , nixPrefetchUrl
     ) where
 
-import qualified Data.ByteString.Lazy.Char8 as LBS -- FIXME: Rename to Char8
+import qualified Data.ByteString.Lazy.Char8 as Char8
 
 import System.Process.Typed (ExitCode(ExitSuccess), ProcessConfig, readProcess, proc)
 
@@ -33,14 +33,14 @@ nixPrefetchUrl :: Url -> String -> IO (Either NixPrefetchUrlError NixPrefetchUrl
 nixPrefetchUrl url name = do
     ( code, stdout, stderr ) <- readProcess processConfig
     if code == ExitSuccess then
-        case LBS.lines stdout of
+        case Char8.lines stdout of
             [ hash, path ] ->
-                return $ Right $ NixPrefetchUrlOutput (LBS.unpack hash) (LBS.unpack path)
+                return $ Right $ NixPrefetchUrlOutput (Char8.unpack hash) (Char8.unpack path)
 
             _ ->
-                return $ Left $ BadOutput $ LBS.unpack stdout
+                return $ Left $ BadOutput $ Char8.unpack stdout
     else
-        return $ Left $ ProcessError $ LBS.unpack stderr
+        return $ Left $ ProcessError $ Char8.unpack stderr
 
     where
         processConfig :: ProcessConfig () () ()

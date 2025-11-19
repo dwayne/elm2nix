@@ -12,7 +12,7 @@ import qualified Data.Aeson as Json
 import qualified Data.Aeson.Encode.Pretty as Json
 import qualified Data.Binary as Binary hiding (decodeFile)
 import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Lazy.Char8 as LBS -- FIXME: Rename to Char8
+import qualified Data.ByteString.Lazy.Char8 as Char8
 import qualified Data.Text as T
 
 import Data.Text (Text)
@@ -142,7 +142,7 @@ viewRegistryDatFile compact input = do
                         ( LBS.hPut, Json.encode )
 
                     else
-                        ( LBS.hPutStrLn, Json.encodePretty )
+                        ( Char8.hPutStrLn, Json.encodePretty )
             in
             Right <$> put stdout (encode allPackages)
 
