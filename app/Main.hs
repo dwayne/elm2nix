@@ -23,11 +23,8 @@ main = do
         CLI.Registry (CLI.Generate (CLI.GenerateOptions input output)) ->
             Elm2Nix.writeRegistryDatFile input output >>= either (die . Elm2Nix.writeRegistryDatFileErrorToText) return
 
-        CLI.Registry (CLI.View (CLI.ViewOptions input)) ->
-            --
-            -- TODO: Add a compact option
-            --
-            Elm2Nix.viewRegistryDatFile False input >>= either (die . Elm2Nix.viewRegistryDatFileErrorToText) return
+        CLI.Registry (CLI.View (CLI.ViewOptions compact input)) ->
+            Elm2Nix.viewRegistryDatFile compact input >>= either (die . Elm2Nix.viewRegistryDatFileErrorToText) return
 
 
 die :: Text -> IO ()

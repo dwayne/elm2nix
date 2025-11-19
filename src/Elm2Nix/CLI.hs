@@ -39,7 +39,8 @@ data GenerateOptions
 
 data ViewOptions
     = ViewOptions
-        { voInput :: FilePath
+        { voCompact :: Bool
+        , voInput :: FilePath
         }
     deriving (Eq, Show)
 
@@ -81,7 +82,7 @@ registryCommands :: Parser RegistryCommands
 registryCommands =
     hsubparser $ mconcat
         [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from your elm.json"))
-        , command "view" (info (View <$> viewOptions) (progDesc "Display a registry.dat file in a human-readable format"))
+        , command "view" (info (View <$> viewOptions) (progDesc "Display a registry.dat file as JSON"))
         ]
 
 
@@ -97,7 +98,7 @@ generateOptions =
 
 viewOptions :: Parser ViewOptions
 viewOptions =
-    ViewOptions <$> registryInputOption
+    ViewOptions <$> isCompactOption <*> registryInputOption
 
 
 isCompactOption :: Parser Bool
@@ -105,7 +106,7 @@ isCompactOption =
     switch $ mconcat
         [ long "compact"
         , showDefault
-        , help "Format the lock file as compactly as possible"
+        , help "Format the JSON as compactly as possible"
         ]
 
 
