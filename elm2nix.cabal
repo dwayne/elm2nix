@@ -14,6 +14,7 @@ library
         Elm2Nix.Data.Name,
         Elm2Nix.Data.RegistryDat,
         Elm2Nix.Data.Version,
+        Elm2Nix.Lib.Binary,
         Elm2Nix.Lib.Json,
         Elm2Nix.Lib.Nix
 
@@ -67,6 +68,7 @@ test-suite test
         Test.Elm2Nix.Data.Name,
         Test.Elm2Nix.Data.RegistryDat,
         Test.Elm2Nix.Data.Version,
+        Test.Elm2Nix.Lib.Binary,
         Test.Elm2Nix.Lib.Json,
         Test.Elm2Nix.Lib.Nix,
         Test.Fixture

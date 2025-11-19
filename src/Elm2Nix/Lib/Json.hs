@@ -17,9 +17,7 @@ data DecodeFileError
 
 decodeFile :: FromJSON a => FilePath -> IO (Either DecodeFileError a)
 decodeFile path =
-    fmap join
-        $ tryJust (handleNotFound . isDoesNotExistError)
-        $ eitherDecodeFileStrict
+    join <$> tryJust (handleNotFound . isDoesNotExistError) eitherDecodeFileStrict
     where
         eitherDecodeFileStrict :: FromJSON a => IO (Either DecodeFileError a)
         eitherDecodeFileStrict =

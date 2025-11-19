@@ -6,6 +6,7 @@ import qualified Test.Elm2Nix.Data.FixedOutputDerivation as FixedOutputDerivatio
 import qualified Test.Elm2Nix.Data.Name as Name
 import qualified Test.Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Test.Elm2Nix.Data.Version as Version
+import qualified Test.Elm2Nix.Lib.Binary as Binary
 import qualified Test.Elm2Nix.Lib.Json as Json
 import qualified Test.Elm2Nix.Lib.Nix as Nix
 
@@ -20,3 +21,4 @@ main = do
     Json.main
     FixedOutputDerivation.main
     RegistryDat.main
+    Binary.main
