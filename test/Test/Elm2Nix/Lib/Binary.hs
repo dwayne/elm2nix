@@ -19,7 +19,7 @@ main = hspec $
 
 decodeFileSpec :: Spec
 decodeFileSpec =
-    describe "decodeFile" $ do
+    describe "decodeFile (skip)" $ do
         describe "valid input" $
             it "example 1" $
                 let

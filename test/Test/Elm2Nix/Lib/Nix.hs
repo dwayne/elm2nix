@@ -12,7 +12,7 @@ main = hspec $
 
 nixPrefetchUrlSpec :: Spec
 nixPrefetchUrlSpec =
-    describe "nixPrefetchUrl (network)" $ do
+    describe "nixPrefetchUrl (skip) (skip:network)" $ do
         describe "valid input" $
             it "example 1" $
                 let

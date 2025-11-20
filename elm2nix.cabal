@@ -2,6 +2,29 @@ cabal-version: 3.0
 name: elm2nix
 version: 0.1.0.0
 
+synopsis: Create Elm artifacts to be used when compiling Elm applications with Nix
+description:
+    Create Elm artifacts to be used when compiling Elm applications with Nix.
+    .
+    Generate a lock file from your elm.json:
+    .
+    $ elm2nix lock
+    .
+    Generate a registry.dat file from your elm.json:
+    .
+    $ elm2nix registry generate
+
+license: BSD-3-Clause
+license-file: LICENSE
+
+author: Dwayne Crooks
+maintainer: me+elm2nix@dwaynecrooks.com
+
+category: Distribution, Nix
+
+source-repository head
+    type: git
+    location: https://github.com/dwayne/elm2nix
 
 library
     hs-source-dirs: src
@@ -22,17 +45,23 @@ library
 
     default-language: Haskell2010
     build-depends:
-        aeson,
-        aeson-pretty,
-        base,
-        binary,
-        bytestring,
-        containers,
-        indexed-traversable,
-        optparse-applicative,
-        text,
-        typed-process,
-        unliftio
+        aeson >= 2.2.3 && < 2.3,
+        aeson-pretty >= 0.8.10 && < 0.9,
+        base >= 4.20.1 && < 4.21,
+        binary >= 0.8.9 && < 0.9,
+        bytestring >= 0.12.2 && < 0.13,
+        containers >= 0.7 && < 0.8,
+        indexed-traversable >= 0.1.4 && < 0.2,
+        --
+        -- N.B. The lower bound has been adjusted to satisfy
+        -- the version that's currently available in Nixpkgs
+        --
+        -- Previously, it was >= 0.19.0 && < 0.20
+        --
+        optparse-applicative >= 0.18.1 && < 0.20,
+        text >= 2.1.2 && < 2.2,
+        typed-process >= 0.2.13 && < 0.3,
+        unliftio >= 0.2.25 && < 0.3
 
 
 common threaded
@@ -45,13 +74,13 @@ executable elm2nix
     hs-source-dirs: app
     main-is: Main.hs
 
-    ghc-options: -Wall -Wno-name-shadowing -O2
+    ghc-options: -Wall -Wno-name-shadowing
 
     default-language: Haskell2010
     build-depends:
-        base,
+        base >= 4.20.1 && < 4.21,
         elm2nix,
-        text
+        text >= 2.1.2 && < 2.2
 
 
 test-suite test

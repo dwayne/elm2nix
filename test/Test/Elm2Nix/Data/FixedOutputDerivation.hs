@@ -19,7 +19,7 @@ main = hspec $
 
 fromDependenciesSpec :: Spec
 fromDependenciesSpec =
-    describe "fromDependencies (network)" $ do
+    describe "fromDependencies (skip) (skip:network)" $ do
         describe "valid input" $
             it "example 1" $
                 let
