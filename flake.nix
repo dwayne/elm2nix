@@ -1,4 +1,6 @@
 {
+  description = "elm2nix developer shell, package, and app";
+
   outputs = { self, nixpkgs, flake-utils }:
     let
       compiler = "ghc9102";
