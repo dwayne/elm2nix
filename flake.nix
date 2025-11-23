@@ -33,8 +33,15 @@
           '';
         };
 
-        packages.default = elm2nix;
-        apps.default = flake-utils.lib.mkApp { drv = elm2nix; };
+        packages = {
+          default = elm2nix;
+          inherit elm2nix;
+        };
+
+        apps = {
+          default = self.apps.${system}.elm2nix;
+          elm2nix = flake-utils.lib.mkApp { drv = elm2nix; };
+        };
       }
     );
 }
