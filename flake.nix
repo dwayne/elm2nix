@@ -43,5 +43,7 @@
           elm2nix = flake-utils.lib.mkApp { drv = elm2nix; };
         };
       }
-    );
+    ) // {
+      lib.elm2nix = pkgs: pkgs.callPackage ./nix {};
+    };
 }
