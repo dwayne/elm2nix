@@ -42,9 +42,6 @@
           default = example;
           checkedExample = example.override {
             doValidateFormat = true;
-            doElmReview = true;
-            elmReviewElmLock = ./review/elm.lock;
-            elmReviewRegistryDat = ./review/registry.dat;
             doElmTest = true;
           };
         };

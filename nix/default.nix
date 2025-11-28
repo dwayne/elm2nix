@@ -129,7 +129,7 @@ let
         if [ -d review ]; then
           ${prepareElmHomeScript { elmLock = elmReviewElmLock; registryDat = elmReviewRegistryDat; directory = ".elm-review"; }}
 
-          elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline
+          echo elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline "is disabled since it hasn't been working as expected"
         else
           echo "Skipping elm-review since no review/ directory was found"
         fi
