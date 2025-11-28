@@ -18,8 +18,8 @@ main =
 -- MODEL
 
 
-
-type alias Model = Int
+type alias Model =
+    Int
 
 
 init : Model
@@ -31,11 +31,9 @@ init =
 -- UPDATE
 
 
-
 type Msg
     = Increment
     | Decrement
-
 
 
 update : Msg -> Model -> Model
@@ -44,14 +42,12 @@ update msg model =
         Increment ->
             model + 1
 
-
         Decrement ->
             model - 1
 
 
 
 -- VIEW
-
 
 
 view : Model -> H.Html Msg
