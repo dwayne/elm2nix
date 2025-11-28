@@ -28,6 +28,7 @@
             elm2nix.packages.${system}.default
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
+            pkgs.elmPackages.elm-review
           ];
 
           shellHook = ''
@@ -40,6 +41,9 @@
           default = example;
           checkedExample = example.override {
             doValidateFormat = true;
+            doElmReview = true;
+            elmReviewElmLock = ./review/elm.lock;
+            elmReviewRegistryDat = ./review/registry.dat;
           };
         };
       }

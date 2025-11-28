@@ -18,6 +18,10 @@ let
     , outputMin ? "${lib.removeSuffix ".js" output}.min.js"
     , doValidateFormat ? false
     , elmFormatInputs ? [ "src" ]
+    , doElmReview ? false
+    , elmReviewFlags ? []
+    , elmReviewElmLock ? throw "elmReviewElmLock is required when doElmReview is true"
+    , elmReviewRegistryDat ? throw "elmReviewRegistryDat is required when doElmReview is true"
     , extraNativeBuildInputs ? []
     , enableDebugger ? false
     , enableOptimizations ? false
@@ -43,23 +47,28 @@ let
       minifier = if useTerser then "terser" else "uglifyjs";
       toCompress = if enableMinification then outputMin else output;
 
-      prepareElmHomeScript = ''
-        cp -LR "${dotElmLinks}" .elm
-        chmod -R +w .elm
-        export ELM_HOME=.elm
+      prepareElmHomeScript =
+        { elmLock
+        , registryDat
+        , directory ? ".elm"
+        }: ''
+        echo "Prepare ${directory} and set ELM_HOME=${directory}"
+        cp -LR "${dotElmLinks { inherit elmLock registryDat; }}" ${directory}
+        chmod -R +w ${directory}
+        export ELM_HOME=${directory}
       '';
 
-      dotElmLinks =
+      dotElmLinks = { elmLock, registryDat }:
         runCommand "dot-elm-links" {} ''
           root="$out/${elmVersion}/packages"
           mkdir -p "$root"
 
           ln -s "${registryDat}" "$root/registry.dat"
 
-          ${symbolicLinksToPackagesScript}
+          ${symbolicLinksToPackagesScript elmLock}
         '';
 
-      symbolicLinksToPackagesScript =
+      symbolicLinksToPackagesScript = elmLock:
         builtins.foldl'
           (script: { author, package, version, sha256 } @ dep:
             script + ''
@@ -74,6 +83,7 @@ let
       nativeBuildInputs = builtins.concatLists
         [ ([ elmPackages.elm ]
           ++ lib.optional doValidateFormat elmPackages.elm-format
+          ++ lib.optional doElmReview elmPackages.elm-review
           ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
           ++ lib.optional enableCompression brotli)
           extraNativeBuildInputs
@@ -83,15 +93,25 @@ let
       dontConfigure = true;
 
       preBuildPhases = [
-        "prepareElmHomePhase"
         (lib.optionalString doValidateFormat "validateFormatPhase")
+        (lib.optionalString doElmReview "elmReviewPhase")
+        "prepareElmHomePhase"
       ];
-
-      prepareElmHomePhase = prepareElmHomeScript;
 
       validateFormatPhase = ''
         elm-format ${builtins.concatStringsSep " " elmFormatInputs} --validate
       '';
+
+      elmReviewPhase = ''
+        if [ -d review ]; then
+          ${prepareElmHomeScript { elmLock = elmReviewElmLock; registryDat = elmReviewRegistryDat; directory = ".elm-review"; }}
+
+          echo "Skipping elm-review"
+          echo elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline "isn't working as expected"
+        fi
+      '';
+
+      prepareElmHomePhase = prepareElmHomeScript { inherit elmLock registryDat; };
 
       buildPhase = ''
         runHook preBuild
