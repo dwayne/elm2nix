@@ -46,10 +46,12 @@ let
     let
       minifier = if useTerser then "terser" else "uglifyjs";
       toCompress = if enableMinification then outputMin else output;
+      defaultElmLock = elmLock;
+      defaultRegistryDat = registryDat;
 
       prepareElmHomeScript =
-        { elmLock
-        , registryDat
+        { elmLock ? defaultElmLock
+        , registryDat ? defaultRegistryDat
         , directory ? ".elm"
         }: ''
         echo "Prepare ${directory} and set ELM_HOME=${directory}"
@@ -58,17 +60,22 @@ let
         export ELM_HOME=${directory}
       '';
 
-      dotElmLinks = { elmLock, registryDat }:
+      dotElmLinks =
+        { elmLock ? defaultElmLock
+        , registryDat ? defaultRegistryDat
+        }:
         runCommand "dot-elm-links" {} ''
           root="$out/${elmVersion}/packages"
           mkdir -p "$root"
 
           ln -s "${registryDat}" "$root/registry.dat"
 
-          ${symbolicLinksToPackagesScript elmLock}
+          ${symbolicLinksToPackagesScript { inherit elmLock; }}
         '';
 
-      symbolicLinksToPackagesScript = elmLock:
+      symbolicLinksToPackagesScript =
+        { elmLock ? defaultElmLock
+        }:
         builtins.foldl'
           (script: { author, package, version, sha256 } @ dep:
             script + ''
@@ -111,7 +118,7 @@ let
         fi
       '';
 
-      prepareElmHomePhase = prepareElmHomeScript { inherit elmLock registryDat; };
+      prepareElmHomePhase = prepareElmHomeScript {};
 
       buildPhase = ''
         runHook preBuild
