@@ -27,6 +27,7 @@
           packages = [
             elm2nix.packages.${system}.default
             pkgs.elmPackages.elm
+            pkgs.elmPackages.elm-format
           ];
 
           shellHook = ''
@@ -35,8 +36,11 @@
         };
 
         packages = {
-          default = example;
           inherit example;
+          default = example;
+          checkedExample = example.override {
+            doValidateFormat = true;
+          };
         };
       }
     );

@@ -16,6 +16,8 @@ let
     , entry ? "src/Main.elm" # :: String | [String]
     , output ? "elm.js" # :: String
     , outputMin ? "${lib.removeSuffix ".js" output}.min.js"
+    , doValidateFormat ? false
+    , elmFormatInputs ? [ "src" ]
     , extraNativeBuildInputs ? []
     , enableDebugger ? false
     , enableOptimizations ? false
@@ -41,16 +43,55 @@ let
       minifier = if useTerser then "terser" else "uglifyjs";
       toCompress = if enableMinification then outputMin else output;
 
+      prepareElmHomeScript = ''
+        cp -LR "${dotElmLinks}" .elm
+        chmod -R +w .elm
+        export ELM_HOME=.elm
+      '';
+
+      dotElmLinks =
+        runCommand "dot-elm-links" {} ''
+          root="$out/${elmVersion}/packages"
+          mkdir -p "$root"
+
+          ln -s "${registryDat}" "$root/registry.dat"
+
+          ${symbolicLinksToPackagesScript}
+        '';
+
+      symbolicLinksToPackagesScript =
+        builtins.foldl'
+          (script: { author, package, version, sha256 } @ dep:
+            script + ''
+              mkdir -p "$root/${author}/${package}"
+              ln -s "${fetchElmPackage dep}" "$root/${author}/${package}/${version}"
+            ''
+          )
+          ""
+          (lib.importJSON elmLock);
     in
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
         [ ([ elmPackages.elm ]
+          ++ lib.optional doValidateFormat elmPackages.elm-format
           ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
           ++ lib.optional enableCompression brotli)
           extraNativeBuildInputs
         ];
 
-      preConfigure = preConfigure { inherit elmLock registryDat; };
+      dontPatch = true;
+      dontConfigure = true;
+
+      preBuildPhases = [
+        "prepareElmHomePhase"
+        (lib.optionalString doValidateFormat "validateFormatPhase")
+      ];
+
+      prepareElmHomePhase = prepareElmHomeScript;
+
+      validateFormatPhase = ''
+        elm-format ${builtins.concatStringsSep " " elmFormatInputs} --validate
+      '';
 
       buildPhase = ''
         runHook preBuild
@@ -115,36 +156,11 @@ let
           echo "Brotlied size: $br_size bytes ($br) (''${br_pct}% of compiled)"
         ''}
       '';
+
+      passthru = {
+        inherit prepareElmHomeScript dotElmLinks symbolicLinksToPackagesScript;
+      };
     });
-
-  preConfigure = args: ''
-    echo "preparing ELM_HOME"
-
-    cp -LR "${dotElmLinks args}" .elm
-    chmod -R +w .elm
-    export ELM_HOME=.elm
-  '';
-
-  dotElmLinks = { elmLock, registryDat }:
-    runCommand "dot-elm-links" {} ''
-      root="$out/${elmVersion}/packages"
-      mkdir -p "$root"
-
-      ln -s "${registryDat}" "$root/registry.dat"
-
-      ${symbolicLinksToPackages elmLock}
-    '';
-
-  symbolicLinksToPackages = elmLock:
-    builtins.foldl'
-      (script: { author, package, version, sha256 } @ dep:
-        script + ''
-          mkdir -p "$root/${author}/${package}"
-          ln -s "${fetchElmPackage dep}" "$root/${author}/${package}/${version}"
-        ''
-      )
-      ""
-      (lib.importJSON elmLock);
 
   fetchElmPackage = { author, package, version, sha256 }:
     fetchzip {
@@ -158,11 +174,7 @@ let
       };
     };
 in
-{ inherit
-    preConfigure
-    dotElmLinks
-    symbolicLinksToPackages
-    fetchElmPackage;
-
+{
   mkElmDerivation = lib.makeOverridable mkElmDerivation;
+  inherit fetchElmPackage;
 }
