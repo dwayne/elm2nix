@@ -40,9 +40,14 @@
         packages = {
           inherit example;
           default = example;
+          debugExample = example.override {
+            enableDebugger = true;
+            output = "debug.js";
+          };
           checkedExample = example.override {
             doValidateFormat = true;
             doElmTest = true;
+            output = "checked.js";
           };
         };
       }
