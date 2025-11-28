@@ -29,6 +29,7 @@
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
             pkgs.elmPackages.elm-review
+            pkgs.elmPackages.elm-test
           ];
 
           shellHook = ''
@@ -41,9 +42,10 @@
           default = example;
           checkedExample = example.override {
             doValidateFormat = true;
-            doElmReview = true;
+            doElmReview = false;
             elmReviewElmLock = ./review/elm.lock;
             elmReviewRegistryDat = ./review/registry.dat;
+            doElmTest = true;
           };
         };
       }

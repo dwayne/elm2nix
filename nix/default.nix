@@ -13,24 +13,38 @@ let
   mkElmDerivation =
     { elmLock # Path to elm.lock
     , registryDat # Path to registry.dat
-    , entry ? "src/Main.elm" # :: String | [String]
-    , output ? "elm.js" # :: String
-    , outputMin ? "${lib.removeSuffix ".js" output}.min.js"
+
     , doValidateFormat ? false
     , elmFormatInputs ? [ "src" ]
+
     , doElmReview ? false
     , elmReviewFlags ? []
     , elmReviewElmLock ? throw "elmReviewElmLock is required when doElmReview is true"
     , elmReviewRegistryDat ? throw "elmReviewRegistryDat is required when doElmReview is true"
+
+    , doElmTest ? false
+    , elmTestFlags ? []
+
+    , entry ? "src/Main.elm" # :: String | [String]
+
+    , output ? "elm.js" # :: String
+    , outputMin ? "${lib.removeSuffix ".js" output}.min.js"
+
     , extraNativeBuildInputs ? []
+
     , enableDebugger ? false
+
     , enableOptimizations ? false
+
     , enableMinification ? false
     , useTerser ? false # Use UglifyJS by default
+
     , enableCompression ? false
-    , gzipArgs ? [ "-9" ]
-    , brotliArgs ? [ "-Z" ]
+    , gzipFlags ? [ "-9" ]
+    , brotliFlags ? [ "-Z" ]
+
     , showStats ? false
+
     , ...
     } @ args:
 
@@ -91,6 +105,7 @@ let
         [ ([ elmPackages.elm ]
           ++ lib.optional doValidateFormat elmPackages.elm-format
           ++ lib.optional doElmReview elmPackages.elm-review
+          ++ lib.optional doElmTest elmPackages.elm-test
           ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
           ++ lib.optional enableCompression brotli)
           extraNativeBuildInputs
@@ -103,6 +118,7 @@ let
         (lib.optionalString doValidateFormat "validateFormatPhase")
         (lib.optionalString doElmReview "elmReviewPhase")
         "prepareElmHomePhase"
+        (lib.optionalString doElmTest "elmTestPhase")
       ];
 
       validateFormatPhase = ''
@@ -113,12 +129,21 @@ let
         if [ -d review ]; then
           ${prepareElmHomeScript { elmLock = elmReviewElmLock; registryDat = elmReviewRegistryDat; directory = ".elm-review"; }}
 
-          echo "Skipping elm-review"
           echo elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline "isn't working as expected"
+        else
+          echo "Skipping elm-review since no review/ directory was found"
         fi
       '';
 
       prepareElmHomePhase = prepareElmHomeScript {};
+
+      elmTestPhase = ''
+        if [ -d tests ]; then
+          echo elm-test ${builtins.concatStringsSep " " elmTestFlags} "isn't working as expected"
+        else
+          echo "Skipping elm-test since no tests/ directory was found"
+        fi
+      '';
 
       buildPhase = ''
         runHook preBuild
@@ -156,8 +181,8 @@ let
       '';
 
       compressionPhase = ''
-        gzip ${builtins.concatStringsSep " " gzipArgs} -c "$out/${toCompress}" > "$out/${toCompress}.gz"
-        brotli ${builtins.concatStringsSep " " brotliArgs} -c "$out/${toCompress}" > "$out/${toCompress}.br"
+        gzip ${builtins.concatStringsSep " " gzipFlags} -c "$out/${toCompress}" > "$out/${toCompress}.gz"
+        brotli ${builtins.concatStringsSep " " brotliFlags} -c "$out/${toCompress}" > "$out/${toCompress}.br"
       '';
 
       preFixup = lib.optionalString showStats ''

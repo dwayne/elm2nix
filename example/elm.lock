@@ -7,6 +7,12 @@
     },
     {
         "author": "elm",
+        "package": "bytes",
+        "version": "1.0.8",
+        "sha256": "0n411j2cyz9m241q6vszfzpq3fraradwal5m0gigp2505mdfpz3x"
+    },
+    {
+        "author": "elm",
         "package": "core",
         "version": "1.0.5",
         "sha256": "0g3xbi8f9k5q45s95nx3jfvzwdf4b2n63a52wr4027d2xjx0pmvl"
@@ -25,6 +31,12 @@
     },
     {
         "author": "elm",
+        "package": "random",
+        "version": "1.0.0",
+        "sha256": "0z0znkwfs35xiabk6pa9yqwsq03jssgd7jmsj1kk000mikfm7f39"
+    },
+    {
+        "author": "elm",
         "package": "time",
         "version": "1.0.0",
         "sha256": "0wqa2vhl1zf8z0j2yd3yjwfhr0dydfns43bbzll3k4rhnjadxr1l"
@@ -40,5 +52,11 @@
         "package": "virtual-dom",
         "version": "1.0.5",
         "sha256": "16v6h8msm1yin45vwdj8g0wnqs4gjjyknhz2iamrzzbssxvryyqv"
+    },
+    {
+        "author": "elm-explorations",
+        "package": "test",
+        "version": "2.2.0",
+        "sha256": "0g781y2j4jz94qv3mvaay2zmlzqi0ag13v1k2q111iypfv0kyx8c"
     }
 ]
