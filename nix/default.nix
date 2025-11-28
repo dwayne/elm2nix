@@ -121,11 +121,11 @@ let
         (lib.optionalString doElmTest "elmTestPhase")
       ];
 
-      validateFormatPhase = ''
+      validateFormatPhase = lib.optionalString doValidateFormat ''
         elm-format ${builtins.concatStringsSep " " elmFormatInputs} --validate
       '';
 
-      elmReviewPhase = ''
+      elmReviewPhase = lib.optionalString doElmReview ''
         if [ -d review ]; then
           ${prepareElmHomeScript { elmLock = elmReviewElmLock; registryDat = elmReviewRegistryDat; directory = ".elm-review"; }}
 
@@ -137,7 +137,7 @@ let
 
       prepareElmHomePhase = prepareElmHomeScript {};
 
-      elmTestPhase = ''
+      elmTestPhase = lib.optionalString doElmTest ''
         if [ -d tests ]; then
           echo elm-test ${builtins.concatStringsSep " " elmTestFlags} "isn't working as expected"
         else
