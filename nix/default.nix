@@ -49,13 +49,13 @@ let
     } @ args:
 
     assert !(enableDebugger && enableOptimizations)
-      || throw "You cannot enable both the debugger and optimizations at the same time.";
+      || throw "You cannot enable both debugging and optimizations.";
 
     assert !(enableDebugger && enableMinification)
-      || throw "You cannot enable both the debugger and minification at the same time.";
+      || throw "You cannot enable both debugging and minification.";
 
     assert !(enableDebugger && enableCompression)
-      || throw "You cannot enable both the debugger and compression at the same time.";
+      || throw "You cannot enable both debugging and compression.";
 
     let
       minifier = if useTerser then "terser" else "uglifyjs";
