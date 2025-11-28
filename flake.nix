@@ -14,13 +14,14 @@
       in
       {
         devShells.default = pkgs.mkShell {
-          name = "dev";
+          name = "elm2nix";
 
           packages = [
             pkgs.ghc
             pkgs.hlint
             pkgs.cabal-install
             pkgs.cabal2nix
+            pkgs.elmPackages.elm
           ];
 
           shellHook = ''
