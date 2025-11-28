@@ -71,7 +71,7 @@ let
         echo "Prepare ${directory} and set ELM_HOME=${directory}"
         cp -LR "${dotElmLinks { inherit elmLock registryDat; }}" ${directory}
         chmod -R +w ${directory}
-        export ELM_HOME=${directory}
+        export ELM_HOME="$PWD/${directory}"
       '';
 
       dotElmLinks =
@@ -129,7 +129,7 @@ let
         if [ -d review ]; then
           ${prepareElmHomeScript { elmLock = elmReviewElmLock; registryDat = elmReviewRegistryDat; directory = ".elm-review"; }}
 
-          echo elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline "isn't working as expected"
+          elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline
         else
           echo "Skipping elm-review since no review/ directory was found"
         fi
@@ -139,7 +139,7 @@ let
 
       elmTestPhase = lib.optionalString doElmTest ''
         if [ -d tests ]; then
-          echo elm-test ${builtins.concatStringsSep " " elmTestFlags} "isn't working as expected"
+          elm-test ${builtins.concatStringsSep " " elmTestFlags}
         else
           echo "Skipping elm-test since no tests/ directory was found"
         fi
