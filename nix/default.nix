@@ -46,6 +46,10 @@ let
 
     , showStats ? false
 
+    , enableHashedFilenames ? false
+    , hashLength ? 8
+    , replaceWithHashedFilenames ? true
+
     , ...
     } @ args:
 
@@ -199,6 +203,7 @@ let
         (lib.optional enableMinification "minificationPhase")
         ++ (lib.optional enableCompression "compressionPhase")
         ++ (lib.optional showStats "showStatsPhase")
+        ++ (lib.optional enableHashedFilenames "contentHashingPhase")
         ;
 
       minificationPhase = lib.optional enableMinification ''
@@ -236,7 +241,39 @@ let
         ''}
       '';
 
+      contentHashingPhase = lib.optionalString enableHashedFilenames (
+        assert (hashLength >= 1 && hashLength <= 64)
+          || throw "hashLength must be between 1 and 64 inclusive: ${toString hashLength}";
 
+        ''
+        manifest="$(mktemp)"
+
+        echo "{" > "$manifest"
+        first_entry=1
+
+        for file in "$out"/*; do
+          hash=$(sha256sum "$file" | cut -c 1-${toString hashLength})
+
+          filename="''${file##*/}"
+          base="''${filename%%.*}"
+          ext="''${filename#*.}"
+          hashedFilename="$base.$hash.$ext"
+
+          ${if replaceWithHashedFilenames then "mv" else "cp"} "$file" "$out/$hashedFilename"
+          echo ${if replaceWithHashedFilenames then "Moved" else "Copied"} "$filename" "───>" "$hashedFilename"
+
+          if [ $first_entry -eq 0 ]; then
+            echo "," >> "$manifest"
+          fi
+          first_entry=0
+
+          printf '    "%s": "%s"' "$filename" "$hashedFilename" >> "$manifest"
+        done
+
+        echo "" >> "$manifest"
+        echo "}" >> "$manifest"
+        cp "$manifest" "$out/manifest.json"
+        '');
 
       passthru = {
         inherit prepareElmHomeScript dotElmLinks symbolicLinksToPackagesScript;

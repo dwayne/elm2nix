@@ -61,6 +61,12 @@
             entry = [ "src/Main.elm" "src/Workshop.elm" ];
             output = "combined.js";
           };
+          hashedExample = optimizedExample.override {
+            output = "hashed.js";
+            enableHashedFilenames = true;
+            hashLength = 12;
+            replaceWithHashedFilenames = false;
+          };
         };
       }
     );
