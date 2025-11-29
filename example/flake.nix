@@ -37,7 +37,7 @@
           '';
         };
 
-        packages = {
+        packages = rec {
           inherit example;
           default = example;
           debugExample = example.override {
@@ -48,6 +48,18 @@
             doValidateFormat = true;
             doElmTest = true;
             output = "checked.js";
+          };
+          optimizedExample = checkedExample.override {
+            output = "optimized.js";
+            enableOptimizations = true;
+            optimizeLevel = 2;
+            enableMinification = true;
+            enableCompression = true;
+            showStats = true;
+          };
+          combinedExample = optimizedExample.override {
+            entry = [ "src/Main.elm" "src/Workshop.elm" ];
+            output = "combined.js";
           };
         };
       }

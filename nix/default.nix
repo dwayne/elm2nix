@@ -35,6 +35,7 @@ let
     , enableDebugger ? false
 
     , enableOptimizations ? false
+    , optimizeLevel ? 1 # :: 1 | 2 | 3
 
     , enableMinification ? false
     , useTerser ? false # Use UglifyJS by default
@@ -58,8 +59,10 @@ let
       || throw "You cannot enable both debugging and compression.";
 
     let
+      useElmOptimizeLevel2 = enableOptimizations && optimizeLevel >= 2;
       minifier = if useTerser then "terser" else "uglifyjs";
       toCompress = if enableMinification then outputMin else output;
+
       defaultElmLock = elmLock;
       defaultRegistryDat = registryDat;
 
@@ -106,6 +109,7 @@ let
           ++ lib.optional doValidateFormat elmPackages.elm-format
           ++ lib.optional doElmReview elmPackages.elm-review
           ++ lib.optional doElmTest elmPackages.elm-test
+          ++ lib.optional useElmOptimizeLevel2 elmPackages.elm-optimize-level-2
           ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
           ++ lib.optional enableCompression brotli)
           extraNativeBuildInputs
@@ -145,17 +149,39 @@ let
         fi
       '';
 
-      buildPhase = ''
+      buildPhase =
+        let
+          buildScript =
+            if useElmOptimizeLevel2 then
+              let
+                inputFiles =
+                  if builtins.isList entry then
+                    builtins.warn "elm-optimize-level-2 accepts multiple input files but only processes the first" entry
+                  else
+                    [ entry ];
+              in
+              ''
+              elm-optimize-level-2 \
+                ${builtins.concatStringsSep " " inputFiles} \
+                ${lib.optionalString (optimizeLevel >= 3) "--optimize-speed"} \
+                --output ".build/${output}"
+              ''
+            else
+              ''
+              elm make \
+                ${builtins.concatStringsSep " " (if builtins.isList entry then entry else [ entry ])} \
+                ${lib.optionalString enableDebugger "--debug"} \
+                ${lib.optionalString (enableOptimizations && optimizeLevel == 1) "--optimize"} \
+                --output ".build/${output}"
+              '';
+        in
+        ''
         runHook preBuild
 
-        elm make \
-          ${builtins.concatStringsSep " " (if builtins.isList entry then entry else [ entry ])} \
-          ${lib.optionalString enableDebugger "--debug"} \
-          ${lib.optionalString enableOptimizations "--optimize"} \
-          --output ".build/${output}"
+        ${buildScript}
 
         runHook postBuild
-      '';
+        '';
 
       installPhase = ''
         runHook preInstall
