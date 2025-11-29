@@ -198,20 +198,21 @@ let
       preFixupPhases =
         (lib.optional enableMinification "minificationPhase")
         ++ (lib.optional enableCompression "compressionPhase")
+        ++ (lib.optional showStats "showStatsPhase")
         ;
 
-      minificationPhase = ''
+      minificationPhase = lib.optional enableMinification ''
         ${minifier} "$out/${output}" \
           --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' \
           | ${minifier} --mangle --output "$out/${outputMin}"
       '';
 
-      compressionPhase = ''
+      compressionPhase = lib.optional enableCompression ''
         gzip ${builtins.concatStringsSep " " gzipFlags} -c "$out/${toCompress}" > "$out/${toCompress}.gz"
         brotli ${builtins.concatStringsSep " " brotliFlags} -c "$out/${toCompress}" > "$out/${toCompress}.br"
       '';
 
-      preFixup = lib.optionalString showStats ''
+      showStatsPhase = lib.optionalString showStats ''
         js="${output}"
         js_size=$(stat -c%s $out/$js)
         echo "Compiled size: $js_size bytes ($js)"
@@ -234,6 +235,8 @@ let
           echo "Brotlied size: $br_size bytes ($br) (''${br_pct}% of compiled)"
         ''}
       '';
+
+
 
       passthru = {
         inherit prepareElmHomeScript dotElmLinks symbolicLinksToPackagesScript;
