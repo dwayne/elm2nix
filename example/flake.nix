@@ -45,7 +45,8 @@
             output = "debug.js";
           };
           checkedExample = example.override {
-            doValidateFormat = true;
+            doElmFormat = true;
+            elmFormatSourceFiles = [ "review/src" "src" "tests" ];
             doElmTest = true;
             output = "checked.js";
           };

@@ -14,8 +14,8 @@ let
     { elmLock # Path to elm.lock
     , registryDat # Path to registry.dat
 
-    , doValidateFormat ? false
-    , elmFormatInputs ? [ "src" ]
+    , doElmFormat ? false # Whether or not to check if a given set of Elm files are formatted
+    , elmFormatSourceFiles ? [ "src" ] # A list of Elm files or directories containing Elm files
 
     , doElmReview ? false
     , elmReviewFlags ? []
@@ -110,7 +110,7 @@ let
     stdenv.mkDerivation (args // {
       nativeBuildInputs = builtins.concatLists
         [ ([ elmPackages.elm ]
-          ++ lib.optional doValidateFormat elmPackages.elm-format
+          ++ lib.optional doElmFormat elmPackages.elm-format
           ++ lib.optional doElmReview elmPackages.elm-review
           ++ lib.optional doElmTest elmPackages.elm-test
           ++ lib.optional useElmOptimizeLevel2 elmPackages.elm-optimize-level-2
@@ -123,14 +123,14 @@ let
       dontConfigure = true;
 
       preBuildPhases = [
-        (lib.optionalString doValidateFormat "validateFormatPhase")
+        (lib.optionalString doElmFormat "elmFormatPhase")
         (lib.optionalString doElmReview "elmReviewPhase")
         "prepareElmHomePhase"
         (lib.optionalString doElmTest "elmTestPhase")
       ];
 
-      validateFormatPhase = lib.optionalString doValidateFormat ''
-        elm-format ${builtins.concatStringsSep " " elmFormatInputs} --validate
+      elmFormatPhase = lib.optionalString doElmFormat ''
+        elm-format ${builtins.concatStringsSep " " elmFormatSourceFiles} --validate
       '';
 
       elmReviewPhase = lib.optionalString doElmReview ''
