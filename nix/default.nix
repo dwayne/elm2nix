@@ -37,18 +37,18 @@ let
     , enableOptimizations ? false
     , optimizeLevel ? 1 # :: 1 | 2 | 3
 
-    , enableMinification ? false
+    , doMinification ? false
     , useTerser ? false # Use UglifyJS by default
 
-    , enableCompression ? false
+    , doCompression ? false
     , gzipFlags ? [ "-9" ]
     , brotliFlags ? [ "-Z" ]
 
-    , showStats ? false
+    , doReporting ? false
 
-    , enableHashedFilenames ? false
+    , doContentHashing ? false
     , hashLength ? 8
-    , replaceWithHashedFilenames ? true
+    , keepFilesWithNoHashInFilenames ? false
 
     , ...
     } @ args:
@@ -56,16 +56,16 @@ let
     assert !(enableDebugger && enableOptimizations)
       || throw "You cannot enable both debugging and optimizations.";
 
-    assert !(enableDebugger && enableMinification)
+    assert !(enableDebugger && doMinification)
       || throw "You cannot enable both debugging and minification.";
 
-    assert !(enableDebugger && enableCompression)
+    assert !(enableDebugger && doCompression)
       || throw "You cannot enable both debugging and compression.";
 
     let
       useElmOptimizeLevel2 = enableOptimizations && optimizeLevel >= 2;
       minifier = if useTerser then "terser" else "uglifyjs";
-      toCompress = if enableMinification then outputMin else output;
+      toCompress = if doMinification then outputMin else output;
 
       defaultElmLock = elmLock;
       defaultRegistryDat = registryDat;
@@ -114,8 +114,8 @@ let
           ++ lib.optional doElmReview elmPackages.elm-review
           ++ lib.optional doElmTest elmPackages.elm-test
           ++ lib.optional useElmOptimizeLevel2 elmPackages.elm-optimize-level-2
-          ++ lib.optional enableMinification (if useTerser then terser else uglify-js)
-          ++ lib.optional enableCompression brotli)
+          ++ lib.optional doMinification (if useTerser then terser else uglify-js)
+          ++ lib.optional doCompression brotli)
           extraNativeBuildInputs
         ];
 
@@ -160,7 +160,7 @@ let
               let
                 inputFiles =
                   if builtins.isList entry then
-                    builtins.warn "elm-optimize-level-2 accepts multiple input files but only processes the first" entry
+                    builtins.warn "elm-optimize-level-2 accepts multiple entry files but only processes the first" entry
                   else
                     [ entry ];
               in
@@ -200,36 +200,36 @@ let
       #
 
       preFixupPhases =
-        (lib.optional enableMinification "minificationPhase")
-        ++ (lib.optional enableCompression "compressionPhase")
-        ++ (lib.optional showStats "showStatsPhase")
-        ++ (lib.optional enableHashedFilenames "contentHashingPhase")
+        (lib.optional doMinification "minificationPhase")
+        ++ (lib.optional doCompression "compressionPhase")
+        ++ (lib.optional doReporting "reportingPhase")
+        ++ (lib.optional doContentHashing "contentHashingPhase")
         ;
 
-      minificationPhase = lib.optional enableMinification ''
+      minificationPhase = lib.optional doMinification ''
         ${minifier} "$out/${output}" \
           --compress 'pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe' \
           | ${minifier} --mangle --output "$out/${outputMin}"
       '';
 
-      compressionPhase = lib.optional enableCompression ''
+      compressionPhase = lib.optional doCompression ''
         gzip ${builtins.concatStringsSep " " gzipFlags} -c "$out/${toCompress}" > "$out/${toCompress}.gz"
         brotli ${builtins.concatStringsSep " " brotliFlags} -c "$out/${toCompress}" > "$out/${toCompress}.br"
       '';
 
-      showStatsPhase = lib.optionalString showStats ''
+      reportingPhase = lib.optionalString doReporting ''
         js="${output}"
         js_size=$(stat -c%s $out/$js)
         echo "Compiled size: $js_size bytes ($js)"
 
-        ${lib.optionalString enableMinification ''
+        ${lib.optionalString doMinification ''
           min="${outputMin}"
           min_size=$(stat -c%s $out/$min)
           min_pct=$(( 100 * min_size / js_size ))
           echo "Minified size: $min_size bytes ($min) (''${min_pct}% of compiled)"
         ''}
 
-        ${lib.optionalString enableCompression ''
+        ${lib.optionalString doCompression ''
           gz="${toCompress}.gz"
           gz_size=$(stat -c%s $out/$gz)
           gz_pct=$(( 100 * gz_size / js_size ))
@@ -241,7 +241,7 @@ let
         ''}
       '';
 
-      contentHashingPhase = lib.optionalString enableHashedFilenames (
+      contentHashingPhase = lib.optionalString doContentHashing (
         assert (hashLength >= 1 && hashLength <= 64)
           || throw "hashLength must be between 1 and 64 inclusive: ${toString hashLength}";
 
@@ -259,8 +259,8 @@ let
           ext="''${filename#*.}"
           hashedFilename="$base.$hash.$ext"
 
-          ${if replaceWithHashedFilenames then "mv" else "cp"} "$file" "$out/$hashedFilename"
-          echo ${if replaceWithHashedFilenames then "Moved" else "Copied"} "$filename" "───>" "$hashedFilename"
+          ${if keepFilesWithNoHashInFilenames then "cp" else "mv"} "$file" "$out/$hashedFilename"
+          echo ${if keepFilesWithNoHashInFilenames then "Copied" else "Moved"} "$filename" "───>" "$hashedFilename"
 
           if [ $first_entry -eq 0 ]; then
             echo "," >> "$manifest"
@@ -272,7 +272,9 @@ let
 
         echo "" >> "$manifest"
         echo "}" >> "$manifest"
+
         cp "$manifest" "$out/manifest.json"
+        echo "Generated manifest.json"
         '');
 
       passthru = {

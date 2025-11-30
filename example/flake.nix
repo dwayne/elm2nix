@@ -54,19 +54,23 @@
             output = "optimized.js";
             enableOptimizations = true;
             optimizeLevel = 2;
-            enableMinification = true;
-            enableCompression = true;
-            showStats = true;
+            doMinification = true;
+            doCompression = true;
+            doReporting = true;
           };
-          combinedExample = optimizedExample.override {
+          combinedExample1 = checkedExample.override {
             entry = [ "src/Main.elm" "src/Workshop.elm" ];
-            output = "combined.js";
+            output = "combined1.js";
+          };
+          combinedExample2 = optimizedExample.override {
+            entry = [ "src/Main.elm" "src/Workshop.elm" ];
+            output = "combined2.js";
           };
           hashedExample = optimizedExample.override {
             output = "hashed.js";
-            enableHashedFilenames = true;
+            doContentHashing = true;
             hashLength = 12;
-            replaceWithHashedFilenames = false;
+            keepFilesWithNoHashInFilenames = true;
           };
         };
       }
