@@ -50,6 +50,12 @@
             doElmTest = true;
             output = "checked.js";
           };
+          reviewedExample = checkedExample.override {
+            doElmReview = true;
+            elmReviewElmLock = ./review/elm.lock;
+            elmReviewRegistryDat = ./review/registry.dat;
+            output = "reviewed.js";
+          };
           optimizedExample = checkedExample.override {
             output = "optimized.js";
             enableOptimizations = true;
