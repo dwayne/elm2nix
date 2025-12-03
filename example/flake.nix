@@ -19,6 +19,18 @@
           elmLock = ./elm.lock;
           registryDat = ./registry.dat;
         };
+
+        example2 = mkElmDerivation (finalAttrs: {
+          pname = "example";
+          version = "1.0.0";
+          src = ./.;
+          elmLock = ./elm.lock;
+          registryDat = ./registry.dat;
+          dontConfigure = false;
+          preConfigure = builtins.trace finalAttrs ''
+            echo ${finalAttrs.version}
+          '';
+        });
       in
       {
         devShells.default = pkgs.mkShell {
@@ -38,18 +50,23 @@
         };
 
         packages = rec {
-          inherit example;
+          inherit example example2;
           default = example;
           debugExample = example.override {
             enableDebugger = true;
             output = "debug.js";
           };
-          checkedExample = example.override {
+          checkedExample = example.override (prev: {
             doElmFormat = true;
-            elmFormatSourceFiles = [ "review/src" "src" "tests" ];
+            #
+            # How will I be able to do something like:
+            #
+            # elmFormatSourceFiles = prev.elmFormatSourceFiles ++ [ "review/src" "tests" ];
+            #
+            elmFormatSourceFiles = builtins.trace prev [ "review/src" "src" "tests" ];
             doElmTest = true;
             output = "checked.js";
-          };
+          });
           optimizedExample = checkedExample.override {
             output = "optimized.js";
             enableOptimizations = true;
