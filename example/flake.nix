@@ -11,7 +11,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        mkElmDerivation = (elm2nix.lib.elm2nix pkgs).mkElmDerivation;
+        inherit (elm2nix.lib.elm2nix pkgs) mkElmDerivation;
 
         example = mkElmDerivation {
           name = "example";
@@ -19,18 +19,6 @@
           elmLock = ./elm.lock;
           registryDat = ./registry.dat;
         };
-
-        example2 = mkElmDerivation (finalAttrs: {
-          pname = "example";
-          version = "1.0.0";
-          src = ./.;
-          elmLock = ./elm.lock;
-          registryDat = ./registry.dat;
-          dontConfigure = false;
-          preConfigure = builtins.trace finalAttrs ''
-            echo ${finalAttrs.version}
-          '';
-        });
       in
       {
         devShells.default = pkgs.mkShell {
@@ -50,23 +38,18 @@
         };
 
         packages = rec {
-          inherit example example2;
+          inherit example;
           default = example;
           debugExample = example.override {
             enableDebugger = true;
             output = "debug.js";
           };
-          checkedExample = example.override (prev: {
+          checkedExample = example.override {
             doElmFormat = true;
-            #
-            # How will I be able to do something like:
-            #
-            # elmFormatSourceFiles = prev.elmFormatSourceFiles ++ [ "review/src" "tests" ];
-            #
-            elmFormatSourceFiles = builtins.trace prev [ "review/src" "src" "tests" ];
+            elmFormatSourceFiles = [ "review/src" "src" "tests" ];
             doElmTest = true;
             output = "checked.js";
-          });
+          };
           optimizedExample = checkedExample.override {
             output = "optimized.js";
             enableOptimizations = true;
