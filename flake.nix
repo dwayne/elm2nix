@@ -4,6 +4,13 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
+        #
+        # FIXME: Given that I'm setting `doCheck = false` maybe
+        # I don't need to add this preCheck anymore.
+        #
+        # But maybe I should still keep it in case someone turns
+        # on the checks downstream?
+        #
         elm2nix = (pkgs.haskellPackages.callPackage ./elm2nix.nix {}).overrideAttrs (old: {
           preCheck = (old.preCheck or "") + ''
             export HSPEC_SKIP="(skip)"
