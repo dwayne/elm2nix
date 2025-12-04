@@ -10,7 +10,26 @@
   outputs = { self, nixpkgs, flake-utils, elm2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            (final: prev: {
+              elmPackages = prev.elmPackages.overrideScope (sFinal: sPrev: {
+                elm-review = sPrev.elm-review.overrideAttrs (old: {
+                  patches = (old.patches or []) ++ [
+                    (prev.fetchpatch {
+                      url = "https://github.com/jfmengels/node-elm-review/commit/c766aca85a30b39396e8555c3a21d69f421ce65a.patch";
+                      hash = "sha256-lrm9h2RXPUwckgoa0pahUkC+V1mwf4U1hbEN9IRdckE=";
+                    })
+                  ];
+                });
+              });
+            })
+          ];
+        };
+
+        elm-review = pkgs.elmPackages.elm-review;
+
         inherit (elm2nix.lib.elm2nix pkgs) mkElmDerivation;
 
         example = mkElmDerivation {
@@ -38,7 +57,7 @@
         };
 
         packages = rec {
-          inherit example;
+          inherit example elm-review;
           default = example;
           debugExample = example.override {
             enableDebugger = true;
