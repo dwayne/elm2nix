@@ -110,7 +110,7 @@ let
                 ""
                 (lib.importJSON elmLock);
           in
-          ({
+          {
             nativeBuildInputs = builtins.concatLists
               [ ([ elmPackages.elm ]
                 ++ lib.optional doElmFormat elmPackages.elm-format
@@ -283,7 +283,7 @@ let
             passthru = {
               inherit prepareElmHomeScript dotElmLinks symbolicLinksToPackagesScript;
             };
-          } // args);
+          };
     };
 
   fetchElmPackage = { author, package, version, sha256 }:
