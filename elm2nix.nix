@@ -17,6 +17,8 @@ mkDerivation {
   testHaskellDepends = [
     aeson base binary bytestring containers hspec text
   ];
+  doHaddock = false;
+  doCheck = false;
   description = "Create Elm artifacts to be used when compiling Elm applications with Nix";
   license = lib.licenses.bsd3;
   mainProgram = "elm2nix";
