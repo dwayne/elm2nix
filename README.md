@@ -1,5 +1,95 @@
 # elm2nix
 
+A rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) with a few improvements.
+
+## Usage
+
+### Overview
+
+In the folder containing your Elm application's `elm.json` you use:
+
+- `elm2nix lock` to generate a lock file called `elm.lock` by default
+- `elm2nix registry generate` to generate `registry.dat`
+
+These generated files are used by a builder called `buildElmApplication` to build various derivations of your Elm application.
+
+### Details
+
+1. Add `dwayne/elm2nix` as an input to your flake.
+
+```nix
+inputs.elm2nix.url = "github:dwayne/elm2nix";
+```
+
+2. Add it's default package to your development shell.
+
+```nix
+outputs = { self, nixpkgs, flake-utils, elm2nix }:
+    flake-utils.lib.eachDefaultSystem(system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+      in
+      {
+        devShells.default = pkgs.mkShell {
+          packages = [
+            elm2nix.packages.${system}.default
+            ...
+          ];
+
+          ...
+        };
+
+        ...
+      }
+    );
+```
+
+3. Use the `elm2nix` program to generate the `elm.lock` and `registry.dat` files from your Elm application's `elm.json`.
+
+```bash
+nix develop
+elm2nix lock              # generates elm.lock
+elm2nix registry generate # generates registry.dat
+```
+
+See `elm2nix --help` for more details.
+
+4. Use `buildElmApplication` to build your Elm application.
+
+```nix
+outputs = { self, nixpkgs, flake-utils, elm2nix }:
+    flake-utils.lib.eachDefaultSystem(system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
+
+        myApp = buildElmApplication {
+          name = "my-app";
+          src = ./.;
+          elmLock = ./elm.lock;
+          registryDat = ./registry.dat;
+        };
+      in
+      {
+        packages.myApp = myApp;
+
+        ...
+      }
+    );
+```
+
+5. Build your Elm application.
+
+```bash
+nix build .#myApp
+```
+
+This will generate a `result/` directory containing your compiled application in `elm.js`.
+
+6. That's it.
+
+You can view a full working example in the [`example/`](./example) directory.
+
 ## Draft
 
 - Explain at a high level what the repository is about
