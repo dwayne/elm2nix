@@ -4,7 +4,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
-        elm2nix = (pkgs.haskellPackages.callPackage ./elm2nix.nix {}).overrideAttrs (old: {
+        elm2nix = (pkgs.haskellPackages.callPackage ./nix/generated/elm2nix.nix {}).overrideAttrs (old: {
           #
           # N.B. Even though `doCheck = false` by default I add this `preCheck`
           #      to ensure that downstream users don't have to worry about it.

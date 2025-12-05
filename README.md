@@ -45,7 +45,7 @@ TODO:
 ### How was `elm2nix.nix` generated?
 
 ```bash
-cabal2nix --no-haddock --no-check . > elm2nix.nix
+(cd nix/generated && cabal2nix --no-haddock --no-check ../..)
 ```
 
 ## Documentation
