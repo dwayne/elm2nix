@@ -1,6 +1,13 @@
 # elm2nix
 
-A rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) with a few improvements.
+A rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) with a few changes and improvements.
+
+These are some of the notable differences:
+
+1. It uses a JSON formatted lock file that has support for multiple versions of the same package.
+2. `elm2nix registry view`
+3. `buildElmApplication`
+4. ... (WIP: 2025.10.21)
 
 ## Usage
 
@@ -8,10 +15,10 @@ A rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) with a few im
 
 In the folder containing your Elm application's `elm.json` you use:
 
-- `elm2nix lock` to generate a lock file called `elm.lock` by default
-- `elm2nix registry generate` to generate `registry.dat`
+- `elm2nix lock` to generate an `elm.lock` lock file
+- `elm2nix registry generate` to generate a `registry.dat` file
 
-These generated files are used by a builder called `buildElmApplication` to build various derivations of your Elm application.
+These generated files are then used by a Nix builder, called `buildElmApplication`, to build various derivations of your Elm application.
 
 ### Details
 
