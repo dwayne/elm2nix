@@ -5,9 +5,18 @@ A rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) with a few ch
 These are some of the notable differences:
 
 1. It uses a JSON formatted lock file that has support for multiple versions of the same package.
-2. `elm2nix registry view`
-3. `buildElmApplication`
-4. ... (WIP: 2025.10.21)
+2. You can display any `registry.dat` as JSON using `elm2nix registry view`.
+3. There is a `buildElmApplication` build helper that allows you to build an Elm application in a variety of ways by setting options. For e.g.
+    - Turn on the time-travelling debugger
+    - Fail the build if your Elm source code is improperly formatted
+    - Fail the build if your Elm tests fail
+    - Turn on optimizations
+    - Use [`elm-optimize-level-2`](https://github.com/mdgriffith/elm-optimize-level-2) instead of `elm make --optimize`
+    - Enable minification with [UglifyJS](https://github.com/mishoo/UglifyJS) or [Terser](https://terser.org/)
+    - Enable compression with [gzip](https://www.gnu.org/software/gzip/) and [brotli](https://github.com/google/brotli)
+    - [Show a report](https://guide.elm-lang.org/optimization/asset_size#scripts) about the changes in your file size due to minification and compression
+    - Enable content hashing for cache busting purposes
+    - Or completely customize portions of the build to your liking if you know how [`stdenv.mkDerivation`](https://nixos.org/manual/nixpkgs/stable/#chap-stdenv) works
 
 ## Usage
 
@@ -18,7 +27,7 @@ In the folder containing your Elm application's `elm.json` you use:
 - `elm2nix lock` to generate an `elm.lock` lock file
 - `elm2nix registry generate` to generate a `registry.dat` file
 
-These generated files are then used by a Nix builder, called `buildElmApplication`, to build various derivations of your Elm application.
+These generated files are then used by a build helper, called `buildElmApplication`, to build your Elm application.
 
 ### Details
 
