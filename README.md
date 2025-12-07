@@ -108,9 +108,11 @@ You can view a full working example in the [`example/`](./example) directory.
 
 ## About
 
-Near the end of 2025 I was looking for a practical and interesting project to work on. When I researched [`cachix/elm2nix`](https://github.com/cachix/elm2nix) it seemed to fit the bill because it combined 3 technologies I loved, Elm, Haskell, and Nix to produce a useful tool for Elm developers. At the time, I knew how to use each of the technologies to varying degrees but I didn't have a deep understanding of how `cachix/elm2nix` worked and why it needed to work that way. As a result, it seemed like a great project to satisfy my curiosity. Fast forward 2 months and I'm happy I took the plunge. I learned so much about Elm, Haskell, and Nix that I didn't know before and I was able to find little ways to usefully improve upon the project.
+I was looking for a practical and interesting project to work on that might be useful for the Elm community and at the same time extend my skills within functional programming. When I researched [`cachix/elm2nix`](https://github.com/cachix/elm2nix) it seemed to fit the bill because it combined 3 technologies I loved, Elm, Haskell, and Nix to produce a useful tool for Elm developers. At the time, I knew how to use each of the technologies to varying degrees but I didn't have a deep understanding of how `cachix/elm2nix` worked and why it needed to work that way. As a result, it seemed like a great project to satisfy my goals. Fast forward 2 months and I'm happy I took the plunge. I learned so much about Elm, Haskell, and Nix that I didn't know before and I was able to find little ways to usefully improve upon the project.
 
 ## References
+
+A grossly incomplete list of resources that helped me while working on the project.
 
 - [elm2nix 0.1](https://blog.hercules-ci.com/elm/2019/01/03/elm2nix-0.1/)
   - [NixOS/nixpkgs - elm2nix issue 20601](https://github.com/NixOS/nixpkgs/issues/20601)
