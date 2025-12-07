@@ -106,57 +106,22 @@ This will generate a `result/` directory containing your compiled application in
 
 You can view a full working example in the [`example/`](./example) directory.
 
-## Draft
+## About
 
-- Explain at a high level what the repository is about
-- Show how to use everything that's available
-- How to enter the developer shell?
-  - `nix develop`
-  - What does it give you access to?
-- What does the repository contain?
-  - The Haskell source code for the `elm2nix` executable
-    - How to build it?
-    - How to test it?
-  - The Nix source code for the `buildElmApplication` builder
-    - How to use it?
-  - An example Elm application that uses `buildElmApplication` and friends to showcase various examples
+Near the end of 2025 I was looking for a practical and interesting project to work on. When I researched [`cachix/elm2nix`](https://github.com/cachix/elm2nix) it seemed to fit the bill because it combined 3 technologies I loved, Elm, Haskell, and Nix to produce a useful tool for Elm developers. At the time, I knew how to use each of the technologies to varying degrees but I didn't have a deep understanding of how `cachix/elm2nix` worked and why it needed to work that way. As a result, it seemed like a great project to satisfy my curiosity. Fast forward 2 months and I'm happy I took the plunge. I learned so much about Elm, Haskell, and Nix that I didn't know before and I was able to find little ways to usefully improve upon the project.
 
-Haskell specific stuff:
+## References
 
-```
-- app
-- src
-- test
-- elm2nix.cabal
-```
-
-`elm2nix.nix` is generated with `cabal2nix`. Maybe I should put it in the `nix/generated` directory. It should not be edited manually.
-
-TODO:
-
-- Maybe I should write a Makefile?
-  - For both the Haskell package and the example Elm application
-- Maybe I should add convenience scripts in `bin` like I typically do
-  - `check`
-    - `hlint` could be optional
-  - `clean`
-  - `format`
-  - `test`
-- Add a README to `example/`
-- Add a README to `nix/`
-- Add a README to `test/`
-
-## Notes
-
-### How was `elm2nix.nix` generated?
-
-```bash
-(cd nix/generated && cabal2nix --no-haddock --no-check ../..)
-```
-
-## Documentation
-
-- [GHC Documentation](https://downloads.haskell.org/ghc/9.10.2/docs/)
-- Cabal User Guide
-- Documentation for all the Haskell libraries I used
-- Documentation for Nix and Nixpkgs
+- [elm2nix 0.1](https://blog.hercules-ci.com/elm/2019/01/03/elm2nix-0.1/)
+  - [NixOS/nixpkgs - elm2nix issue 20601](https://github.com/NixOS/nixpkgs/issues/20601)
+- [`cachix/elm2nix`](https://github.com/cachix/elm2nix)
+- [`jeslie0/mkElmDerivation`](https://github.com/jeslie0/mkElmDerivation)
+  - [Default to terser instead of uglifyjs](https://github.com/jeslie0/mkElmDerivation/issues/13)
+  - [Fork: `r-k-b/mkElmDerivation`](https://github.com/r-k-b/mkElmDerivation)
+- [`haskellPackages.mkDerivation`](https://nixos.org/manual/nixpkgs/stable/#haskell-mkderivation)
+  - [`pkgs/development/haskell-modules/generic-builder.nix`](https://github.com/NixOS/nixpkgs/blob/b165db247068f3cd0a1d4df0189f8824f59b8279/pkgs/development/haskell-modules/generic-builder.nix)
+- [`buildNpmPackage`](https://nixos.org/manual/nixpkgs/stable/#javascript-buildNpmPackage)
+  - [`pkgs/build-support/node/build-npm-package/default.nix`](https://github.com/NixOS/nixpkgs/blob/b165db247068f3cd0a1d4df0189f8824f59b8279/pkgs/build-support/node/build-npm-package/default.nix)
+- [`lib.customisation.extendMkDerivation`](https://nixos.org/manual/nixpkgs/stable/#function-library-lib.customisation.extendMkDerivation)
+- [Caching Elm dependencies on GitHub Actions](https://brianvanburken.nl/caching-elm-dependencies-on-github-actions/)
+- [What I've learned about minifying Elm code](https://discourse.elm-lang.org/t/what-i-ve-learned-about-minifying-elm-code/7632)
