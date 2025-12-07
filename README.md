@@ -120,6 +120,7 @@ A grossly incomplete list of resources that helped me while working on the proje
 - [`jeslie0/mkElmDerivation`](https://github.com/jeslie0/mkElmDerivation)
   - [Default to terser instead of uglifyjs](https://github.com/jeslie0/mkElmDerivation/issues/13)
   - [Fork: `r-k-b/mkElmDerivation`](https://github.com/r-k-b/mkElmDerivation)
+- [The Standard Environment: Phases](https://nixos.org/manual/nixpkgs/stable/#sec-stdenv-phases)
 - [`haskellPackages.mkDerivation`](https://nixos.org/manual/nixpkgs/stable/#haskell-mkderivation)
   - [`pkgs/development/haskell-modules/generic-builder.nix`](https://github.com/NixOS/nixpkgs/blob/b165db247068f3cd0a1d4df0189f8824f59b8279/pkgs/development/haskell-modules/generic-builder.nix)
 - [`buildNpmPackage`](https://nixos.org/manual/nixpkgs/stable/#javascript-buildNpmPackage)
