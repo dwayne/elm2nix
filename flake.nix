@@ -27,7 +27,7 @@
           ];
 
           shellHook = ''
-            export PS1="($name) $PS1"
+            export PS1="($name)\n$PS1"
             export PROJECT_ROOT="$PWD"
             export HSPEC_SKIP="(skip:network)"
           '';
