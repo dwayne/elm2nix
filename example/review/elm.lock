@@ -1,6 +1,12 @@
 [
     {
         "author": "elm",
+        "package": "browser",
+        "version": "1.0.2",
+        "sha256": "0863nw2hhbpm3s03lm1imi5x28wwknzrwg2p79s5mydgvdvgwjf0"
+    },
+    {
+        "author": "elm",
         "package": "bytes",
         "version": "1.0.8",
         "sha256": "0n411j2cyz9m241q6vszfzpq3fraradwal5m0gigp2505mdfpz3x"
@@ -22,6 +28,12 @@
         "package": "json",
         "version": "1.1.3",
         "sha256": "1hx986yqw1v2bpkrh6brszl8n8awwg1s8zi7v5qg0p1rqwvjlicz"
+    },
+    {
+        "author": "elm",
+        "package": "json",
+        "version": "1.1.4",
+        "sha256": "0niq7id7r78ckvgap4psq0xdlnhcv1dz2j81lrnhl4fsgn0awvs8"
     },
     {
         "author": "elm",
@@ -52,6 +64,12 @@
         "package": "time",
         "version": "1.0.0",
         "sha256": "0wqa2vhl1zf8z0j2yd3yjwfhr0dydfns43bbzll3k4rhnjadxr1l"
+    },
+    {
+        "author": "elm",
+        "package": "url",
+        "version": "1.0.0",
+        "sha256": "1f2ij4i7zmijnj2i50qf19lpkr14bhms8dkq029inb5mydi9f8gs"
     },
     {
         "author": "elm",

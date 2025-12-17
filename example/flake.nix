@@ -10,7 +10,28 @@
   outputs = { self, nixpkgs, flake-utils, elm2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            (final: prev: {
+              elmPackages = prev.elmPackages.overrideScope (sFinal: sPrev: {
+                elm-review = sPrev.elm-review.overrideAttrs (old: {
+                  patches = (old.patches or []) ++ [
+                    (prev.fetchpatch {
+                      url = "https://github.com/jfmengels/node-elm-review/commit/c766aca85a30b39396e8555c3a21d69f421ce65a.patch";
+                      hash = "sha256-lrm9h2RXPUwckgoa0pahUkC+V1mwf4U1hbEN9IRdckE=";
+                    })
+                    (prev.fetchpatch {
+                      url = "https://github.com/jfmengels/node-elm-review/commit/6f28d380f5eccb054a52e53292cc0ee5a729ca5f.patch";
+                      hash = "sha256-rb42/8MG+tI3cmNl0bhCvwc7jObZ3dlofg1yl2wbGSI=";
+                    })
+                  ];
+                });
+              });
+            })
+          ];
+        };
+
         inherit (elm2nix.lib.elm2nix pkgs)
           buildElmApplication
           prepareElmHomeScript
@@ -83,6 +104,13 @@
             elmFormatSourceFiles = [ "review/src" "src" "tests" ];
             doElmTest = true;
             output = "checked.js";
+          };
+
+          reviewedExample = checkedExample.override {
+            doElmReview = true;
+            elmReviewElmLock = ./review/elm.lock;
+            elmReviewRegistryDat = ./review/registry.dat;
+            output = "reviewed.js";
           };
 
           optimizedExample = checkedExample.override {
