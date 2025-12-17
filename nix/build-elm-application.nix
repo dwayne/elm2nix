@@ -85,24 +85,12 @@ lib.extendMkDerivation {
 
         preBuildPhases = [
           (lib.optionalString doElmFormat "elmFormatPhase")
-          (lib.optionalString doElmReview "elmReviewPhase")
           "prepareElmHomePhase"
           (lib.optionalString doElmTest "elmTestPhase")
         ];
 
         elmFormatPhase = lib.optionalString doElmFormat ''
           elm-format ${builtins.concatStringsSep " " elmFormatSourceFiles} --validate
-        '';
-
-        elmReviewPhase = lib.optionalString doElmReview ''
-          if [ -d review ]; then
-            ${prepareElmHomeScript { elmLock = elmReviewElmLock; registryDat = elmReviewRegistryDat; directory = ".elm-review"; }}
-
-            # echo elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline "is disabled since it hasn't been working as expected"
-            elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline
-          else
-            echo "Skipping elm-review since no review/ directory was found"
-          fi
         '';
 
         prepareElmHomePhase = prepareElmHomeScript { inherit elmLock registryDat; };
@@ -148,6 +136,18 @@ lib.extendMkDerivation {
 
           runHook postBuild
           '';
+
+        postBuildPhases = [
+          (lib.optionalString doElmReview "elmReviewPhase")
+        ];
+
+        elmReviewPhase = lib.optionalString doElmReview ''
+          if [ -d review ]; then
+            elm-review ${builtins.concatStringsSep " " elmReviewFlags} --offline
+          else
+            echo "Skipping elm-review since no review/ directory was found"
+          fi
+        '';
 
         installPhase = ''
           runHook preInstall

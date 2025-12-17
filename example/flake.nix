@@ -108,8 +108,6 @@
 
           reviewedExample = checkedExample.override {
             doElmReview = true;
-            elmReviewElmLock = ./review/elm.lock;
-            elmReviewRegistryDat = ./review/registry.dat;
             output = "reviewed.js";
           };
 
