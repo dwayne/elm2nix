@@ -21,6 +21,10 @@
                       url = "https://github.com/jfmengels/node-elm-review/commit/c766aca85a30b39396e8555c3a21d69f421ce65a.patch";
                       hash = "sha256-lrm9h2RXPUwckgoa0pahUkC+V1mwf4U1hbEN9IRdckE=";
                     })
+                    (prev.fetchpatch {
+                      url = "https://github.com/jfmengels/node-elm-review/commit/6f28d380f5eccb054a52e53292cc0ee5a729ca5f.patch";
+                      hash = "sha256-rb42/8MG+tI3cmNl0bhCvwc7jObZ3dlofg1yl2wbGSI=";
+                    })
                   ];
                 });
               });
