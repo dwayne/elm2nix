@@ -39,6 +39,7 @@ library
         Elm2Nix.Data.Version,
         Elm2Nix.Lib.Binary,
         Elm2Nix.Lib.Json,
+        Elm2Nix.Lib.Json.Decode,
         Elm2Nix.Lib.Nix
 
     ghc-options: -Wall -Wno-name-shadowing
@@ -51,6 +52,7 @@ library
         binary >= 0.8.9 && < 0.9,
         bytestring >= 0.12.2 && < 0.13,
         containers >= 0.7 && < 0.8,
+        json,
         indexed-traversable >= 0.1.4 && < 0.2,
         --
         -- N.B. The lower bound has been adjusted to satisfy
@@ -99,6 +101,7 @@ test-suite test
         Test.Elm2Nix.Data.Version,
         Test.Elm2Nix.Lib.Binary,
         Test.Elm2Nix.Lib.Json,
+        Test.Elm2Nix.Lib.Json.Decode,
         Test.Elm2Nix.Lib.Nix,
         Test.Fixture
 
