@@ -3,6 +3,7 @@ module Elm2Nix.Lib.Json.Decode
     , DecodeError(..)
     , succeed, failWith
     , string, keyValuePairs, field, at, optional
+    , Error(..)
     , decodeString, decodeValue
     ) where
 
@@ -48,6 +49,17 @@ instance Applicative Decoder where
 
                         Left err ->
                             Left err
+
+                Left err ->
+                    Left err
+
+
+instance Monad Decoder where
+    da >>= callback =
+        Decoder $ \value ->
+            case decodeValue da value of
+                Right a ->
+                    decodeValue (callback a) value
 
                 Left err ->
                     Left err

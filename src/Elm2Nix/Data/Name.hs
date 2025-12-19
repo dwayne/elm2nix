@@ -111,10 +111,10 @@ fromText t =
     in
     case T.uncons slashPackage of
         Just ( '/', package ) ->
-            if T.null author then
+            if isBlank author then
                 Left EmptyAuthor
 
-            else if T.null package then
+            else if isBlank package then
                 Left EmptyPackage
 
             else
@@ -122,6 +122,11 @@ fromText t =
 
         _ ->
             Left MissingForwardSlash
+
+
+isBlank :: Text -> Bool
+isBlank =
+    T.null . T.strip
 
 
 

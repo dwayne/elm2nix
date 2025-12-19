@@ -1,11 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Elm2Nix.Data.ElmJson (ElmJson, fromList, toAscList, toSet) where
+module Elm2Nix.Data.ElmJson
+    ( ElmJson
+    , fromList
+    , toAscList
+    , toSet
+    , nameDecoder
+    ) where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Key as Key
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
+import qualified Data.Text as T
 
 import Data.Aeson.Key (Key)
 import Data.Aeson.Types ((<?>), (.:?), FromJSON, JSONPathElement(..), Object, Parser, Value, emptyObject, parseFail)
@@ -14,6 +21,7 @@ import Data.Traversable.WithIndex (itraverse)
 
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.Version as Version
+import qualified Elm2Nix.Lib.Json.Decode as JD
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Name (Name)
@@ -73,6 +81,22 @@ optional o key f =
 nameParser :: Key -> Parser Name
 nameParser =
     either (parseFail . errorToString) pure . Name.fromText . Key.toText
+    where
+        errorToString Name.EmptyAuthor         = "author is empty"
+        errorToString Name.EmptyPackage        = "package is empty"
+        errorToString Name.MissingForwardSlash = "/ is missing"
+
+
+nameDecoder :: JD.Decoder Name
+nameDecoder =
+    JD.string >>= \s ->
+        case Name.fromText (T.pack s) of
+            Right name ->
+                JD.succeed name
+
+            Left err ->
+                JD.failWith (errorToString err)
+
     where
         errorToString Name.EmptyAuthor         = "author is empty"
         errorToString Name.EmptyPackage        = "package is empty"
