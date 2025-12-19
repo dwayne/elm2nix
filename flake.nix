@@ -30,6 +30,15 @@
             export PS1="($name)\n$PS1"
             export PROJECT_ROOT="$PWD"
             export HSPEC_SKIP="(skip:network)"
+
+            lint () {
+              hlint "$PROJECT_ROOT/src" "$PROJECT_ROOT/test"
+            }
+            export -f lint
+
+            alias b='cabal build'
+            alias l='lint'
+            alias t='cabal test'
           '';
         };
 
