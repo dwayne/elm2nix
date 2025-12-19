@@ -5,6 +5,7 @@ module Test.Elm2Nix.Data.Name (main) where
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
 
+import Data.Foldable (traverse_)
 import Test.Hspec
 
 import qualified Elm2Nix.Data.Name as Name
@@ -27,10 +28,18 @@ fromTextSpec =
 
         describe "invalid input" $ do
             it "when author is empty" $
-                Name.fromText "/core" `shouldBe` Left Name.EmptyAuthor
+                let
+                    check t =
+                        Name.fromText t `shouldBe` Left Name.EmptyAuthor
+                in
+                traverse_ check [ "/core", " /core" ]
 
             it "when package is empty" $
-                Name.fromText "elm/" `shouldBe` Left Name.EmptyPackage
+                let
+                    check t =
+                        Name.fromText t `shouldBe` Left Name.EmptyPackage
+                in
+                traverse_ check [ "elm/", "elm/ " ]
 
             it "when / is missing" $
                 Name.fromText "elmcore" `shouldBe` Left Name.MissingForwardSlash

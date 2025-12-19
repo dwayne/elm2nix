@@ -5,7 +5,6 @@ module Test.Elm2Nix.Data.ElmJson (main) where
 import qualified Data.Aeson as Json
 
 import Data.ByteString.Lazy (ByteString)
-import Data.Foldable (traverse_)
 import Test.Hspec
 
 import qualified Elm2Nix.Data.ElmJson as ElmJson
@@ -308,23 +307,10 @@ nameDecoderSpec :: Spec
 nameDecoderSpec =
     describe "nameDecoder" $ do
         it "empty author" $
-            let
-                check input =
-                    JD.decodeString ElmJson.nameDecoder (toJSONString input) `shouldBe` Left (JD.DecodeError (JD.Failure "author is empty"))
-            in
-            traverse_ check [ "/browser", " /browser" ]
+            JD.decodeString ElmJson.nameDecoder "\"/browser\"" `shouldBe` Left (JD.DecodeError (JD.Failure "author is empty"))
 
         it "empty package" $
-            let
-                check input =
-                    JD.decodeString ElmJson.nameDecoder (toJSONString input) `shouldBe` Left (JD.DecodeError (JD.Failure "package is empty"))
-            in
-            traverse_ check [ "elm/", "elm/ " ]
+            JD.decodeString ElmJson.nameDecoder "\"elm/\"" `shouldBe` Left (JD.DecodeError (JD.Failure "package is empty"))
 
         it "missing slash" $
-            JD.decodeString ElmJson.nameDecoder (toJSONString "elmbrowser") `shouldBe` Left (JD.DecodeError (JD.Failure "/ is missing"))
-
-
-toJSONString :: String -> String
-toJSONString s =
-    ("\"" ++ s ++ "\"")
+            JD.decodeString ElmJson.nameDecoder "\"elmbrowser\"" `shouldBe` Left (JD.DecodeError (JD.Failure "/ is missing"))
