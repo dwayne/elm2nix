@@ -1,9 +1,9 @@
 module Test.Elm2Nix.Lib.Json.Decode (main) where
 
-import qualified Elm2Nix.Lib.Json.Decode as JD
-
 import Data.Maybe (fromMaybe)
 import Test.Hspec
+
+import qualified Elm2Nix.Lib.Json.Decode as JD
 
 
 main :: IO ()
@@ -91,4 +91,4 @@ elmJsonDecoder =
 
 pathToDependenciesDecoder :: [String] -> JD.Decoder [(String, String)]
 pathToDependenciesDecoder dottedPath =
-    fmap (fromMaybe []) (JD.optional (JD.at dottedPath (JD.keyValuePairs Right JD.string)))
+    fmap (fromMaybe []) (JD.optionalAt dottedPath (JD.keyValuePairs Right JD.string))

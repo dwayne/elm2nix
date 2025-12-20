@@ -2,6 +2,7 @@
 
 module Elm2Nix.Data.ElmJson
     ( ElmJson
+    , fromFile
     , fromList
     , toAscList
     , toSet
@@ -92,7 +93,7 @@ decoder =
 
 pathToDependenciesDecoder :: [String] -> JD.Decoder [Dependency]
 pathToDependenciesDecoder path =
-    fmap (fromMaybe []) (JD.optional (JD.at path dependenciesDecoder))
+    fmap (fromMaybe []) (JD.optionalAt path dependenciesDecoder)
 
 
 dependenciesDecoder :: JD.Decoder [Dependency]
@@ -152,6 +153,10 @@ versionDecoder =
 
 -- CONSTRUCT
 
+
+
+fromFile :: FilePath -> IO (Either JD.Error ElmJson)
+fromFile = JD.decodeFile decoder
 
 
 fromList :: [Dependency] -> ElmJson

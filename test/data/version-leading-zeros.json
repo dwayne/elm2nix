@@ -1,4 +1,5 @@
 {
+    "type": "application",
     "dependencies": {
         "direct": {
             "elm/browser": "1.0.02"

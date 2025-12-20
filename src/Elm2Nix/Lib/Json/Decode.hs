@@ -2,15 +2,17 @@ module Elm2Nix.Lib.Json.Decode
     ( Decoder
     , DecodeError(..)
     , succeed, failWith
-    , string, literal, keyValuePairs, field, at, optional
+    , string, literal, keyValuePairs
+    , field, at, optionalAt
     , Error(..)
-    , decodeString, decodeValue
+    , decodeFile, decodeString, decodeValue
     ) where
 
 import qualified Text.JSON as JSON
 import qualified Text.JSON.Types as JSON
 
 import Data.Bifunctor (first)
+import Data.List (intercalate)
 import Text.JSON (JSValue(..))
 
 
@@ -154,15 +156,56 @@ at :: [String] -> Decoder a -> Decoder a
 at path decoder = foldr field decoder path
 
 
-optional :: Decoder a -> Decoder (Maybe a)
-optional decoder =
+optionalAt :: [String] -> Decoder a -> Decoder (Maybe a)
+optionalAt path decoder =
+    let
+        dottedName = intercalate "." path
+    in
     Decoder $ \value ->
-        case decodeValue decoder value of
-            Right x ->
-                Right (Just x)
+        case getFields path value of
+            Right maybeValue ->
+                case maybeValue of
+                    Just fieldValue ->
+                        case decodeValue decoder fieldValue of
+                            Right a ->
+                                Right (Just a)
 
-            Left _ ->
-                Right Nothing
+                            Left err ->
+                                Left (FieldError dottedName err)
+
+                    Nothing ->
+                        Right Nothing
+
+            Left err ->
+                Left (FieldError dottedName err)
+
+
+getFields :: [String] -> JSON.JSValue -> Either DecodeError (Maybe JSON.JSValue)
+getFields path value =
+    case path of
+        [] ->
+            Right Nothing
+
+        [name] ->
+            case value of
+                JSObject o ->
+                    Right $ JSON.get_field o name
+
+                _ ->
+                    Left (Expected "an OBJECT" value)
+
+        name : restPath ->
+            case value of
+                JSObject o ->
+                    case JSON.get_field o name of
+                        Just fieldValue ->
+                            getFields restPath fieldValue
+
+                        Nothing ->
+                            Right Nothing
+
+                _ ->
+                    Left (Expected "an OBJECT" value)
 
 
 
@@ -174,6 +217,11 @@ data Error
     = SyntaxError String
     | DecodeError DecodeError
     deriving (Eq, Show)
+
+
+decodeFile :: Decoder a -> FilePath -> IO (Either Error a)
+decodeFile decoder path =
+    decodeString decoder <$> readFile path
 
 
 decodeString :: Decoder a -> String -> Either Error a
