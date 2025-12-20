@@ -5,7 +5,7 @@ module Elm2Nix.Data.ElmJson
     , fromList
     , toAscList
     , toSet
-    , nameDecoder, versionDecoder
+    , dependenciesDecoder, nameDecoder, versionDecoder
     ) where
 
 import qualified Data.Aeson as Json
@@ -16,6 +16,7 @@ import qualified Data.Text as T
 
 import Data.Aeson.Key (Key)
 import Data.Aeson.Types ((<?>), (.:?), FromJSON, JSONPathElement(..), Object, Parser, Value, emptyObject, parseFail)
+import Data.Bifunctor (first)
 import Data.Set (Set)
 import Data.Traversable.WithIndex (itraverse)
 
@@ -76,6 +77,19 @@ dependencyParser key value =
 optional :: Object -> Key -> (Value -> Parser a) -> Parser a
 optional o key f =
     (o .:? key >>= f . Maybe.fromMaybe emptyObject) <?> Key key
+
+
+dependenciesDecoder :: JD.Decoder [Dependency]
+dependenciesDecoder =
+    JD.keyValuePairs nameFromString versionDecoder >>= JD.succeed . map (uncurry Dependency)
+
+
+nameFromString :: String -> Either String Name
+nameFromString = first errorToString . Name.fromText . T.pack
+    where
+        errorToString Name.EmptyAuthor         = "author is empty"
+        errorToString Name.EmptyPackage        = "package is empty"
+        errorToString Name.MissingForwardSlash = "/ is missing"
 
 
 nameParser :: Key -> Parser Name

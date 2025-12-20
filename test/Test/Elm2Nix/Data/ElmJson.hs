@@ -22,6 +22,7 @@ main = hspec $
         eitherDecodeSpec
         nameDecoderSpec
         versionDecoderSpec
+        dependenciesDecoderSpec
 
 
 eitherDecodeSpec :: Spec
@@ -325,3 +326,49 @@ versionDecoderSpec =
 
         it "example 2" $
             JD.decodeString ElmJson.versionDecoder "\"1.2\"" `shouldBe` Left (JD.DecodeError (JD.Failure "version is invalid: 1.2"))
+
+
+dependenciesDecoderSpec :: Spec
+dependenciesDecoderSpec =
+    describe "dependenciesDecoder" $ do
+        it "example 1" $
+            JD.decodeString ElmJson.dependenciesDecoder "{}" `shouldBe` Right []
+
+        it "example 2" $
+            let
+                input =
+                    "{                               \
+                    \    \"elm/browser\": \"1.0.2\", \
+                    \    \"elm/core\": \"1.0.5\",    \
+                    \    \"elm/html\": \"1.0.0\",    \
+                    \    \"elm/json\": \"1.1.3\",    \
+                    \    \"elm/url\": \"1.0.0\"      \
+                    \}                               "
+
+                output =
+                    [ Dependency Name.elmBrowser (Version 1 0 2)
+                    , Dependency Name.elmCore (Version 1 0 5)
+                    , Dependency Name.elmHtml (Version 1 0 0)
+                    , Dependency Name.elmJson (Version 1 1 3)
+                    , Dependency Name.elmUrl (Version 1 0 0)
+                    ]
+            in
+            JD.decodeString ElmJson.dependenciesDecoder input `shouldBe` Right output
+
+        it "example 3" $
+            let
+                input =
+                    "{                           \
+                    \    \"/browser\": \"1.0.2\" \
+                    \}                           "
+            in
+            JD.decodeString ElmJson.dependenciesDecoder input `shouldBe` Left (JD.DecodeError (JD.FieldError "/browser" (JD.Failure "author is empty")))
+
+        it "example 4" $
+            let
+                input =
+                    "{                            \
+                    \    \"elm/browser\": \"1.0\" \
+                    \}                            "
+            in
+            JD.decodeString ElmJson.dependenciesDecoder input `shouldBe` Left (JD.DecodeError (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0")))
