@@ -5,7 +5,7 @@ module Elm2Nix.Data.ElmJson
     , fromList
     , toAscList
     , toSet
-    , nameDecoder
+    , nameDecoder, versionDecoder
     ) where
 
 import qualified Data.Aeson as Json
@@ -106,6 +106,17 @@ nameDecoder =
 versionParser :: Value -> Parser Version
 versionParser =
     Json.withText "Version" $ \t -> maybe (parseFail $ "version is invalid: " ++ show t) pure (Version.fromText t)
+
+
+versionDecoder :: JD.Decoder Version
+versionDecoder =
+    JD.string >>= \s ->
+        case Version.fromText (T.pack s) of
+            Just version ->
+                JD.succeed version
+
+            Nothing ->
+                JD.failWith $ "version is invalid: " ++ s
 
 
 

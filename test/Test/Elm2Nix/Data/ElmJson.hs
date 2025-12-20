@@ -21,6 +21,7 @@ main = hspec $
     describe "Elm2Nix.Data.ElmJson" $ do
         eitherDecodeSpec
         nameDecoderSpec
+        versionDecoderSpec
 
 
 eitherDecodeSpec :: Spec
@@ -314,3 +315,13 @@ nameDecoderSpec =
 
         it "missing slash" $
             JD.decodeString ElmJson.nameDecoder "\"elmbrowser\"" `shouldBe` Left (JD.DecodeError (JD.Failure "/ is missing"))
+
+
+versionDecoderSpec :: Spec
+versionDecoderSpec =
+    describe "versionDecoder" $ do
+        it "example 1" $
+            JD.decodeString ElmJson.versionDecoder "\"1.2.3\"" `shouldBe` Right (Version 1 2 3)
+
+        it "example 2" $
+            JD.decodeString ElmJson.versionDecoder "\"1.2\"" `shouldBe` Left (JD.DecodeError (JD.Failure "version is invalid: 1.2"))
