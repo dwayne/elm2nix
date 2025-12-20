@@ -2,7 +2,7 @@ module Elm2Nix.Lib.Json.Decode
     ( Decoder
     , DecodeError(..)
     , succeed, failWith
-    , string, keyValuePairs, field, at, optional
+    , string, literal, keyValuePairs, field, at, optional
     , Error(..)
     , decodeString, decodeValue
     ) where
@@ -87,6 +87,16 @@ string =
 
             _ ->
                 Left (Expected "a STRING" value)
+
+
+literal :: String -> Decoder ()
+literal s =
+    string >>= \t ->
+        if t == s then
+            succeed ()
+
+        else
+            failWith $ "not equal to \"" ++ s ++ "\": \"" ++ t ++ "\""
 
 
 keyValuePairs :: (String -> Either String k) -> Decoder v -> Decoder [(k, v)]

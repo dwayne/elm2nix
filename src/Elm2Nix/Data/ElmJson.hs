@@ -5,7 +5,7 @@ module Elm2Nix.Data.ElmJson
     , fromList
     , toAscList
     , toSet
-    , dependenciesDecoder, nameDecoder, versionDecoder
+    , decoder, dependenciesDecoder, nameDecoder, versionDecoder
     ) where
 
 import qualified Data.Aeson as Json
@@ -17,6 +17,7 @@ import qualified Data.Text as T
 import Data.Aeson.Key (Key)
 import Data.Aeson.Types ((<?>), (.:?), FromJSON, JSONPathElement(..), Object, Parser, Value, emptyObject, parseFail)
 import Data.Bifunctor (first)
+import Data.Maybe (fromMaybe)
 import Data.Set (Set)
 import Data.Traversable.WithIndex (itraverse)
 
@@ -77,6 +78,21 @@ dependencyParser key value =
 optional :: Object -> Key -> (Value -> Parser a) -> Parser a
 optional o key f =
     (o .:? key >>= f . Maybe.fromMaybe emptyObject) <?> Key key
+
+
+decoder :: JD.Decoder ElmJson
+decoder =
+    JD.field "type" (JD.literal "application") >>
+        ((\a b c d -> fromList $ a ++ b ++ c ++ d)
+            <$> pathToDependenciesDecoder [ "dependencies", "direct" ]
+            <*> pathToDependenciesDecoder [ "dependencies", "indirect" ]
+            <*> pathToDependenciesDecoder [ "test-dependencies", "direct" ]
+            <*> pathToDependenciesDecoder [ "test-dependencies", "indirect" ])
+
+
+pathToDependenciesDecoder :: [String] -> JD.Decoder [Dependency]
+pathToDependenciesDecoder path =
+    fmap (fromMaybe []) (JD.optional (JD.at path dependenciesDecoder))
 
 
 dependenciesDecoder :: JD.Decoder [Dependency]

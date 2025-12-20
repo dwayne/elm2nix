@@ -9,10 +9,14 @@ import Test.Hspec
 main :: IO ()
 main = hspec $
     describe "Elm2Nix.Lib.Json.Decode" $ do
-        it "example 1" $
+        it "string" $
             JD.decodeString JD.string "\"apple\"" `shouldBe` Right "apple"
 
-        it "example 2" $
+        it "literal" $ do
+            JD.decodeString (JD.literal "apple") "\"apple\"" `shouldBe` Right ()
+            JD.decodeString (JD.literal "apple") "\"apples\"" `shouldBe` Left (JD.DecodeError (JD.Failure "not equal to \"apple\": \"apples\""))
+
+        it "keyValuePairs" $
             let
                 input =
                     "{                               \
@@ -33,19 +37,19 @@ main = hspec $
             in
             JD.decodeString (JD.keyValuePairs Right JD.string) input `shouldBe` Right output
 
-        it "example 3" $
+        it "field" $
             let
                 input = "{ \"person\": { \"name\": \"tom\", \"age\": 42 } }"
             in
             JD.decodeString (JD.field "person" (JD.field "name" JD.string)) input `shouldBe` Right "tom"
 
-        it "example 4" $
+        it "at" $
             let
                 input = "{ \"person\": { \"name\": \"tom\", \"age\": 42 } }"
             in
             JD.decodeString (JD.at [ "person", "name" ] JD.string) input `shouldBe` Right "tom"
 
-        it "example 5" $
+        it "elmJsonDecoder" $
             let
                 input =
                     "{                                       \
@@ -79,12 +83,12 @@ main = hspec $
 elmJsonDecoder :: JD.Decoder [(String, String)]
 elmJsonDecoder =
     (\a b c d -> a ++ b ++ c ++ d)
-        <$> dependencyDecoder ["dependencies", "direct"]
-        <*> dependencyDecoder ["dependencies", "indirect"]
-        <*> dependencyDecoder ["test-dependencies", "direct"]
-        <*> dependencyDecoder ["test-dependencies", "indirect"]
+        <$> pathToDependenciesDecoder ["dependencies", "direct"]
+        <*> pathToDependenciesDecoder ["dependencies", "indirect"]
+        <*> pathToDependenciesDecoder ["test-dependencies", "direct"]
+        <*> pathToDependenciesDecoder ["test-dependencies", "indirect"]
 
 
-dependencyDecoder :: [String] -> JD.Decoder [(String, String)]
-dependencyDecoder dottedPath =
+pathToDependenciesDecoder :: [String] -> JD.Decoder [(String, String)]
+pathToDependenciesDecoder dottedPath =
     fmap (fromMaybe []) (JD.optional (JD.at dottedPath (JD.keyValuePairs Right JD.string)))
