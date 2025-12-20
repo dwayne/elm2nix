@@ -8,7 +8,7 @@ import Test.Hspec
 
 main :: IO ()
 main = hspec $
-    describe "Json.Decode" $ do
+    describe "Elm2Nix.Lib.Json.Decode" $ do
         it "example 1" $
             JD.decodeString JD.string "\"apple\"" `shouldBe` Right "apple"
 
