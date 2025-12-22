@@ -43,11 +43,14 @@ main = hspec $
             in
             JD.decodeString (JD.field "person" (JD.field "name" JD.string)) input `shouldBe` Right "tom"
 
-        it "at" $
+        it "optionalAt" $
             let
                 input = "{ \"person\": { \"name\": \"tom\", \"age\": 42 } }"
-            in
-            JD.decodeString (JD.at [ "person", "name" ] JD.string) input `shouldBe` Right "tom"
+            in do
+            JD.decodeString (JD.optionalAt [ "person", "name" ] JD.string) input `shouldBe` Right (Just "tom")
+            JD.decodeString (JD.optionalAt [ "person", "name" ] (JD.literal "tommy")) input `shouldBe` Left (JD.DecodeError (JD.FieldError "person.name" (JD.Failure "not equal to \"tommy\": \"tom\"")))
+            JD.decodeString (JD.optionalAt [ "person", "city" ] JD.string) input `shouldBe` Right Nothing
+
 
         it "elmJsonDecoder" $
             let

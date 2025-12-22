@@ -3,7 +3,7 @@ module Elm2Nix.Lib.Json.Decode
     , DecodeError(..)
     , succeed, failWith
     , string, literal, keyValuePairs
-    , field, at, optionalAt
+    , field, optionalAt
     , Error(..)
     , decodeFile, decodeString, decodeValue
     ) where
@@ -150,10 +150,6 @@ field name fieldDecoder =
 
             _ ->
                 Left err
-
-
-at :: [String] -> Decoder a -> Decoder a
-at path decoder = foldr field decoder path
 
 
 optionalAt :: [String] -> Decoder a -> Decoder (Maybe a)
