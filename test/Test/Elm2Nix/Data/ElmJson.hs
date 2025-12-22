@@ -5,6 +5,7 @@ module Test.Elm2Nix.Data.ElmJson (main) where
 import qualified Data.Aeson as Json
 
 import Data.ByteString.Lazy (ByteString)
+import Data.List (isSuffixOf)
 import System.IO.Error (isDoesNotExistError)
 import Test.Hspec
 
@@ -28,6 +29,7 @@ main = hspec $
         dependenciesDecoderSpec
         decoderSpec
         fromFileSpec
+        fromFilesSpec
 
 
 eitherDecodeSpec :: Spec
@@ -642,3 +644,30 @@ fromFileSpec =
                 path <- Fixture.file "version-leading-zeros.json"
                 Left err <- ElmJson.fromFile path
                 err `shouldBe` JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0.02")))
+
+
+fromFilesSpec :: Spec
+fromFilesSpec =
+    describe "fromFiles" $ do
+        describe "valid input" $
+            it "example 1" $
+                let
+                    elmJson =
+                        ElmJson.fromList
+                            [ Dependency Name.elmBrowser (Version 1 0 2)
+                            , Dependency Name.elmCore (Version 1 0 5)
+                            , Dependency Name.elmHtml (Version 1 0 0)
+                            ]
+                in
+                (ElmJson.fromFiles =<< traverse Fixture.file [ "elm1.json", "elm2.json", "elm3.json" ]) `shouldReturn` Right elmJson
+
+        describe "invalid input" $ do
+            it "when one of the files does not exist" $ do
+                paths <- traverse Fixture.file [ "elm1.json", "path/to/missing/elm.json", "elm3.json" ]
+                ElmJson.fromFiles paths `shouldThrow` isDoesNotExistError
+
+            it "when there is an error in one of the files" $ do
+                paths <- traverse Fixture.file [ "elm1.json", "name-missing-forward-slash.json", "elm3.json" ]
+                Left ( badPath, err ) <- ElmJson.fromFiles paths
+                ("name-missing-forward-slash.json" `isSuffixOf` badPath) `shouldBe` True
+                err `shouldBe` JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing")))

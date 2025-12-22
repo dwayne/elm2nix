@@ -1,0 +1,8 @@
+{
+    "type": "application",
+    "dependencies": {
+        "direct": {
+            "elm/html": "1.0.0"
+        }
+    }
+}

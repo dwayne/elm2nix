@@ -1,0 +1,8 @@
+{
+    "type": "application",
+    "dependencies": {
+        "direct": {
+            "elm/core": "1.0.5"
+        }
+    }
+}

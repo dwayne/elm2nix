@@ -2,7 +2,7 @@
 
 module Elm2Nix.Data.ElmJson
     ( ElmJson
-    , fromFile
+    , fromFile, fromFiles
     , fromList
     , toAscList
     , toSet
@@ -157,6 +157,30 @@ versionDecoder =
 
 fromFile :: FilePath -> IO (Either JD.Error ElmJson)
 fromFile = JD.decodeFile decoder
+
+
+fromFiles :: [FilePath] -> IO (Either (FilePath, JD.Error) ElmJson)
+fromFiles =
+    fromFilesHelper Set.empty
+
+
+fromFilesHelper :: Set Dependency -> [FilePath] -> IO (Either (FilePath, JD.Error) ElmJson)
+fromFilesHelper currentDeps paths =
+    case paths of
+        [] ->
+            return $ Right (ElmJson currentDeps)
+
+        path : restPaths -> do
+            result <- fromFile path
+            case result of
+                --
+                -- TODO: Use a function that doesn't wrap the dependencies into ElmJson prematurely.
+                --
+                Right (ElmJson nextDeps) ->
+                    fromFilesHelper (Set.union currentDeps nextDeps) restPaths
+
+                Left err ->
+                    return $ Left ( path, err )
 
 
 fromList :: [Dependency] -> ElmJson
