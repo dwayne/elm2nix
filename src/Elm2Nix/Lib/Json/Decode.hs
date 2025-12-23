@@ -4,6 +4,7 @@ module Elm2Nix.Lib.Json.Decode
     , succeed, failWith
     , string, literal, keyValuePairs
     , field, optionalAt
+    , list
     , Error(..)
     , decodeFile, decodeString, decodeValue
     ) where
@@ -203,6 +204,16 @@ getFields path value =
                 _ ->
                     Left (Expected "an OBJECT" value)
 
+
+list :: Decoder a -> Decoder [a]
+list decoder =
+    Decoder $ \value ->
+        case value of
+            JSArray values ->
+                traverse (decodeValue decoder) values
+
+            _ ->
+                Left (Expected "an ARRAY" value)
 
 
 -- RUN

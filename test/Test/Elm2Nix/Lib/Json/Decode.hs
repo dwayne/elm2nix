@@ -51,6 +51,12 @@ main = hspec $
             JD.decodeString (JD.optionalAt [ "person", "name" ] (JD.literal "tommy")) input `shouldBe` Left (JD.DecodeError (JD.FieldError "person.name" (JD.Failure "not equal to \"tommy\": \"tom\"")))
             JD.decodeString (JD.optionalAt [ "person", "city" ] JD.string) input `shouldBe` Right Nothing
 
+        it "list" $
+            let
+                input = "[ \"a\", \"b\", \"c\" ]"
+            in
+            JD.decodeString (JD.list JD.string) input `shouldBe` Right [ "a", "b", "c" ]
+
 
         it "elmJsonDecoder" $
             let

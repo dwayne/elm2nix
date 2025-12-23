@@ -2,6 +2,7 @@ module Main (main) where
 
 import qualified Test.Elm2Nix.Data.Dependency as Dependency
 import qualified Test.Elm2Nix.Data.ElmJson as ElmJson
+import qualified Test.Elm2Nix.Data.ElmLock as ElmLock
 import qualified Test.Elm2Nix.Data.FixedOutputDerivation as FixedOutputDerivation
 import qualified Test.Elm2Nix.Data.Name as Name
 import qualified Test.Elm2Nix.Data.RegistryDat as RegistryDat
@@ -18,6 +19,7 @@ main = do
     Version.main
     Dependency.main
     ElmJson.main
+    ElmLock.main
     Nix.main
     Json.main
     JD.main

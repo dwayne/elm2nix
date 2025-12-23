@@ -33,6 +33,7 @@ library
         Elm2Nix.CLI,
         Elm2Nix.Data.Dependency,
         Elm2Nix.Data.ElmJson,
+        Elm2Nix.Data.ElmLock,
         Elm2Nix.Data.FixedOutputDerivation,
         Elm2Nix.Data.Name,
         Elm2Nix.Data.RegistryDat,
@@ -95,6 +96,7 @@ test-suite test
     other-modules:
         Test.Elm2Nix.Data.Dependency,
         Test.Elm2Nix.Data.ElmJson,
+        Test.Elm2Nix.Data.ElmLock,
         Test.Elm2Nix.Data.FixedOutputDerivation,
         Test.Elm2Nix.Data.Name,
         Test.Elm2Nix.Data.RegistryDat,

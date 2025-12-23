@@ -1,0 +1,83 @@
+module Elm2Nix.Data.ElmLock
+    ( ElmLock
+    , fromFile, fromList
+    , decoder
+    , toSet
+    ) where
+
+import qualified Data.Set as Set
+import qualified Data.Text as T
+
+import Data.Set (Set)
+
+import qualified Elm2Nix.Data.Name as Name
+import qualified Elm2Nix.Data.Version as Version
+import qualified Elm2Nix.Lib.Json.Decode as JD
+
+import Elm2Nix.Data.Dependency (Dependency(..))
+import Elm2Nix.Data.Name (Name)
+import Elm2Nix.Data.Version (Version)
+
+
+newtype ElmLock = ElmLock (Set Dependency)
+    deriving (Eq, Show)
+
+
+fromFile :: FilePath -> IO (Either JD.Error ElmLock)
+fromFile = JD.decodeFile decoder
+
+
+fromList :: [Dependency] -> ElmLock
+fromList = ElmLock . Set.fromList
+
+
+decoder :: JD.Decoder ElmLock
+decoder =
+    fromList <$> JD.list dependencyDecoder
+
+
+dependencyDecoder :: JD.Decoder Dependency
+dependencyDecoder =
+    Dependency <$> nameDecoder <*> JD.field "version" versionDecoder
+
+
+nameDecoder :: JD.Decoder Name
+nameDecoder = do
+    author <- JD.field "author" JD.string
+    package <- JD.field "package" JD.string
+    case Name.fromText (T.pack $ author ++ "/" ++ package) of
+        Right name ->
+            JD.succeed name
+
+        Left err ->
+            JD.failWith (errorToString err)
+
+    where
+        --
+        -- TODO: Extract to Name.errorToString
+        --
+        errorToString Name.EmptyAuthor         = "author is empty"
+        errorToString Name.EmptyPackage        = "package is empty"
+        errorToString Name.MissingForwardSlash = "/ is missing"
+
+
+versionDecoder :: JD.Decoder Version
+versionDecoder =
+    --
+    -- TODO:
+    --
+    -- 1. Extract to Version.hs
+    -- 2. Remove from ElmJson.hs
+    -- 3. Reuse here and in ElmJson.hs
+    --
+    JD.string >>= \s ->
+        case Version.fromText (T.pack s) of
+            Just version ->
+                JD.succeed version
+
+            Nothing ->
+                JD.failWith $ "version is invalid: " ++ s
+
+
+toSet :: ElmLock -> Set Dependency
+toSet (ElmLock dependencies) = dependencies
