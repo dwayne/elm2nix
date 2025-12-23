@@ -2,7 +2,7 @@
 
 module Elm2Nix.Data.RegistryDat
     ( RegistryDat
-    , fromElmJson, fromList, fromSet
+    , fromElmLock, fromElmJson, fromList, fromSet
     , toCount, toPackages, toAllPackages
     ) where
 
@@ -18,10 +18,12 @@ import Data.Set (Set)
 import Data.Text (Text)
 
 import qualified Elm2Nix.Data.ElmJson as ElmJson
+import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
+import Elm2Nix.Data.ElmLock (ElmLock)
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
 
@@ -75,6 +77,10 @@ instance Binary Versions where
 
 -- CONSTRUCT
 
+
+
+fromElmLock :: ElmLock -> RegistryDat
+fromElmLock = fromSet . ElmLock.toSet
 
 
 fromElmJson :: ElmJson -> RegistryDat
