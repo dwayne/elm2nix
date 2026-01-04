@@ -20,10 +20,12 @@ import Data.Text (Text)
 import System.IO (stdout)
 
 import qualified Elm2Nix.Data.Dependency as Dependency
+import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
 import qualified Elm2Nix.Lib.Json as Json
+import qualified Elm2Nix.Lib.Json.Decode as JD
 import qualified Elm2Nix.Lib.Nix as Nix
 
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
@@ -35,14 +37,14 @@ import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
 
 
 data WriteElmLockFileError
-    = DecodeFileError Json.DecodeFileError
+    = FromFilesError (FilePath, JD.Error)
     | FromDependenciesError FOD.FromDependenciesError
     deriving (Eq, Show)
 
 
-writeElmLockFile :: Bool -> FilePath -> FilePath -> IO (Either WriteElmLockFileError ())
-writeElmLockFile compact input output = do
-    result1 <- Json.decodeFile input
+writeElmLockFile :: [FilePath] -> Bool -> FilePath -> IO (Either WriteElmLockFileError ())
+writeElmLockFile inputs compact output = do
+    result1 <- ElmJson.fromFiles inputs
     case result1 of
         Right elmJson -> do
             result2 <- FOD.fromElmJson elmJson
@@ -59,7 +61,7 @@ writeElmLockFile compact input output = do
                     return $ Left $ FromDependenciesError err
 
         Left err ->
-            return $ Left $ DecodeFileError err
+            return $ Left $ FromFilesError err
 
 
 encodeCompact :: FilePath -> [FixedOutputDerivation] -> IO ()
@@ -81,8 +83,10 @@ encodeExpanded output =
 writeElmLockFileErrorToText :: WriteElmLockFileError -> Text
 writeElmLockFileErrorToText err =
     case err of
-        DecodeFileError err ->
-            jsonDecodeFileErrorToText err
+        FromFilesError (path, _) ->
+            -- jsonDecodeFileErrorToText err
+            -- TODO: Improve the error message
+            T.pack path <> ": An unexpected error occurred"
 
         FromDependenciesError err ->
             fromDependenciesErrorToText err

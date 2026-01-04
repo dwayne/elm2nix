@@ -16,8 +16,8 @@ data CLI
 
 data LockOptions
     = LockOptions
-        { loCompact :: Bool
-        , loInput :: FilePath
+        { loInputs :: [FilePath]
+        , loCompact :: Bool
         , loOutput :: FilePath
         }
     deriving (Eq, Show)
@@ -88,7 +88,7 @@ registryCommands =
 
 lockOptions :: Parser LockOptions
 lockOptions =
-    LockOptions <$> isCompactOption <*> elmJsonInputOption <*> elmLockOutputOption
+    LockOptions <$> elmJsonInputArgument <*> isCompactOption <*> elmLockOutputOption
 
 
 generateOptions :: Parser GenerateOptions
@@ -108,6 +108,19 @@ isCompactOption =
         , showDefault
         , help "Format the JSON as compactly as possible"
         ]
+
+
+elmJsonInputArgument :: Parser [FilePath]
+elmJsonInputArgument =
+    withDefault <$> many
+        (strArgument $ mconcat
+            [ metavar "PATH..."
+            , help "The paths to the elm.json files (default: \"elm.json\")"
+            ]
+        )
+    where
+        withDefault [] = [ "elm.json" ]
+        withDefault fs = fs
 
 
 elmJsonInputOption :: Parser FilePath

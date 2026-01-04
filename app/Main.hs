@@ -19,8 +19,8 @@ unsafeMain :: IO ()
 unsafeMain = do
     cli <- CLI.runIO
     case cli of
-        CLI.Lock (CLI.LockOptions compact input output) ->
-            Elm2Nix.writeElmLockFile compact input output >>= either (die . Elm2Nix.writeElmLockFileErrorToText) return
+        CLI.Lock (CLI.LockOptions inputs compact output) ->
+            Elm2Nix.writeElmLockFile inputs compact output >>= either (die . Elm2Nix.writeElmLockFileErrorToText) return
 
         CLI.Registry (CLI.Generate (CLI.GenerateOptions input output)) ->
             Elm2Nix.writeRegistryDatFile input output >>= either (die . Elm2Nix.writeRegistryDatFileErrorToText) return
