@@ -5,6 +5,7 @@
 , terser
 , uglify-js
 
+, generateRegistryDat
 , prepareElmHomeScript
 }:
 
@@ -14,7 +15,6 @@ lib.extendMkDerivation {
   extendDrvArgs =
     finalAttrs:
     { elmLock # Path to elm.lock
-    , registryDat # Path to registry.dat
 
     , doElmFormat ? false # Whether or not to check if a given set of Elm files are formatted
     , elmFormatSourceFiles ? [ "src" ] # A list of Elm files or directories containing Elm files
@@ -62,6 +62,7 @@ lib.extendMkDerivation {
         || throw "You cannot enable both debugging and compression.";
 
       let
+        registryDat = generateRegistryDat { inherit elmLock; };
         useElmOptimizeLevel2 = enableOptimizations && optimizeLevel >= 2;
         minifier = if useTerser then "terser" else "uglifyjs";
         toCompress = if doMinification then outputMin else output;

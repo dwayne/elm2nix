@@ -13,6 +13,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         inherit (elm2nix.lib.elm2nix pkgs)
           buildElmApplication
+          generateRegistryDat
           prepareElmHomeScript
           dotElmLinks
           symbolicLinksToPackagesScript
@@ -20,7 +21,9 @@
           ;
 
         elmLock = ./elm.lock;
-        registryDat = ./registry.dat;
+        registryDat = generateRegistryDat {
+          inherit elmLock;
+        };
 
         exampleFetchElmPackage = fetchElmPackage {
           author = "elm";
@@ -45,7 +48,6 @@
           name = "example";
           src = ./.;
           elmLock = ./elm.lock;
-          registryDat = ./registry.dat;
         };
       in
       {

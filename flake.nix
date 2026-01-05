@@ -3,16 +3,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-
-        elm2nix = (pkgs.haskellPackages.callPackage ./nix/generated/elm2nix.nix {}).overrideAttrs (old: {
-          #
-          # N.B. Even though `doCheck = false` by default I add this `preCheck`
-          #      to ensure that downstream users don't have to worry about it.
-          #
-          preCheck = (old.preCheck or "") + ''
-            export HSPEC_SKIP="(skip)"
-          '';
-        });
+        elm2nix = pkgs.callPackage ./nix/elm2nix.nix {};
       in
       {
         devShells.default = pkgs.mkShell {
