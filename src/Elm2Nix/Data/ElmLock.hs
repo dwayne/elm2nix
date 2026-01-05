@@ -16,7 +16,6 @@ import qualified Elm2Nix.Lib.Json.Decode as JD
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Name (Name)
-import Elm2Nix.Data.Version (Version)
 
 
 newtype ElmLock = ElmLock (Set Dependency)
@@ -38,7 +37,7 @@ decoder =
 
 dependencyDecoder :: JD.Decoder Dependency
 dependencyDecoder =
-    Dependency <$> nameDecoder <*> JD.field "version" versionDecoder
+    Dependency <$> nameDecoder <*> JD.field "version" Version.decoder
 
 
 nameDecoder :: JD.Decoder Name
@@ -59,24 +58,6 @@ nameDecoder = do
         errorToString Name.EmptyAuthor         = "author is empty"
         errorToString Name.EmptyPackage        = "package is empty"
         errorToString Name.MissingForwardSlash = "/ is missing"
-
-
-versionDecoder :: JD.Decoder Version
-versionDecoder =
-    --
-    -- TODO:
-    --
-    -- 1. Extract to Version.hs
-    -- 2. Remove from ElmJson.hs
-    -- 3. Reuse here and in ElmJson.hs
-    --
-    JD.string >>= \s ->
-        case Version.fromText (T.pack s) of
-            Just version ->
-                JD.succeed version
-
-            Nothing ->
-                JD.failWith $ "version is invalid: " ++ s
 
 
 toSet :: ElmLock -> Set Dependency

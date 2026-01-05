@@ -6,7 +6,7 @@ module Elm2Nix.Data.ElmJson
     , fromList
     , toAscList
     , toSet
-    , decoder, dependenciesDecoder, nameDecoder, versionDecoder
+    , decoder, dependenciesDecoder, nameDecoder
     ) where
 
 import qualified Data.Aeson as Json
@@ -98,7 +98,7 @@ pathToDependenciesDecoder path =
 
 dependenciesDecoder :: JD.Decoder [Dependency]
 dependenciesDecoder =
-    JD.keyValuePairs nameFromString versionDecoder >>= JD.succeed . map (uncurry Dependency)
+    JD.keyValuePairs nameFromString Version.decoder >>= JD.succeed . map (uncurry Dependency)
 
 
 nameFromString :: String -> Either String Name
@@ -137,17 +137,6 @@ nameDecoder =
 versionParser :: Value -> Parser Version
 versionParser =
     Json.withText "Version" $ \t -> maybe (parseFail $ "version is invalid: " ++ show t) pure (Version.fromText t)
-
-
-versionDecoder :: JD.Decoder Version
-versionDecoder =
-    JD.string >>= \s ->
-        case Version.fromText (T.pack s) of
-            Just version ->
-                JD.succeed version
-
-            Nothing ->
-                JD.failWith $ "version is invalid: " ++ s
 
 
 

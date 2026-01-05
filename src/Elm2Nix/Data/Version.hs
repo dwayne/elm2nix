@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Elm2Nix.Data.Version (Version(..), fromText) where
+module Elm2Nix.Data.Version (Version(..), fromText, decoder) where
 
 import qualified Data.Char as Char
 import qualified Data.Text as T
@@ -10,6 +10,8 @@ import Control.Monad (liftM3)
 import Data.Binary (Binary(..), getWord8, putWord8)
 import Data.Text (Text)
 import Data.Word (Word16)
+
+import qualified Elm2Nix.Lib.Json.Decode as JD
 
 
 data Version
@@ -119,3 +121,21 @@ readWord16Helper n t =
 maxWord16 :: Int
 maxWord16 =
     fromIntegral (maxBound :: Word16)
+
+
+decoder :: JD.Decoder Version
+decoder =
+    --
+    -- TODO:
+    --
+    -- 1. Extract to Version.hs
+    -- 2. Remove from ElmJson.hs
+    -- 3. Reuse here and in ElmJson.hs
+    --
+    JD.string >>= \s ->
+        case fromText (T.pack s) of
+            Just version ->
+                JD.succeed version
+
+            Nothing ->
+                JD.failWith $ "version is invalid: " ++ s

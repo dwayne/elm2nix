@@ -9,6 +9,7 @@ import Control.Exception (evaluate)
 import Test.Hspec
 
 import qualified Elm2Nix.Data.Version as Version
+import qualified Elm2Nix.Lib.Json.Decode as JD
 
 import Elm2Nix.Data.Version (Version(..))
 
@@ -17,6 +18,7 @@ main :: IO ()
 main = hspec $
     describe "Elm2Nix.Data.Version" $ do
         fromTextSpec
+        decoderSpec
         orderSpec
         showSpec
         binarySerializationSpec
@@ -38,6 +40,16 @@ fromTextSpec =
 
             it "must have each part fit in a 16-bit unsigned integer" $
                 Version.fromText "1.2.65536" `shouldBe` Nothing
+
+
+decoderSpec :: Spec
+decoderSpec =
+    describe "decoder" $ do
+        it "example 1" $
+            JD.decodeString Version.decoder "\"1.2.3\"" `shouldBe` Right (Version 1 2 3)
+
+        it "example 2" $
+            JD.decodeString Version.decoder "\"1.2\"" `shouldBe` Left (JD.DecodeError (JD.Failure "version is invalid: 1.2"))
 
 
 orderSpec :: Spec
