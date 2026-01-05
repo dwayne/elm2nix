@@ -125,13 +125,6 @@ maxWord16 =
 
 decoder :: JD.Decoder Version
 decoder =
-    --
-    -- TODO:
-    --
-    -- 1. Extract to Version.hs
-    -- 2. Remove from ElmJson.hs
-    -- 3. Reuse here and in ElmJson.hs
-    --
     JD.string >>= \s ->
         case fromText (T.pack s) of
             Just version ->
