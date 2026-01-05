@@ -2,7 +2,7 @@ module Elm2Nix.CLI
     ( CLI(..)
     , LockOptions(..)
     , RegistryCommands(..), GenerateOptions(..), ViewOptions(..)
-    , run, runIO
+    , runIO, run
     ) where
 
 import Options.Applicative
@@ -66,14 +66,14 @@ preferences =
 cli :: ParserInfo CLI
 cli =
     info (commands <**> helper) $ mconcat
-        [ header "Create Elm artifacts to be used when compiling Elm applications with Nix"
+        [ header "Create Elm support files to be used when compiling Elm applications with Nix"
         ]
 
 
 commands :: Parser CLI
 commands =
     hsubparser $ mconcat
-        [ command "lock" (info (Lock <$> lockOptions) (progDesc "Generate a lock file from your elm.json"))
+        [ command "lock" (info (Lock <$> lockOptions) (progDesc "Generate a lock file from one or more elm.json files"))
         , command "registry" (info (Registry <$> registryCommands) (progDesc "Generate or view a registry.dat file"))
         ]
 
@@ -81,7 +81,7 @@ commands =
 registryCommands :: Parser RegistryCommands
 registryCommands =
     hsubparser $ mconcat
-        [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from your elm.lock"))
+        [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from your lock file"))
         , command "view" (info (View <$> viewOptions) (progDesc "Display a registry.dat file as JSON"))
         ]
 
@@ -101,15 +101,6 @@ viewOptions =
     ViewOptions <$> isCompactOption <*> registryInputOption
 
 
-isCompactOption :: Parser Bool
-isCompactOption =
-    switch $ mconcat
-        [ long "compact"
-        , showDefault
-        , help "Format the JSON as compactly as possible"
-        ]
-
-
 elmJsonInputArgument :: Parser [FilePath]
 elmJsonInputArgument =
     withDefault <$> many
@@ -123,16 +114,13 @@ elmJsonInputArgument =
         withDefault fs = fs
 
 
--- elmJsonInputOption :: Parser FilePath
--- elmJsonInputOption =
---     strOption $ mconcat
---         [ long "input"
---         , short 'i'
---         , value "elm.json"
---         , showDefault
---         , metavar "FILE"
---         , help "The path to the elm.json file"
---         ]
+isCompactOption :: Parser Bool
+isCompactOption =
+    switch $ mconcat
+        [ long "compact"
+        , showDefault
+        , help "Format the JSON as compactly as possible"
+        ]
 
 
 elmLockInputOption :: Parser FilePath
