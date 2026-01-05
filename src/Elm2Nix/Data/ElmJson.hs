@@ -150,9 +150,9 @@ fromFilesHelper currentDeps paths =
             return $ Right (ElmJson currentDeps)
 
         path : restPaths -> do
-            result <- JD.decodeFile allDependenciesDecoder path
+            result <- fromFile path
             case result of
-                Right nextDeps ->
+                Right (ElmJson nextDeps) ->
                     fromFilesHelper (Set.union currentDeps nextDeps) restPaths
 
                 Left err ->
