@@ -114,7 +114,7 @@ elmJsonInputArgument :: Parser [FilePath]
 elmJsonInputArgument =
     withDefault <$> many
         (strArgument $ mconcat
-            [ metavar "PATH..." -- TODO: Rename to FILE
+            [ metavar "FILE..."
             , help "The paths to the elm.json files (default: \"elm.json\")"
             ]
         )
