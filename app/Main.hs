@@ -23,7 +23,7 @@ unsafeMain = do
             Elm2Nix.writeElmLockFile inputs compact output >>= either (die . Elm2Nix.writeElmLockFileErrorToText) return
 
         CLI.Registry (CLI.Generate (CLI.GenerateOptions input output)) ->
-            Elm2Nix.writeRegistryDatFile input output >>= either (die . Elm2Nix.writeRegistryDatFileErrorToText) return
+            Elm2Nix.writeRegistryDatFile input output >>= either (die . uncurry Elm2Nix.writeRegistryDatFileErrorToText) return
 
         CLI.Registry (CLI.View (CLI.ViewOptions compact input)) ->
             Elm2Nix.viewRegistryDatFile compact input >>= either (die . Elm2Nix.viewRegistryDatFileErrorToText) return

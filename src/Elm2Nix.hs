@@ -25,7 +25,6 @@ import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
-import qualified Elm2Nix.Lib.Json as Json
 import qualified Elm2Nix.Lib.Json.Decode as JD
 import qualified Elm2Nix.Lib.Nix as Nix
 
@@ -84,23 +83,22 @@ encodeExpanded output =
 writeElmLockFileErrorToText :: WriteElmLockFileError -> Text
 writeElmLockFileErrorToText err =
     case err of
-        FromFilesError (path, _) ->
-            -- jsonDecodeFileErrorToText err
-            -- TODO: Improve the error message
-            T.pack path <> ": An unexpected error occurred"
+        FromFilesError (path, err) ->
+            jsonDecodeFileErrorToText path err
 
         FromDependenciesError err ->
             fromDependenciesErrorToText err
 
 
-jsonDecodeFileErrorToText :: Json.DecodeFileError -> Text
-jsonDecodeFileErrorToText err =
-    case err of
-        Json.FileNotFound path ->
-            "File not found: " <> T.pack path
+jsonDecodeFileErrorToText :: FilePath -> JD.Error -> Text
+jsonDecodeFileErrorToText path (JD.SyntaxError s) = "Syntax error in " <> T.pack path <> ": " <> T.pack s
+jsonDecodeFileErrorToText path (JD.DecodeError err) = "JSON decoding error in " <> T.pack path <> ": " <> jsonDecodeErrorToText err
 
-        Json.SyntaxError path details ->
-            "Syntax error in " <> T.pack path <> ": " <> T.pack details
+
+jsonDecodeErrorToText :: JD.DecodeError -> Text
+jsonDecodeErrorToText (JD.Failure s) = T.pack s
+jsonDecodeErrorToText (JD.Expected s value) = "Expected " <> T.pack s <> " but got " <> T.pack (show value)
+jsonDecodeErrorToText (JD.FieldError name err) = "Problem with field \"" <> T.pack name <> "\": " <> jsonDecodeErrorToText err
 
 
 fromDependenciesErrorToText :: FOD.FromDependenciesError -> Text
@@ -126,7 +124,7 @@ nixPrefetchUrlErrorToText err =
 type WriteRegistryDatFileError = JD.Error
 
 
-writeRegistryDatFile :: FilePath -> FilePath -> IO (Either WriteRegistryDatFileError ())
+writeRegistryDatFile :: FilePath -> FilePath -> IO (Either (FilePath, WriteRegistryDatFileError) ())
 writeRegistryDatFile input output = do
     result <- ElmLock.fromFile input
     case result of
@@ -134,11 +132,11 @@ writeRegistryDatFile input output = do
             Right <$> Binary.encodeFile output (RegistryDat.fromElmLock elmLock)
 
         Left err ->
-            return $ Left err
+            return $ Left (input, err)
 
 
-writeRegistryDatFileErrorToText :: WriteRegistryDatFileError -> Text
-writeRegistryDatFileErrorToText = const "A registry.dat file error occurred" -- TODO: Improve the error message
+writeRegistryDatFileErrorToText :: FilePath -> WriteRegistryDatFileError -> Text
+writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText
 
 
 
