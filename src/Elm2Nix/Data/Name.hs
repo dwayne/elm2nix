@@ -6,6 +6,7 @@ module Elm2Nix.Data.Name
     , FromTextError(..), fromText
     , toAuthor, toPackage
     , toText, toString
+    , fromTextErrorToString
     ) where
 
 import qualified Data.ByteString as BS
@@ -150,3 +151,9 @@ toText separator (Name author package) =
 toString :: Text -> Name -> String
 toString separator =
     T.unpack . toText separator
+
+
+fromTextErrorToString :: FromTextError -> String
+fromTextErrorToString EmptyAuthor         = "author is empty"
+fromTextErrorToString EmptyPackage        = "package is empty"
+fromTextErrorToString MissingForwardSlash = "/ is missing"

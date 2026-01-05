@@ -102,20 +102,11 @@ dependenciesDecoder =
 
 
 nameFromString :: String -> Either String Name
-nameFromString = first errorToString . Name.fromText . T.pack
-    where
-        errorToString Name.EmptyAuthor         = "author is empty"
-        errorToString Name.EmptyPackage        = "package is empty"
-        errorToString Name.MissingForwardSlash = "/ is missing"
+nameFromString = first Name.fromTextErrorToString . Name.fromText . T.pack
 
 
 nameParser :: Key -> Parser Name
-nameParser =
-    either (parseFail . errorToString) pure . Name.fromText . Key.toText
-    where
-        errorToString Name.EmptyAuthor         = "author is empty"
-        errorToString Name.EmptyPackage        = "package is empty"
-        errorToString Name.MissingForwardSlash = "/ is missing"
+nameParser = either (parseFail . Name.fromTextErrorToString) pure . Name.fromText . Key.toText
 
 
 nameDecoder :: JD.Decoder Name
@@ -126,12 +117,7 @@ nameDecoder =
                 JD.succeed name
 
             Left err ->
-                JD.failWith (errorToString err)
-
-    where
-        errorToString Name.EmptyAuthor         = "author is empty"
-        errorToString Name.EmptyPackage        = "package is empty"
-        errorToString Name.MissingForwardSlash = "/ is missing"
+                JD.failWith (Name.fromTextErrorToString err)
 
 
 versionParser :: Value -> Parser Version

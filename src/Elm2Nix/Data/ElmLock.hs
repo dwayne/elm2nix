@@ -49,15 +49,7 @@ nameDecoder = do
             JD.succeed name
 
         Left err ->
-            JD.failWith (errorToString err)
-
-    where
-        --
-        -- TODO: Extract to Name.errorToString
-        --
-        errorToString Name.EmptyAuthor         = "author is empty"
-        errorToString Name.EmptyPackage        = "package is empty"
-        errorToString Name.MissingForwardSlash = "/ is missing"
+            JD.failWith (Name.fromTextErrorToString err)
 
 
 toSet :: ElmLock -> Set Dependency
