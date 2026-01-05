@@ -81,7 +81,7 @@ commands =
 registryCommands :: Parser RegistryCommands
 registryCommands =
     hsubparser $ mconcat
-        [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from your elm.json"))
+        [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from your elm.lock"))
         , command "view" (info (View <$> viewOptions) (progDesc "Display a registry.dat file as JSON"))
         ]
 
@@ -93,7 +93,7 @@ lockOptions =
 
 generateOptions :: Parser GenerateOptions
 generateOptions =
-    GenerateOptions <$> elmJsonInputOption <*> registryOutputOption
+    GenerateOptions <$> elmLockInputOption <*> registryOutputOption
 
 
 viewOptions :: Parser ViewOptions
@@ -114,7 +114,7 @@ elmJsonInputArgument :: Parser [FilePath]
 elmJsonInputArgument =
     withDefault <$> many
         (strArgument $ mconcat
-            [ metavar "PATH..."
+            [ metavar "PATH..." -- TODO: Rename to FILE
             , help "The paths to the elm.json files (default: \"elm.json\")"
             ]
         )
@@ -123,15 +123,27 @@ elmJsonInputArgument =
         withDefault fs = fs
 
 
-elmJsonInputOption :: Parser FilePath
-elmJsonInputOption =
+-- elmJsonInputOption :: Parser FilePath
+-- elmJsonInputOption =
+--     strOption $ mconcat
+--         [ long "input"
+--         , short 'i'
+--         , value "elm.json"
+--         , showDefault
+--         , metavar "FILE"
+--         , help "The path to the elm.json file"
+--         ]
+
+
+elmLockInputOption :: Parser FilePath
+elmLockInputOption =
     strOption $ mconcat
         [ long "input"
         , short 'i'
-        , value "elm.json"
+        , value "elm.lock"
         , showDefault
         , metavar "FILE"
-        , help "The path to the elm.json file"
+        , help "The path to the lock file"
         ]
 
 

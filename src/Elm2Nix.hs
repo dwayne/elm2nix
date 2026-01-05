@@ -21,6 +21,7 @@ import System.IO (stdout)
 
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
+import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
@@ -122,22 +123,22 @@ nixPrefetchUrlErrorToText err =
 
 
 
-type WriteRegistryDatFileError = Json.DecodeFileError
+type WriteRegistryDatFileError = JD.Error
 
 
 writeRegistryDatFile :: FilePath -> FilePath -> IO (Either WriteRegistryDatFileError ())
 writeRegistryDatFile input output = do
-    result <- Json.decodeFile input
+    result <- ElmLock.fromFile input
     case result of
-        Right elmJson ->
-            Right <$> Binary.encodeFile output (RegistryDat.fromElmJson elmJson)
+        Right elmLock ->
+            Right <$> Binary.encodeFile output (RegistryDat.fromElmLock elmLock)
 
         Left err ->
             return $ Left err
 
 
 writeRegistryDatFileErrorToText :: WriteRegistryDatFileError -> Text
-writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText
+writeRegistryDatFileErrorToText = const "A registry.dat file error occurred" -- TODO: Improve the error message
 
 
 
