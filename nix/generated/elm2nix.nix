@@ -1,6 +1,6 @@
 { mkDerivation, aeson, aeson-pretty, base, binary, bytestring
-, containers, hspec, indexed-traversable, lib, optparse-applicative
-, text, typed-process, unliftio
+, containers, hspec, indexed-traversable, json, lib
+, optparse-applicative, text, typed-process, unliftio
 }:
 mkDerivation {
   pname = "elm2nix";
@@ -10,7 +10,7 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     aeson aeson-pretty base binary bytestring containers
-    indexed-traversable optparse-applicative text typed-process
+    indexed-traversable json optparse-applicative text typed-process
     unliftio
   ];
   executableHaskellDepends = [ base text ];

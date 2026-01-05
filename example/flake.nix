@@ -85,6 +85,11 @@
             output = "checked.js";
           };
 
+          reviewedExample = example.override {
+            doElmReview = true;
+            output = "reviewed.js";
+          };
+
           optimizedExample = checkedExample.override {
             output = "optimized.js";
             enableOptimizations = true;

@@ -10,7 +10,7 @@ description:
     .
     $ elm2nix lock
     .
-    Generate a registry.dat file from your elm.json:
+    Generate a registry.dat file from your lock file:
     .
     $ elm2nix registry generate
 
@@ -53,7 +53,7 @@ library
         binary >= 0.8.9 && < 0.9,
         bytestring >= 0.12.2 && < 0.13,
         containers >= 0.7 && < 0.8,
-        json,
+        json >= 0.11 && < 0.12,
         indexed-traversable >= 0.1.4 && < 0.2,
         --
         -- N.B. The lower bound has been adjusted to satisfy
