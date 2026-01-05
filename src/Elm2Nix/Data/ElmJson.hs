@@ -83,12 +83,16 @@ optional o key f =
 
 decoder :: JD.Decoder ElmJson
 decoder =
-    JD.field "type" (JD.literal "application") >>
-        ((\a b c d -> fromList $ a ++ b ++ c ++ d)
-            <$> pathToDependenciesDecoder [ "dependencies", "direct" ]
-            <*> pathToDependenciesDecoder [ "dependencies", "indirect" ]
-            <*> pathToDependenciesDecoder [ "test-dependencies", "direct" ]
-            <*> pathToDependenciesDecoder [ "test-dependencies", "indirect" ])
+    JD.field "type" (JD.literal "application") >> (ElmJson <$> allDependenciesDecoder)
+
+
+allDependenciesDecoder :: JD.Decoder (Set Dependency)
+allDependenciesDecoder =
+    (\a b c d -> Set.fromList $ a ++ b ++ c ++ d)
+        <$> pathToDependenciesDecoder [ "dependencies", "direct" ]
+        <*> pathToDependenciesDecoder [ "dependencies", "indirect" ]
+        <*> pathToDependenciesDecoder [ "test-dependencies", "direct" ]
+        <*> pathToDependenciesDecoder [ "test-dependencies", "indirect" ]
 
 
 pathToDependenciesDecoder :: [String] -> JD.Decoder [Dependency]
@@ -146,12 +150,9 @@ fromFilesHelper currentDeps paths =
             return $ Right (ElmJson currentDeps)
 
         path : restPaths -> do
-            result <- fromFile path
+            result <- JD.decodeFile allDependenciesDecoder path
             case result of
-                --
-                -- TODO: Use a function that doesn't wrap the dependencies into ElmJson prematurely.
-                --
-                Right (ElmJson nextDeps) ->
+                Right nextDeps ->
                     fromFilesHelper (Set.union currentDeps nextDeps) restPaths
 
                 Left err ->
