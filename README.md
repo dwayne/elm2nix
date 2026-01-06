@@ -4,12 +4,15 @@ A rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) with a few ch
 
 These are some of the notable differences:
 
-1. It uses a JSON formatted lock file that has support for multiple versions of the same package.
-2. You can display any `registry.dat` as JSON using `elm2nix registry view`.
-3. There is a `buildElmApplication` build helper that allows you to build an Elm application in a variety of ways by setting options. For e.g.
+1. You can input one or more `elm.json` files to create the lock file.
+2. It uses a JSON formatted lock file that has support for multiple versions of the same package.
+3. You don't have to manually generate a `registry.dat` file since it's automatically handled for you.
+4. You can display any `registry.dat` file as JSON using `elm2nix registry view`.
+5. There is a `buildElmApplication` build helper that allows you to build an Elm application in a variety of ways by setting options. For e.g.
     - Turn on the time-travelling debugger
     - Fail the build if your Elm source code is improperly formatted
     - Fail the build if your Elm tests fail
+    - Fail the build if [`elm-review`](https://github.com/jfmengels/elm-review) fails
     - Turn on optimizations
     - Use [`elm-optimize-level-2`](https://github.com/mdgriffith/elm-optimize-level-2) instead of `elm make --optimize`
     - Enable minification with [UglifyJS](https://github.com/mishoo/UglifyJS) or [Terser](https://terser.org/)
@@ -25,9 +28,8 @@ These are some of the notable differences:
 In the folder containing your Elm application's `elm.json` you use:
 
 - `elm2nix lock` to generate an `elm.lock` lock file
-- `elm2nix registry generate` to generate a `registry.dat` file
 
-These generated files are then used by a build helper, called `buildElmApplication`, to build your Elm application.
+The lock file is used by a build helper, called `buildElmApplication`, to build your Elm application.
 
 ### Details
 
@@ -60,15 +62,14 @@ outputs = { self, nixpkgs, flake-utils, elm2nix }:
     );
 ```
 
-3. Use the `elm2nix` program to generate the `elm.lock` and `registry.dat` files from your Elm application's `elm.json`.
+3. Use the `elm2nix` program to generate the `elm.lock` file from your Elm application's `elm.json`.
 
 ```bash
 nix develop
-elm2nix lock              # generates elm.lock
-elm2nix registry generate # generates registry.dat
+elm2nix lock
 ```
 
-See `elm2nix --help` for more details.
+See `elm2nix lock --help` for more details.
 
 4. Use `buildElmApplication` to build your Elm application.
 
@@ -83,7 +84,6 @@ outputs = { self, nixpkgs, flake-utils, elm2nix }:
           name = "my-app";
           src = ./.;
           elmLock = ./elm.lock;
-          registryDat = ./registry.dat;
         };
       in
       {
@@ -108,7 +108,7 @@ You can view a full working example in the [`example/`](./example) directory.
 
 ## About
 
-I was looking for a practical and interesting project to work on that might be beneficial for the Elm community and at the same time extend my skills within functional programming. When I researched [`cachix/elm2nix`](https://github.com/cachix/elm2nix) it seemed to fit the bill because it combined 3 technologies I loved, [Elm](https://elm-lang.org/), [Haskell](https://www.haskell.org/), and [Nix](https://nixos.org/), to produce a useful tool for Elm developers. At the time, I knew how to use each of the technologies to varying degrees but I didn't have a deep understanding of how `cachix/elm2nix` worked and why it needed to work that way. As a result, it seemed like a great project to satisfy my goals. Fast forward 2 months and I'm happy I took the plunge. I learned so much about Elm, Haskell, and Nix that I didn't know before and I was able to find little ways to positively improve upon the project.
+I was looking for a practical and interesting project to work on that might be beneficial for the Elm community and at the same time extend my skills within functional programming. When I researched [`cachix/elm2nix`](https://github.com/cachix/elm2nix) it seemed to fit the bill because it combined 3 technologies I love, [Elm](https://elm-lang.org/), [Haskell](https://www.haskell.org/), and [Nix](https://nixos.org/), to produce a useful tool for Elm developers. At the time, I knew how to use each of the technologies to varying degrees but I didn't have a deep understanding of how `cachix/elm2nix` worked and why it needed to work that way. As a result, it seemed like a great project to satisfy my goals. Fast forward 4 months and I'm happy I took the plunge. I learned so much about Elm, Haskell, and Nix that I didn't know before and I was able to find little ways to positively improve upon the project.
 
 ## References
 
