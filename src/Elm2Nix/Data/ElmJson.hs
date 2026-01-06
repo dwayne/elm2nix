@@ -2,25 +2,17 @@
 
 module Elm2Nix.Data.ElmJson
     ( ElmJson
-    , fromFile, fromFiles
-    , fromList
-    , toAscList
-    , toSet
-    , decoder, dependenciesDecoder, nameDecoder
+    , fromFile, fromFiles, fromList
+    , decoder, dependenciesDecoder
+    , toAscList, toSet
     ) where
 
-import qualified Data.Aeson as Json
-import qualified Data.Aeson.Key as Key
-import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import qualified Data.Text as T
 
-import Data.Aeson.Key (Key)
-import Data.Aeson.Types ((<?>), (.:?), FromJSON, JSONPathElement(..), Object, Parser, Value, emptyObject, parseFail)
 import Data.Bifunctor (first)
 import Data.Maybe (fromMaybe)
 import Data.Set (Set)
-import Data.Traversable.WithIndex (itraverse)
 
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.Version as Version
@@ -28,7 +20,6 @@ import qualified Elm2Nix.Lib.Json.Decode as JD
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Name (Name)
-import Elm2Nix.Data.Version (Version)
 
 
 newtype ElmJson = ElmJson (Set Dependency)
@@ -42,91 +33,6 @@ newtype ElmJson = ElmJson (Set Dependency)
 
 instance Show ElmJson where
     show (ElmJson dependencies) = show dependencies
-
-
-instance FromJSON ElmJson where
-    parseJSON = elmJsonParser
-
-
-elmJsonParser :: Value -> Parser ElmJson
-elmJsonParser =
-    Json.withObject "ElmJson" $ \o ->
-        ElmJson <$> (
-            Set.union
-                <$> optional o "dependencies" directAndIndirectParser
-                <*> optional o "test-dependencies" directAndIndirectParser
-        )
-
-
-directAndIndirectParser :: Value -> Parser (Set Dependency)
-directAndIndirectParser =
-    Json.withObject "DirectAndIndirect" $ \o ->
-        Set.union
-            <$> optional o "direct" dependenciesParser
-            <*> optional o "indirect" dependenciesParser
-
-
-dependenciesParser :: Value -> Parser (Set Dependency)
-dependenciesParser =
-    Json.withObject "Dependencies" $ fmap (foldr Set.insert Set.empty) . itraverse dependencyParser
-
-
-dependencyParser :: Key -> Value -> Parser Dependency
-dependencyParser key value =
-    (Dependency <$> nameParser key <*> versionParser value) <?> Key key
-
-
-optional :: Object -> Key -> (Value -> Parser a) -> Parser a
-optional o key f =
-    (o .:? key >>= f . Maybe.fromMaybe emptyObject) <?> Key key
-
-
-decoder :: JD.Decoder ElmJson
-decoder =
-    JD.field "type" (JD.literal "application") >> (ElmJson <$> allDependenciesDecoder)
-
-
-allDependenciesDecoder :: JD.Decoder (Set Dependency)
-allDependenciesDecoder =
-    (\a b c d -> Set.fromList $ a ++ b ++ c ++ d)
-        <$> pathToDependenciesDecoder [ "dependencies", "direct" ]
-        <*> pathToDependenciesDecoder [ "dependencies", "indirect" ]
-        <*> pathToDependenciesDecoder [ "test-dependencies", "direct" ]
-        <*> pathToDependenciesDecoder [ "test-dependencies", "indirect" ]
-
-
-pathToDependenciesDecoder :: [String] -> JD.Decoder [Dependency]
-pathToDependenciesDecoder path =
-    fmap (fromMaybe []) (JD.optionalAt path dependenciesDecoder)
-
-
-dependenciesDecoder :: JD.Decoder [Dependency]
-dependenciesDecoder =
-    JD.keyValuePairs nameFromString Version.decoder >>= JD.succeed . map (uncurry Dependency)
-
-
-nameFromString :: String -> Either String Name
-nameFromString = first Name.fromTextErrorToString . Name.fromText . T.pack
-
-
-nameParser :: Key -> Parser Name
-nameParser = either (parseFail . Name.fromTextErrorToString) pure . Name.fromText . Key.toText
-
-
-nameDecoder :: JD.Decoder Name
-nameDecoder =
-    JD.string >>= \s ->
-        case Name.fromText (T.pack s) of
-            Right name ->
-                JD.succeed name
-
-            Left err ->
-                JD.failWith (Name.fromTextErrorToString err)
-
-
-versionParser :: Value -> Parser Version
-versionParser =
-    Json.withText "Version" $ \t -> maybe (parseFail $ "version is invalid: " ++ show t) pure (Version.fromText t)
 
 
 
@@ -161,6 +67,30 @@ fromFilesHelper currentDeps paths =
 
 fromList :: [Dependency] -> ElmJson
 fromList = ElmJson . Set.fromList
+
+
+decoder :: JD.Decoder ElmJson
+decoder =
+    JD.field "type" (JD.literal "application") >>
+        ((\a b c d -> fromList $ a ++ b ++ c ++ d)
+            <$> pathToDependenciesDecoder [ "dependencies", "direct" ]
+            <*> pathToDependenciesDecoder [ "dependencies", "indirect" ]
+            <*> pathToDependenciesDecoder [ "test-dependencies", "direct" ]
+            <*> pathToDependenciesDecoder [ "test-dependencies", "indirect" ])
+
+
+pathToDependenciesDecoder :: [String] -> JD.Decoder [Dependency]
+pathToDependenciesDecoder path =
+    fmap (fromMaybe []) (JD.optionalAt path dependenciesDecoder)
+
+
+dependenciesDecoder :: JD.Decoder [Dependency]
+dependenciesDecoder =
+    JD.keyValuePairs nameFromString Version.decoder >>= JD.succeed . map (uncurry Dependency)
+
+
+nameFromString :: String -> Either String Name
+nameFromString = first Name.fromTextErrorToString . Name.fromText . T.pack
 
 
 

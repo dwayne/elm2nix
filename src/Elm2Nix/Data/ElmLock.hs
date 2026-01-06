@@ -1,7 +1,6 @@
 module Elm2Nix.Data.ElmLock
     ( ElmLock
-    , fromFile, fromList
-    , decoder
+    , fromFile, fromList, decoder
     , toSet
     ) where
 
@@ -16,10 +15,16 @@ import qualified Elm2Nix.Lib.Json.Decode as JD
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Name (Name)
+import Elm2Nix.Data.Version (Version)
 
 
 newtype ElmLock = ElmLock (Set Dependency)
     deriving (Eq, Show)
+
+
+
+-- CONSTRUCT
+
 
 
 fromFile :: FilePath -> IO (Either JD.Error ElmLock)
@@ -31,13 +36,11 @@ fromList = ElmLock . Set.fromList
 
 
 decoder :: JD.Decoder ElmLock
-decoder =
-    fromList <$> JD.list dependencyDecoder
+decoder = fromList <$> JD.list dependencyDecoder
 
 
 dependencyDecoder :: JD.Decoder Dependency
-dependencyDecoder =
-    Dependency <$> nameDecoder <*> JD.field "version" Version.decoder
+dependencyDecoder = Dependency <$> nameDecoder <*> versionDecoder
 
 
 nameDecoder :: JD.Decoder Name
@@ -50,6 +53,15 @@ nameDecoder = do
 
         Left err ->
             JD.failWith (Name.fromTextErrorToString err)
+
+
+versionDecoder :: JD.Decoder Version
+versionDecoder = JD.field "version" Version.decoder
+
+
+
+-- CONVERT
+
 
 
 toSet :: ElmLock -> Set Dependency
