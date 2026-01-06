@@ -10,7 +10,7 @@ description:
     .
     $ elm2nix lock
     .
-    Generate a registry.dat file from your lock file:
+    Generate a registry.dat file from a lock file:
     .
     $ elm2nix registry generate
     .
