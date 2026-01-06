@@ -19,7 +19,7 @@ mkDerivation {
   ];
   doHaddock = false;
   doCheck = false;
-  description = "Create Elm artifacts to be used when compiling Elm applications with Nix";
+  description = "Create Elm support files to be used when compiling Elm applications with Nix";
   license = lib.licenses.bsd3;
   mainProgram = "elm2nix";
 }
