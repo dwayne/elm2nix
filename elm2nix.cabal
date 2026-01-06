@@ -2,17 +2,21 @@ cabal-version: 3.0
 name: elm2nix
 version: 0.1.0.0
 
-synopsis: Create Elm artifacts to be used when compiling Elm applications with Nix
+synopsis: Create Elm support files to be used when compiling Elm applications with Nix
 description:
-    Create Elm artifacts to be used when compiling Elm applications with Nix.
+    Create Elm support files to be used when compiling Elm applications with Nix.
     .
-    Generate a lock file from your elm.json:
+    Generate a lock file from one or more elm.json files:
     .
     $ elm2nix lock
     .
     Generate a registry.dat file from your lock file:
     .
     $ elm2nix registry generate
+    .
+    View a registry.dat file as JSON:
+    .
+    $ elm2nix registry view
 
 license: BSD-3-Clause
 license-file: LICENSE
