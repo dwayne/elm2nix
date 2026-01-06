@@ -82,7 +82,7 @@ registryCommands :: Parser RegistryCommands
 registryCommands =
     hsubparser $ mconcat
         [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from your lock file"))
-        , command "view" (info (View <$> viewOptions) (progDesc "Display a registry.dat file as JSON"))
+        , command "view" (info (View <$> viewOptions) (progDesc "View a registry.dat file as JSON"))
         ]
 
 
