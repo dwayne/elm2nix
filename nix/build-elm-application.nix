@@ -62,8 +62,14 @@ lib.extendMkDerivation {
         || throw "You cannot enable both debugging and compression.";
 
       let
-        registryDat = generateRegistryDat { inherit elmLock; };
+        hasMultipleEntries = builtins.isList entry && builtins.length entry >= 2;
         useElmOptimizeLevel2 = enableOptimizations && optimizeLevel >= 2;
+      in
+      assert !(hasMultipleEntries && useElmOptimizeLevel2)
+        || throw "elm-optimize-level-2 does not support multiple entries.";
+
+      let
+        registryDat = generateRegistryDat { inherit elmLock; };
         minifier = if useTerser then "terser" else "uglifyjs";
         toCompress = if doMinification then outputMin else output;
       in
@@ -109,7 +115,7 @@ lib.extendMkDerivation {
                 let
                   inputFiles =
                     if builtins.isList entry then
-                      builtins.warn "elm-optimize-level-2 accepts multiple entry files but only processes the first" entry
+                      entry
                     else
                       [ entry ];
                 in

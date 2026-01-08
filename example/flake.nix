@@ -75,47 +75,108 @@
 
           default = example;
 
-          debugExample = example.override {
+          debuggedExample = example.override {
             enableDebugger = true;
-            output = "debug.js";
+            output = "debugged.js";
           };
 
-          checkedExample = example.override {
+          formattingCheckedExample = example.override {
             doElmFormat = true;
             elmFormatSourceFiles = [ "review/src" "src" "tests" ];
-            doElmTest = true;
-            output = "checked.js";
+            output = "formatting-checked.js";
           };
 
-          reviewedExample = example.override {
+          testedExample = formattingCheckedExample.override {
+            doElmTest = true;
+            output = "tested.js";
+          };
+
+          reviewedExample = testedExample.override {
             doElmReview = true;
             output = "reviewed.js";
           };
 
-          optimizedExample = checkedExample.override {
-            output = "optimized.js";
+          optimizedExample = reviewedExample.override {
             enableOptimizations = true;
-            optimizeLevel = 2;
-            doMinification = true;
-            doCompression = true;
-            doReporting = true;
+            output = "optimized.js";
           };
 
-          combinedExample1 = checkedExample.override {
+          optimized2Example = optimizedExample.override {
+            optimizeLevel = 2;
+            output = "optimized2.js";
+          };
+
+          optimized3Example = optimizedExample.override {
+            optimizeLevel = 3;
+            output = "optimized3.js";
+          };
+
+          combined1Example = optimizedExample.override {
             entry = [ "src/Main.elm" "src/Workshop.elm" ];
             output = "combined1.js";
           };
 
-          combinedExample2 = optimizedExample.override {
+          #
+          # N.B.: The following isn't allowed since elm-optimize-level-2 doesn't support multiple entries.
+          #
+          # When you attempt to build this derivation it will fail as expected.
+          #
+          combined2Example = optimized2Example.override {
             entry = [ "src/Main.elm" "src/Workshop.elm" ];
             output = "combined2.js";
           };
 
-          hashedExample = optimizedExample.override {
-            output = "hashed.js";
+          minifiedExample = optimized2Example.override {
+            doMinification = true;
+            useTerser = true;
+            output = "minified.js";
+          };
+
+          compressedExample = minifiedExample.override {
+            doCompression = true;
+            output = "compressed.js";
+          };
+
+          reportedExample = compressedExample.override {
+            doReporting = true;
+            output = "reported.js";
+          };
+
+          hashedExample = reportedExample.override {
             doContentHashing = true;
             hashLength = 12;
             keepFilesWithNoHashInFilenames = true;
+            output = "hashed.js";
+          };
+
+          #
+          # N.B. The finalExample derivation is equivalent to the hashedExample derivation.
+          #
+          finalExample = buildElmApplication {
+            name = "example";
+            src = ./.;
+            elmLock = ./elm.lock;
+
+            doElmFormat = true;
+            elmFormatSourceFiles = [ "review/src" "src" "tests" ];
+
+            doElmTest = true;
+            doElmReview = true;
+
+            enableOptimizations = true;
+            optimizeLevel = 2;
+
+            doMinification = true;
+            useTerser = true;
+
+            doCompression = true;
+            doReporting = true;
+
+            doContentHashing = true;
+            hashLength = 12;
+            keepFilesWithNoHashInFilenames = true;
+
+            output = "hashed.js";
           };
         };
 
