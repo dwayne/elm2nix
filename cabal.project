@@ -1,0 +1,10 @@
+packages: .
+
+source-repository-package
+  type: git
+  location: git@github.com:dwayne/hs-json-codec.git
+  tag: 9664684da40b1e0488c20a5290cf2e1eaa313c9b
+
+source-repository-package
+  type: git
+  location: git@github.com:dwayne/hs-json-parser.git
