@@ -2,16 +2,14 @@
 
 module Test.Elm2Nix.Data.ElmLock (main) where
 
-import Test.Hspec
-
+import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
-import qualified Elm2Nix.Lib.Json.Decode as JD
 import qualified Test.Fixture as Fixture
-
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
+import Test.Hspec
 
 
 main :: IO ()
@@ -59,7 +57,7 @@ decoderSpec =
                             , Dependency Name.elmJson (Version 1 1 4)
                             ]
                 in
-                JD.decodeString ElmLock.decoder input `shouldBe` Right elmLock
+                JD.decodeText ElmLock.decoder input `shouldBe` Right elmLock
 
 
 fromFileSpec :: Spec

@@ -1,3 +1,4 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Test.Elm2Nix.Data.Version (main) where
@@ -8,8 +9,8 @@ import qualified Data.ByteString.Lazy as LBS
 import Control.Exception (evaluate)
 import Test.Hspec
 
+import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.Version as Version
-import qualified Elm2Nix.Lib.Json.Decode as JD
 
 import Elm2Nix.Data.Version (Version(..))
 
@@ -46,10 +47,16 @@ decoderSpec :: Spec
 decoderSpec =
     describe "decoder" $ do
         it "example 1" $
-            JD.decodeString Version.decoder "\"1.2.3\"" `shouldBe` Right (Version 1 2 3)
+            JD.decodeText Version.decoder "\"1.2.3\"" `shouldBe` Right (Version 1 2 3)
 
         it "example 2" $
-            JD.decodeString Version.decoder "\"1.2\"" `shouldBe` Left (JD.DecodeError (JD.Failure "version is invalid: 1.2"))
+            JD.decodeText Version.decoder "\"1.2\"" `shouldSatisfy`
+                \case
+                    Left (JD.DecodeError (JD.Failure "version is invalid: 1.2" _)) ->
+                        True
+
+                    _ ->
+                        False
 
 
 orderSpec :: Spec

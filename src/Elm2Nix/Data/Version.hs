@@ -11,7 +11,7 @@ import Data.Binary (Binary(..), getWord8, putWord8)
 import Data.Text (Text)
 import Data.Word (Word16)
 
-import qualified Elm2Nix.Lib.Json.Decode as JD
+import qualified Data.Json.Decode as JD
 
 
 data Version
@@ -125,10 +125,10 @@ maxWord16 =
 
 decoder :: JD.Decoder Version
 decoder =
-    JD.string >>= \s ->
-        case fromText (T.pack s) of
+    JD.text >>= \t ->
+        case fromText t of
             Just version ->
                 JD.succeed version
 
             Nothing ->
-                JD.failWith $ "version is invalid: " ++ s
+                JD.fail $ "version is invalid: " <> t

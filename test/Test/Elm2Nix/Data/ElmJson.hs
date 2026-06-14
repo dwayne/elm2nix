@@ -1,19 +1,18 @@
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Test.Elm2Nix.Data.ElmJson (main) where
 
-import Data.List (isSuffixOf)
-import System.IO.Error (isDoesNotExistError)
-import Test.Hspec
-
+import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.Name as Name
-import qualified Elm2Nix.Lib.Json.Decode as JD
 import qualified Test.Fixture as Fixture
 
-
+import Data.List (isSuffixOf)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
+import System.IO.Error (isDoesNotExistError)
+import Test.Hspec
 
 
 main :: IO ()
@@ -29,7 +28,7 @@ dependenciesDecoderSpec :: Spec
 dependenciesDecoderSpec =
     describe "dependenciesDecoder" $ do
         it "example 1" $
-            JD.decodeString ElmJson.dependenciesDecoder "{}" `shouldBe` Right []
+            JD.decodeText ElmJson.dependenciesDecoder "{}" `shouldBe` Right []
 
         it "example 2" $
             let
@@ -50,7 +49,7 @@ dependenciesDecoderSpec =
                     , Dependency Name.elmUrl (Version 1 0 0)
                     ]
             in
-            JD.decodeString ElmJson.dependenciesDecoder input `shouldBe` Right output
+            JD.decodeText ElmJson.dependenciesDecoder input `shouldBe` Right output
 
         it "example 3" $
             let
@@ -59,7 +58,13 @@ dependenciesDecoderSpec =
                     \    \"/browser\": \"1.0.2\" \
                     \}                           "
             in
-            JD.decodeString ElmJson.dependenciesDecoder input `shouldBe` Left (JD.DecodeError (JD.FieldError "/browser" (JD.Failure "author is empty")))
+            JD.decodeText ElmJson.dependenciesDecoder input `shouldSatisfy`
+                \case
+                    Left (JD.DecodeError (JD.FieldError "/browser" (JD.Failure "author is empty" _))) ->
+                        True
+
+                    _ ->
+                        False
 
         it "example 4" $
             let
@@ -68,7 +73,13 @@ dependenciesDecoderSpec =
                     \    \"elm/browser\": \"1.0\" \
                     \}                            "
             in
-            JD.decodeString ElmJson.dependenciesDecoder input `shouldBe` Left (JD.DecodeError (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0")))
+            JD.decodeText ElmJson.dependenciesDecoder input `shouldSatisfy`
+                \case
+                    Left (JD.DecodeError (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _))) ->
+                        True
+
+                    _ ->
+                        False
 
 
 decoderSpec :: Spec
@@ -106,7 +117,7 @@ decoderSpec =
                             , Dependency Name.elmJson (Version 1 1 3)
                             ]
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 2" $
                 let
@@ -135,7 +146,7 @@ decoderSpec =
                             , Dependency Name.elmHtml (Version 1 0 0)
                             ]
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 3" $
                 let
@@ -160,7 +171,7 @@ decoderSpec =
                             , Dependency Name.elmCore (Version 1 0 5)
                             ]
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 4" $
                 let
@@ -183,7 +194,7 @@ decoderSpec =
                             , Dependency Name.elmCore (Version 1 0 5)
                             ]
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 5" $
                 let
@@ -203,7 +214,7 @@ decoderSpec =
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             ]
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 6" $
                 let
@@ -219,7 +230,7 @@ decoderSpec =
                     elmJson =
                         ElmJson.fromList []
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 7" $
                 let
@@ -232,14 +243,14 @@ decoderSpec =
 
                     elmJson = ElmJson.fromList []
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 8" $
                 let
                     input = "{ \"type\": \"application\" }"
                     elmJson = ElmJson.fromList []
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 9" $
                 let
@@ -272,7 +283,7 @@ decoderSpec =
                             , Dependency Name.elmJson (Version 1 1 3)
                             ]
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
             it "example 10" $
                 let
@@ -294,7 +305,7 @@ decoderSpec =
                             [ Dependency Name.elmBrowser (Version 1 0 2)
                             ]
                 in
-                JD.decodeString ElmJson.decoder input `shouldBe` Right elmJson
+                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
 
 fromFileSpec :: Spec
@@ -323,17 +334,35 @@ fromFileSpec =
             it "when / is missing" $ do
                 path <- Fixture.file "name-missing-forward-slash.json"
                 Left err <- ElmJson.fromFile path
-                err `shouldBe` JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing")))
+                err `shouldSatisfy`
+                    \case
+                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _))) ->
+                            True
+
+                        _ ->
+                            False
 
             it "when version is incorrectly formatted" $ do
                 path <- Fixture.file "version-incorrect-format.json"
                 Left err <- ElmJson.fromFile path
-                err `shouldBe` JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0")))
+                err `shouldSatisfy`
+                    \case
+                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _))) ->
+                            True
+
+                        _ ->
+                            False
 
             it "when version has a part with leading zeros" $ do
                 path <- Fixture.file "version-leading-zeros.json"
                 Left err <- ElmJson.fromFile path
-                err `shouldBe` JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0.02")))
+                err `shouldSatisfy`
+                    \case
+                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0.02" _))) ->
+                            True
+
+                        _ ->
+                            False
 
 
 fromFilesSpec :: Spec
@@ -360,4 +389,10 @@ fromFilesSpec =
                 paths <- traverse Fixture.file [ "elm1.json", "name-missing-forward-slash.json", "elm3.json" ]
                 Left ( badPath, err ) <- ElmJson.fromFiles paths
                 ("name-missing-forward-slash.json" `isSuffixOf` badPath) `shouldBe` True
-                err `shouldBe` JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing")))
+                err `shouldSatisfy`
+                    \case
+                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _))) ->
+                            True
+
+                        _ ->
+                            False

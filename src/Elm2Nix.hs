@@ -14,21 +14,19 @@ import qualified Data.Aeson.Encode.Pretty as Json
 import qualified Data.Binary as Binary hiding (decodeFile)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Lazy.Char8 as Char8
+import qualified Data.Json.Decode as JD
 import qualified Data.Text as T
-
-import Data.Text (Text)
-import System.IO (stdout)
-
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
-import qualified Elm2Nix.Lib.Json.Decode as JD
 import qualified Elm2Nix.Lib.Nix as Nix
 
+import Data.Text (Text)
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
+import System.IO (stdout)
 
 
 
@@ -91,14 +89,20 @@ writeElmLockFileErrorToText err =
 
 
 jsonDecodeFileErrorToText :: FilePath -> JD.Error -> Text
-jsonDecodeFileErrorToText path (JD.SyntaxError s) = "Syntax error in " <> T.pack path <> ": " <> T.pack s
+--
+-- TODO: Improve error messages.
+--
+jsonDecodeFileErrorToText path (JD.EncodingError u) = "Unicode error in " <> T.pack path <> ": " <> T.show u
+jsonDecodeFileErrorToText path (JD.SyntaxError s) = "Syntax error in " <> T.pack path <> ": " <> T.show s
 jsonDecodeFileErrorToText path (JD.DecodeError err) = "JSON decoding error in " <> T.pack path <> ": " <> jsonDecodeErrorToText err
 
 
 jsonDecodeErrorToText :: JD.DecodeError -> Text
-jsonDecodeErrorToText (JD.Failure s) = T.pack s
-jsonDecodeErrorToText (JD.Expected s value) = "Expected " <> T.pack s <> " but got " <> T.pack (show value)
-jsonDecodeErrorToText (JD.FieldError name err) = "Problem with field \"" <> T.pack name <> "\": " <> jsonDecodeErrorToText err
+jsonDecodeErrorToText =
+    --
+    -- TODO: Improve error messages.
+    --
+    T.show
 
 
 fromDependenciesErrorToText :: FOD.FromDependenciesError -> Text

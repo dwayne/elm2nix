@@ -7,17 +7,16 @@ module Elm2Nix.Data.ElmJson
     , toAscList, toSet
     ) where
 
+import qualified Data.Json.Decode as JD
 import qualified Data.Set as Set
 import qualified Data.Text as T
+import qualified Elm2Nix.Data.Name as Name
+import qualified Elm2Nix.Data.Version as Version
 
 import Data.Bifunctor (first)
 import Data.Maybe (fromMaybe)
 import Data.Set (Set)
-
-import qualified Elm2Nix.Data.Name as Name
-import qualified Elm2Nix.Data.Version as Version
-import qualified Elm2Nix.Lib.Json.Decode as JD
-
+import Data.Text (Text)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Name (Name)
 
@@ -71,7 +70,7 @@ fromList = ElmJson . Set.fromList
 
 decoder :: JD.Decoder ElmJson
 decoder =
-    JD.field "type" (JD.literal "application") >>
+    JD.field "type" (literal "application") >>
         ((\a b c d -> fromList $ a ++ b ++ c ++ d)
             <$> pathToDependenciesDecoder [ "dependencies", "direct" ]
             <*> pathToDependenciesDecoder [ "dependencies", "indirect" ]
@@ -79,18 +78,28 @@ decoder =
             <*> pathToDependenciesDecoder [ "test-dependencies", "indirect" ])
 
 
-pathToDependenciesDecoder :: [String] -> JD.Decoder [Dependency]
+literal :: Text -> JD.Decoder ()
+literal expected =
+    JD.text >>= \actual ->
+        if actual == expected then
+            JD.succeed ()
+
+        else
+            JD.fail $ "not equal to \"" <> expected <> "\": \"" <> actual <> "\""
+
+
+pathToDependenciesDecoder :: [Text] -> JD.Decoder [Dependency]
 pathToDependenciesDecoder path =
-    fmap (fromMaybe []) (JD.optionalAt path dependenciesDecoder)
+    fmap (fromMaybe []) (JD.optional $ JD.at path dependenciesDecoder)
 
 
 dependenciesDecoder :: JD.Decoder [Dependency]
 dependenciesDecoder =
-    JD.keyValuePairs nameFromString Version.decoder >>= JD.succeed . map (uncurry Dependency)
+    JD.keyValuePairsWithKeyTransformer toName Version.decoder >>= JD.succeed . map (uncurry Dependency)
 
 
-nameFromString :: String -> Either String Name
-nameFromString = first Name.fromTextErrorToString . Name.fromText . T.pack
+toName :: Text -> Either Text Name
+toName = first (T.pack . Name.fromTextErrorToString) . Name.fromText
 
 
 
