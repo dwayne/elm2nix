@@ -336,7 +336,7 @@ fromFileSpec =
                 Left err <- ElmJson.fromFile path
                 err `shouldSatisfy`
                     \case
-                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _))) ->
+                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _)))) ->
                             True
 
                         _ ->
@@ -347,7 +347,7 @@ fromFileSpec =
                 Left err <- ElmJson.fromFile path
                 err `shouldSatisfy`
                     \case
-                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _))) ->
+                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _)))) ->
                             True
 
                         _ ->
@@ -358,7 +358,7 @@ fromFileSpec =
                 Left err <- ElmJson.fromFile path
                 err `shouldSatisfy`
                     \case
-                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0.02" _))) ->
+                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0.02" _)))) ->
                             True
 
                         _ ->
@@ -391,7 +391,7 @@ fromFilesSpec =
                 ("name-missing-forward-slash.json" `isSuffixOf` badPath) `shouldBe` True
                 err `shouldSatisfy`
                     \case
-                        JD.DecodeError (JD.FieldError "dependencies.direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _))) ->
+                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _)))) ->
                             True
 
                         _ ->

@@ -90,7 +90,7 @@ literal expected =
 
 pathToDependenciesDecoder :: [Text] -> JD.Decoder [Dependency]
 pathToDependenciesDecoder path =
-    fmap (fromMaybe []) (JD.optional $ JD.at path dependenciesDecoder)
+    fmap (fromMaybe []) (JD.optionalAt path dependenciesDecoder)
 
 
 dependenciesDecoder :: JD.Decoder [Dependency]
