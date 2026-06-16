@@ -55,7 +55,6 @@ library
         binary >= 0.8.9 && < 0.9,
         bytestring >= 0.12.2 && < 0.13,
         containers >= 0.7 && < 0.8,
-        json >= 0.11 && < 0.12,
         json-codec ^>=0.1,
         indexed-traversable >= 0.1.4 && < 0.2,
         --
