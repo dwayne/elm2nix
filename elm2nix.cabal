@@ -1,22 +1,23 @@
 cabal-version: 3.0
+
 name: elm2nix
 version: 0.1.0.0
 
 synopsis: Create Elm support files to be used when compiling Elm applications with Nix
 description:
-    Create Elm support files to be used when compiling Elm applications with Nix.
-    .
-    Generate a lock file from one or more elm.json files:
-    .
-    $ elm2nix lock
-    .
-    Generate a registry.dat file from a lock file:
-    .
-    $ elm2nix registry generate
-    .
-    View a registry.dat file as JSON:
-    .
-    $ elm2nix registry view
+  Create Elm support files to be used when compiling Elm applications with Nix.
+  .
+  Generate a lock file from one or more elm.json files:
+  .
+  $ elm2nix lock
+  .
+  Generate a registry.dat file from a lock file:
+  .
+  $ elm2nix registry generate
+  .
+  View a registry.dat file as JSON:
+  .
+  $ elm2nix registry view
 
 license: BSD-3-Clause
 license-file: LICENSE
@@ -27,96 +28,94 @@ maintainer: me+elm2nix@dwaynecrooks.com
 category: Distribution, Nix
 
 source-repository head
-    type: git
-    location: https://github.com/dwayne/elm2nix
+  type: git
+  location: https://github.com/dwayne/elm2nix
 
 library
-    hs-source-dirs: src
-    exposed-modules:
-        Elm2Nix,
-        Elm2Nix.CLI,
-        Elm2Nix.Data.Dependency,
-        Elm2Nix.Data.ElmJson,
-        Elm2Nix.Data.ElmLock,
-        Elm2Nix.Data.FixedOutputDerivation,
-        Elm2Nix.Data.Name,
-        Elm2Nix.Data.RegistryDat,
-        Elm2Nix.Data.Version,
-        Elm2Nix.Lib.Binary,
-        Elm2Nix.Lib.Nix
+  default-language: Haskell2010
+  hs-source-dirs: src
 
-    ghc-options: -Wall -Wno-name-shadowing
+  ghc-options: -Wall -Wno-name-shadowing
 
-    default-language: Haskell2010
-    build-depends:
-        aeson ^>=2.2.3,
-        aeson-pretty ^>=0.8.10,
-        base ^>=4.20.1,
-        binary ^>=0.8.9,
-        bytestring ^>=0.12.2,
-        containers ^>=0.7,
-        json-codec ^>=0.1,
-        indexed-traversable ^>=0.1.4,
-        --
-        -- N.B. The lower bound has been adjusted to satisfy
-        -- the version that's currently available in Nixpkgs
-        --
-        -- Previously, it was >= 0.19.0 && < 0.20
-        --
-        optparse-applicative ^>=0.18.1,
-        text ^>=2.1.2,
-        typed-process ^>=0.2.13,
-        unliftio ^>=0.2.25
+  exposed-modules:
+    Elm2Nix,
+    Elm2Nix.CLI,
+    Elm2Nix.Data.Dependency,
+    Elm2Nix.Data.ElmJson,
+    Elm2Nix.Data.ElmLock,
+    Elm2Nix.Data.FixedOutputDerivation,
+    Elm2Nix.Data.Name,
+    Elm2Nix.Data.RegistryDat,
+    Elm2Nix.Data.Version,
+    Elm2Nix.Lib.Binary,
+    Elm2Nix.Lib.Nix
 
+  build-depends:
+    aeson ^>=2.2.3,
+    aeson-pretty ^>=0.8.10,
+    base ^>=4.20.1,
+    binary ^>=0.8.9,
+    bytestring ^>=0.12.2,
+    containers ^>=0.7,
+    json-codec ^>=0.1,
+    indexed-traversable ^>=0.1.4,
+    --
+    -- N.B. The lower bound has been adjusted to satisfy
+    -- the version that's currently available in Nixpkgs
+    --
+    -- Previously, it was >= 0.19.0 && < 0.20
+    --
+    optparse-applicative ^>=0.18.1,
+    text ^>=2.1.2,
+    typed-process ^>=0.2.13,
+    unliftio ^>=0.2.25
 
 common threaded
-    ghc-options: -threaded -rtsopts -with-rtsopts=-N
-
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
 
 executable elm2nix
-    import: threaded
+  import: threaded
 
-    hs-source-dirs: app
-    main-is: Main.hs
+  default-language: Haskell2010
+  hs-source-dirs: app
+  main-is: Main.hs
 
-    ghc-options: -Wall -Wno-name-shadowing
+  ghc-options: -Wall -Wno-name-shadowing
 
-    default-language: Haskell2010
-    build-depends:
-        base ^>=4.20.1,
-        elm2nix,
-        text ^>=2.1.2
-
+  build-depends:
+    base ^>=4.20.1,
+    elm2nix,
+    text ^>=2.1.2
 
 test-suite tests
-    import: threaded
+  import: threaded
 
-    type: exitcode-stdio-1.0
+  default-language: Haskell2010
+  hs-source-dirs: tests
+  main-is: Spec.hs
+  type: exitcode-stdio-1.0
 
-    hs-source-dirs: tests
-    main-is: Spec.hs
-    other-modules:
-        Test.Elm2Nix.Data.Dependency,
-        Test.Elm2Nix.Data.ElmJson,
-        Test.Elm2Nix.Data.ElmLock,
-        Test.Elm2Nix.Data.FixedOutputDerivation,
-        Test.Elm2Nix.Data.Name,
-        Test.Elm2Nix.Data.RegistryDat,
-        Test.Elm2Nix.Data.Version,
-        Test.Elm2Nix.Lib.Binary,
-        Test.Elm2Nix.Lib.Nix,
-        Test.Fixture
+  ghc-options: -Wall -Wno-name-shadowing
 
-    ghc-options: -Wall -Wno-name-shadowing
+  other-modules:
+    Test.Elm2Nix.Data.Dependency,
+    Test.Elm2Nix.Data.ElmJson,
+    Test.Elm2Nix.Data.ElmLock,
+    Test.Elm2Nix.Data.FixedOutputDerivation,
+    Test.Elm2Nix.Data.Name,
+    Test.Elm2Nix.Data.RegistryDat,
+    Test.Elm2Nix.Data.Version,
+    Test.Elm2Nix.Lib.Binary,
+    Test.Elm2Nix.Lib.Nix,
+    Test.Fixture
 
-    default-language: Haskell2010
-    build-depends:
-        aeson,
-        base,
-        binary,
-        bytestring,
-        containers,
-        elm2nix,
-        hspec,
-        json-codec,
-        text
+  build-depends:
+    aeson,
+    base,
+    binary,
+    bytestring,
+    containers,
+    elm2nix,
+    hspec,
+    json-codec,
+    text
