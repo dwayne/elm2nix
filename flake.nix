@@ -34,7 +34,7 @@
             }
 
             lint () {
-              hlint "$PROJECT_ROOT/src" "$PROJECT_ROOT/test"
+              hlint "$PROJECT_ROOT/src" "$PROJECT_ROOT/tests"
             }
             alias l='lint'
 

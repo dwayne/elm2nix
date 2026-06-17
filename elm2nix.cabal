@@ -88,12 +88,12 @@ executable elm2nix
         text ^>=2.1.2
 
 
-test-suite test
+test-suite tests
     import: threaded
 
     type: exitcode-stdio-1.0
 
-    hs-source-dirs: test
+    hs-source-dirs: tests
     main-is: Spec.hs
     other-modules:
         Test.Elm2Nix.Data.Dependency,

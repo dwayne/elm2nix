@@ -6,4 +6,4 @@ import System.Environment (getEnv)
 file :: FilePath -> IO FilePath
 file path = do
     projectRoot <- getEnv "PROJECT_ROOT"
-    return $ projectRoot ++ "/test/data/" ++ path
+    return $ projectRoot ++ "/tests/data/" ++ path

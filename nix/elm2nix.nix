@@ -9,7 +9,7 @@ in
     fileset = fs.unions [
       ../app
       ../src
-      ../test
+      ../tests
       ../elm2nix.cabal
       ../LICENSE
     ];
