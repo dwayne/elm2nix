@@ -5,10 +5,10 @@ module Test.Elm2Nix.Data.ElmLockSpec (spec) where
 import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
-import qualified Test.Fixture as Fixture
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
+import Test.Fixtures (fixture)
 import Test.Hspec
 
 
@@ -74,4 +74,4 @@ fromFileSpec =
                             , Dependency Name.elmJson (Version 1 1 4)
                             ]
                 in
-                (ElmLock.fromFile =<< Fixture.file "elm.lock") `shouldReturn` Right elmLock
+                (ElmLock.fromFile =<< fixture "elm.lock") `shouldReturn` Right elmLock

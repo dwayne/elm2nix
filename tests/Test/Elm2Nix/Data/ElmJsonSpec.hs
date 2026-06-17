@@ -6,12 +6,12 @@ module Test.Elm2Nix.Data.ElmJsonSpec (spec) where
 import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.Name as Name
-import qualified Test.Fixture as Fixture
 
 import Data.List (isSuffixOf)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
 import System.IO.Error (isDoesNotExistError)
+import Test.Fixtures (fixture)
 import Test.Hspec
 
 
@@ -325,14 +325,14 @@ fromFileSpec =
                             , Dependency Name.elmVirtualDom (Version 1 0 3)
                             ]
                 in
-                (ElmJson.fromFile =<< Fixture.file "elm.json") `shouldReturn` Right elmJson
+                (ElmJson.fromFile =<< fixture "elm.json") `shouldReturn` Right elmJson
 
         describe "invalid input" $ do
             it "when the file does not exist" $
                 ElmJson.fromFile "path/to/missing/elm.json" `shouldThrow` isDoesNotExistError
 
             it "when / is missing" $ do
-                path <- Fixture.file "name-missing-forward-slash.json"
+                path <- fixture "name-missing-forward-slash.json"
                 Left err <- ElmJson.fromFile path
                 err `shouldSatisfy`
                     \case
@@ -343,7 +343,7 @@ fromFileSpec =
                             False
 
             it "when version is incorrectly formatted" $ do
-                path <- Fixture.file "version-incorrect-format.json"
+                path <- fixture "version-incorrect-format.json"
                 Left err <- ElmJson.fromFile path
                 err `shouldSatisfy`
                     \case
@@ -354,7 +354,7 @@ fromFileSpec =
                             False
 
             it "when version has a part with leading zeros" $ do
-                path <- Fixture.file "version-leading-zeros.json"
+                path <- fixture "version-leading-zeros.json"
                 Left err <- ElmJson.fromFile path
                 err `shouldSatisfy`
                     \case
@@ -378,15 +378,15 @@ fromFilesSpec =
                             , Dependency Name.elmHtml (Version 1 0 0)
                             ]
                 in
-                (ElmJson.fromFiles =<< traverse Fixture.file [ "elm1.json", "elm2.json", "elm3.json" ]) `shouldReturn` Right elmJson
+                (ElmJson.fromFiles =<< traverse fixture [ "elm1.json", "elm2.json", "elm3.json" ]) `shouldReturn` Right elmJson
 
         describe "invalid input" $ do
             it "when one of the files does not exist" $ do
-                paths <- traverse Fixture.file [ "elm1.json", "path/to/missing/elm.json", "elm3.json" ]
+                paths <- traverse fixture [ "elm1.json", "path/to/missing/elm.json", "elm3.json" ]
                 ElmJson.fromFiles paths `shouldThrow` isDoesNotExistError
 
             it "when there is an error in one of the files" $ do
-                paths <- traverse Fixture.file [ "elm1.json", "name-missing-forward-slash.json", "elm3.json" ]
+                paths <- traverse fixture [ "elm1.json", "name-missing-forward-slash.json", "elm3.json" ]
                 Left ( badPath, err ) <- ElmJson.fromFiles paths
                 ("name-missing-forward-slash.json" `isSuffixOf` badPath) `shouldBe` True
                 err `shouldSatisfy`

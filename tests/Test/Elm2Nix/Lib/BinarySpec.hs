@@ -5,11 +5,11 @@ import Test.Hspec
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
-import qualified Test.Fixture as Fixture
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.RegistryDat (RegistryDat)
 import Elm2Nix.Data.Version (Version(..))
+import Test.Fixtures (fixture)
 
 
 spec :: Spec
@@ -34,14 +34,14 @@ decodeFileSpec =
                             , Dependency Name.elmVirtualDom (Version 1 0 3)
                             ]
                 in
-                (decodeFile =<< Fixture.file "registry.dat") `shouldReturn` Right registryDat
+                (decodeFile =<< fixture "registry.dat") `shouldReturn` Right registryDat
 
         describe "invalid input" $ do
             it "when the file does not exist" $
                 decodeFile "path/to/missing/registry.dat" `shouldReturn` Left (Binary.FileNotFound "path/to/missing/registry.dat")
 
             it "when the file is corrupted" $ do
-                path <- Fixture.file "corrupted.dat"
+                path <- fixture "corrupted.dat"
                 Left (Binary.DecodeError _ details) <- decodeFile path
                 details `shouldBe` "not enough bytes"
 

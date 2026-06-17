@@ -27,6 +27,11 @@ maintainer: me+elm2nix@dwaynecrooks.com
 
 category: Distribution, Nix
 
+data-files:
+  tests/fixtures/*.dat
+  tests/fixtures/*.json
+  tests/fixtures/*.lock
+
 source-repository head
   type: git
   location: https://github.com/dwayne/elm2nix
@@ -98,6 +103,7 @@ test-suite tests
   ghc-options: -Wall -Wno-name-shadowing
 
   other-modules:
+    Paths_elm2nix,
     Test.Elm2Nix.Data.DependencySpec,
     Test.Elm2Nix.Data.ElmJsonSpec,
     Test.Elm2Nix.Data.ElmLockSpec,
@@ -107,7 +113,10 @@ test-suite tests
     Test.Elm2Nix.Data.VersionSpec,
     Test.Elm2Nix.Lib.BinarySpec,
     Test.Elm2Nix.Lib.NixSpec,
-    Test.Fixture
+    Test.Fixtures
+
+  autogen-modules:
+    Paths_elm2nix
 
   build-depends:
     aeson,
