@@ -1,4 +1,4 @@
-module Test.Elm2Nix.Lib.Binary (main) where
+module Test.Elm2Nix.Lib.BinarySpec (spec) where
 
 import Test.Hspec
 
@@ -12,8 +12,8 @@ import Elm2Nix.Data.RegistryDat (RegistryDat)
 import Elm2Nix.Data.Version (Version(..))
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Lib.Binary" decodeFileSpec
 
 

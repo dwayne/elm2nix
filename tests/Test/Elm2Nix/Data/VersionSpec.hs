@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Test.Elm2Nix.Data.Version (main) where
+module Test.Elm2Nix.Data.VersionSpec (spec) where
 
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
@@ -15,8 +15,8 @@ import qualified Elm2Nix.Data.Version as Version
 import Elm2Nix.Data.Version (Version(..))
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Data.Version" $ do
         fromTextSpec
         decoderSpec

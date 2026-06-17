@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Test.Elm2Nix.Data.Name (main) where
+module Test.Elm2Nix.Data.NameSpec (spec) where
 
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
@@ -11,8 +11,8 @@ import Test.Hspec
 import qualified Elm2Nix.Data.Name as Name
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Data.Name" $ do
         fromTextSpec
         toTextSpec

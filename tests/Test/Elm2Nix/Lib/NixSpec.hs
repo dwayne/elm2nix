@@ -1,12 +1,12 @@
-module Test.Elm2Nix.Lib.Nix (main) where
+module Test.Elm2Nix.Lib.NixSpec (spec) where
 
 import Test.Hspec
 
 import Elm2Nix.Lib.Nix (NixPrefetchUrlError(..), NixPrefetchUrlOutput(..), Url, nixPrefetchUrl)
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Lib.Nix" nixPrefetchUrlSpec
 
 

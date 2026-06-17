@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Test.Elm2Nix.Data.RegistryDat (main) where
+module Test.Elm2Nix.Data.RegistryDatSpec (spec) where
 
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
@@ -15,8 +15,8 @@ import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Data.RegistryDat" $ do
         fromListSpec
         binarySerializationSpec

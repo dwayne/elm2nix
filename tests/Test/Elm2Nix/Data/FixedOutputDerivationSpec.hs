@@ -1,4 +1,4 @@
-module Test.Elm2Nix.Data.FixedOutputDerivation (main) where
+module Test.Elm2Nix.Data.FixedOutputDerivationSpec (spec) where
 
 import Data.Bifunctor (second)
 import Test.Hspec
@@ -12,8 +12,8 @@ import Elm2Nix.Data.Version (Version(..))
 import Elm2Nix.Lib.Nix (NixPrefetchUrlError(..), Sha256)
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Data.FixedOutputDerivation" fromDependenciesSpec
 
 

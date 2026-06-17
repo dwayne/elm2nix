@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Test.Elm2Nix.Data.ElmLock (main) where
+module Test.Elm2Nix.Data.ElmLockSpec (spec) where
 
 import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmLock as ElmLock
@@ -12,8 +12,8 @@ import Elm2Nix.Data.Version (Version(..))
 import Test.Hspec
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Data.ElmLock" $ do
         decoderSpec
         fromFileSpec

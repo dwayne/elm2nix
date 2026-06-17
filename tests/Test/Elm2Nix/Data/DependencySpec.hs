@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Test.Elm2Nix.Data.Dependency (main) where
+module Test.Elm2Nix.Data.DependencySpec (spec) where
 
 import Test.Hspec
 
@@ -11,8 +11,8 @@ import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Data.Dependency" $ do
         orderSpec
         showSpec

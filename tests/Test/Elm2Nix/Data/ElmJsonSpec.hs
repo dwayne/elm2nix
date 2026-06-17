@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module Test.Elm2Nix.Data.ElmJson (main) where
+module Test.Elm2Nix.Data.ElmJsonSpec (spec) where
 
 import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmJson as ElmJson
@@ -15,8 +15,8 @@ import System.IO.Error (isDoesNotExistError)
 import Test.Hspec
 
 
-main :: IO ()
-main = hspec $
+spec :: Spec
+spec =
     describe "Elm2Nix.Data.ElmJson" $ do
         dependenciesDecoderSpec
         decoderSpec
