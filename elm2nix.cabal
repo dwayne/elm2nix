@@ -23,7 +23,7 @@ license: BSD-3-Clause
 license-file: LICENSE
 
 author: Dwayne Crooks
-maintainer: me+elm2nix@dwaynecrooks.com
+maintainer: maintainer@dwaynecrooks.com
 
 category: Distribution, Nix
 
