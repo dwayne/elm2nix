@@ -13,61 +13,61 @@ import qualified Elm2Nix.Data.Name as Name
 
 spec :: Spec
 spec =
-    describe "Elm2Nix.Data.Name" $ do
-        fromTextSpec
-        toTextSpec
-        binarySerializationSpec
+  describe "Elm2Nix.Data.Name" $ do
+    fromTextSpec
+    toTextSpec
+    binarySerializationSpec
 
 
 fromTextSpec :: Spec
 fromTextSpec =
-    describe "fromText" $ do
-        describe "valid input" $
-            it "example 1" $
-                Name.fromText "elm/core" `shouldBe` Right Name.elmCore
+  describe "fromText" $ do
+    describe "valid input" $
+      it "example 1" $
+        Name.fromText "elm/core" `shouldBe` Right Name.elmCore
 
-        describe "invalid input" $ do
-            it "when author is empty" $
-                let
-                    check t =
-                        Name.fromText t `shouldBe` Left Name.EmptyAuthor
-                in
-                traverse_ check [ "/core", " /core" ]
+    describe "invalid input" $ do
+      it "when author is empty" $
+        let
+          check t =
+            Name.fromText t `shouldBe` Left Name.EmptyAuthor
+        in
+        traverse_ check [ "/core", " /core" ]
 
-            it "when package is empty" $
-                let
-                    check t =
-                        Name.fromText t `shouldBe` Left Name.EmptyPackage
-                in
-                traverse_ check [ "elm/", "elm/ " ]
+      it "when package is empty" $
+        let
+          check t =
+            Name.fromText t `shouldBe` Left Name.EmptyPackage
+        in
+        traverse_ check [ "elm/", "elm/ " ]
 
-            it "when / is missing" $
-                Name.fromText "elmcore" `shouldBe` Left Name.MissingForwardSlash
+      it "when / is missing" $
+        Name.fromText "elmcore" `shouldBe` Left Name.MissingForwardSlash
 
 
 toTextSpec :: Spec
 toTextSpec =
-    describe "toText" $
-        it "example 1" $
-            Name.toText "-" Name.elmCore `shouldBe` "elm-core"
+  describe "toText" $
+    it "example 1" $
+      Name.toText "-" Name.elmCore `shouldBe` "elm-core"
 
 
 binarySerializationSpec :: Spec
 binarySerializationSpec =
-    describe "binary serialization" $ do
-        describe "encode" $
-            it "example 1" $
-                let
-                    expectedByteString =
-                        LBS.pack
-                            [ 0x03                   -- length of the UTF-8 encoding of "elm" (mod 256)
-                            , 0x65, 0x6C, 0x6D       -- UTF-8 encoding of "elm"
-                            , 0x04                   -- length of the UTF-8 encoding of "core" (mod 256)
-                            , 0x63, 0x6F, 0x72, 0x65 -- UTF-8 encoding of "core"
-                            ]
-                in
-                Binary.encode Name.elmCore `shouldBe` expectedByteString
+  describe "binary serialization" $ do
+    describe "encode" $
+      it "example 1" $
+        let
+          expectedByteString =
+            LBS.pack
+              [ 0x03                   -- length of the UTF-8 encoding of "elm" (mod 256)
+              , 0x65, 0x6C, 0x6D       -- UTF-8 encoding of "elm"
+              , 0x04                   -- length of the UTF-8 encoding of "core" (mod 256)
+              , 0x63, 0x6F, 0x72, 0x65 -- UTF-8 encoding of "core"
+              ]
+        in
+        Binary.encode Name.elmCore `shouldBe` expectedByteString
 
-        describe "decode" $
-            it "example 1" $
-                Binary.decode (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Name.elmHtml
+    describe "decode" $
+      it "example 1" $
+        Binary.decode (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Name.elmHtml

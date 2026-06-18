@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Elm2Nix
-    ( writeElmLockFile
-    , WriteElmLockFileError(..), writeElmLockFileErrorToText
-    , writeRegistryDatFile
-    , WriteRegistryDatFileError, writeRegistryDatFileErrorToText
-    , viewRegistryDatFile
-    , ViewRegistryDatFileError, viewRegistryDatFileErrorToText
-    ) where
+  ( writeElmLockFile
+  , WriteElmLockFileError(..), writeElmLockFileErrorToText
+  , writeRegistryDatFile
+  , WriteRegistryDatFileError, writeRegistryDatFileErrorToText
+  , viewRegistryDatFile
+  , ViewRegistryDatFileError, viewRegistryDatFileErrorToText
+  ) where
 
 import qualified Data.Aeson as Json
 import qualified Data.Aeson.Encode.Pretty as Json
@@ -35,31 +35,31 @@ import System.IO (stdout)
 
 
 data WriteElmLockFileError
-    = FromFilesError (FilePath, JD.Error)
-    | FromDependenciesError FOD.FromDependenciesError
-    deriving (Eq, Show)
+  = FromFilesError (FilePath, JD.Error)
+  | FromDependenciesError FOD.FromDependenciesError
+  deriving (Eq, Show)
 
 
 writeElmLockFile :: [FilePath] -> Bool -> FilePath -> IO (Either WriteElmLockFileError ())
 writeElmLockFile inputs compact output = do
-    result1 <- ElmJson.fromFiles inputs
-    case result1 of
-        Right elmJson -> do
-            result2 <- FOD.fromElmJson elmJson
-            case result2 of
-                Right fods ->
-                    fmap Right $
-                        if compact then
-                            encodeCompact output fods
+  result1 <- ElmJson.fromFiles inputs
+  case result1 of
+    Right elmJson -> do
+      result2 <- FOD.fromElmJson elmJson
+      case result2 of
+        Right fods ->
+          fmap Right $
+            if compact then
+              encodeCompact output fods
 
-                        else
-                            encodeExpanded output fods
-
-                Left err ->
-                    return $ Left $ FromDependenciesError err
+            else
+              encodeExpanded output fods
 
         Left err ->
-            return $ Left $ FromFilesError err
+          return $ Left $ FromDependenciesError err
+
+    Left err ->
+      return $ Left $ FromFilesError err
 
 
 encodeCompact :: FilePath -> [FixedOutputDerivation] -> IO ()
@@ -68,24 +68,24 @@ encodeCompact = Json.encodeFile
 
 encodeExpanded :: FilePath -> [FixedOutputDerivation] -> IO ()
 encodeExpanded output =
-    LBS.writeFile output . Json.encodePretty' config
-    where
-        config :: Json.Config
-        config =
-            Json.defConfig
-                { Json.confCompare = Json.keyOrder [ "author", "package", "version", "sha256" ]
-                , Json.confTrailingNewline = True
-                }
+  LBS.writeFile output . Json.encodePretty' config
+  where
+    config :: Json.Config
+    config =
+      Json.defConfig
+        { Json.confCompare = Json.keyOrder [ "author", "package", "version", "sha256" ]
+        , Json.confTrailingNewline = True
+        }
 
 
 writeElmLockFileErrorToText :: WriteElmLockFileError -> Text
 writeElmLockFileErrorToText err =
-    case err of
-        FromFilesError (path, err) ->
-            jsonDecodeFileErrorToText path err
+  case err of
+    FromFilesError (path, err) ->
+      jsonDecodeFileErrorToText path err
 
-        FromDependenciesError err ->
-            fromDependenciesErrorToText err
+    FromDependenciesError err ->
+      fromDependenciesErrorToText err
 
 
 jsonDecodeFileErrorToText :: FilePath -> JD.Error -> Text
@@ -99,25 +99,25 @@ jsonDecodeFileErrorToText path (JD.DecodeError err) = "JSON decoding error in " 
 
 jsonDecodeErrorToText :: JD.DecodeError -> Text
 jsonDecodeErrorToText =
-    --
-    -- TODO: Improve error messages.
-    --
-    T.show
+  --
+  -- TODO: Improve error messages.
+  --
+  T.show
 
 
 fromDependenciesErrorToText :: FOD.FromDependenciesError -> Text
 fromDependenciesErrorToText =
-    T.unlines . map (\(d, err) -> T.pack (Dependency.toString d) <> ": " <> nixPrefetchUrlErrorToText err)
+  T.unlines . map (\(d, err) -> T.pack (Dependency.toString d) <> ": " <> nixPrefetchUrlErrorToText err)
 
 
 nixPrefetchUrlErrorToText :: Nix.NixPrefetchUrlError -> Text
 nixPrefetchUrlErrorToText err =
-    case err of
-        Nix.ProcessError details ->
-            "nix-prefetch-url encountered problems: " <> T.pack details
+  case err of
+    Nix.ProcessError details ->
+      "nix-prefetch-url encountered problems: " <> T.pack details
 
-        Nix.BadOutput details ->
-            "nix-prefetch-url got unexpected output: " <> T.pack details
+    Nix.BadOutput details ->
+      "nix-prefetch-url got unexpected output: " <> T.pack details
 
 
 
@@ -130,13 +130,13 @@ type WriteRegistryDatFileError = JD.Error
 
 writeRegistryDatFile :: FilePath -> FilePath -> IO (Either (FilePath, WriteRegistryDatFileError) ())
 writeRegistryDatFile input output = do
-    result <- ElmLock.fromFile input
-    case result of
-        Right elmLock ->
-            Right <$> Binary.encodeFile output (RegistryDat.fromElmLock elmLock)
+  result <- ElmLock.fromFile input
+  case result of
+    Right elmLock ->
+      Right <$> Binary.encodeFile output (RegistryDat.fromElmLock elmLock)
 
-        Left err ->
-            return $ Left (input, err)
+    Left err ->
+      return $ Left (input, err)
 
 
 writeRegistryDatFileErrorToText :: FilePath -> WriteRegistryDatFileError -> Text
@@ -153,24 +153,24 @@ type ViewRegistryDatFileError = Binary.DecodeFileError
 
 viewRegistryDatFile :: Bool -> FilePath -> IO (Either ViewRegistryDatFileError ())
 viewRegistryDatFile compact input = do
-    result <- Binary.decodeFile input
-    case result of
-        Right registryDat ->
-            let
-                allPackages =
-                    RegistryDat.toAllPackages registryDat
+  result <- Binary.decodeFile input
+  case result of
+    Right registryDat ->
+      let
+        allPackages =
+          RegistryDat.toAllPackages registryDat
 
-                ( put, encode ) =
-                    if compact then
-                        ( LBS.hPut, Json.encode )
+        ( put, encode ) =
+          if compact then
+            ( LBS.hPut, Json.encode )
 
-                    else
-                        ( Char8.hPutStrLn, Json.encodePretty )
-            in
-            Right <$> put stdout (encode allPackages)
+          else
+            ( Char8.hPutStrLn, Json.encodePretty )
+      in
+      Right <$> put stdout (encode allPackages)
 
-        Left err ->
-            return $ Left err
+    Left err ->
+      return $ Left err
 
 
 viewRegistryDatFileErrorToText :: ViewRegistryDatFileError -> Text
@@ -179,9 +179,9 @@ viewRegistryDatFileErrorToText = binaryDecodeFileErrorToText
 
 binaryDecodeFileErrorToText :: Binary.DecodeFileError -> Text
 binaryDecodeFileErrorToText err =
-    case err of
-        Binary.FileNotFound path ->
-            "File not found: " <> T.pack path
+  case err of
+    Binary.FileNotFound path ->
+      "File not found: " <> T.pack path
 
-        Binary.DecodeError path details ->
-            "Syntax error in " <> T.pack path <> ": " <> T.pack details
+    Binary.DecodeError path details ->
+      "Syntax error in " <> T.pack path <> ": " <> T.pack details

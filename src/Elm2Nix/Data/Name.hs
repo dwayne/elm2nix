@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Elm2Nix.Data.Name
-    ( Name, Author, Package
-    , elmBrowser, elmCore, elmHtml, elmJson, elmTime, elmUrl, elmVirtualDom
-    , FromTextError(..), fromText
-    , toAuthor, toPackage
-    , toText, toString
-    , fromTextErrorToString
-    ) where
+  ( Name, Author, Package
+  , elmBrowser, elmCore, elmHtml, elmJson, elmTime, elmUrl, elmVirtualDom
+  , FromTextError(..), fromText
+  , toAuthor, toPackage
+  , toText, toString
+  , fromTextErrorToString
+  ) where
 
 import qualified Data.ByteString as BS
 import qualified Data.Text as T
@@ -20,11 +20,11 @@ import Data.Text (Text)
 
 
 data Name
-    = Name
-        { _author :: Author
-        , _package :: Package
-        }
-    deriving (Eq, Ord)
+  = Name
+    { _author :: Author
+    , _package :: Package
+    }
+  deriving (Eq, Ord)
 
 
 type Author = Text
@@ -37,24 +37,24 @@ type Package = Text
 
 
 instance Show Name where
-    show = toString "/"
+  show = toString "/"
 
 
 instance Binary Name where
-    put (Name author project) = putText author <> putText project
-    get = Name <$> getText <*> getText
+  put (Name author project) = putText author <> putText project
+  get = Name <$> getText <*> getText
 
 
 putText :: Text -> Put
 putText t =
-    putWord8 (fromIntegral $ BS.length bs) <> putByteString bs
-    where
-        bs = TE.encodeUtf8 t
+  putWord8 (fromIntegral $ BS.length bs) <> putByteString bs
+  where
+    bs = TE.encodeUtf8 t
 
 
 getText :: Get Text
 getText =
-    getWord8 >>= fmap TE.decodeUtf8 . getByteString . fromIntegral
+  getWord8 >>= fmap TE.decodeUtf8 . getByteString . fromIntegral
 
 
 
@@ -64,70 +64,70 @@ getText =
 
 elmBrowser :: Name
 elmBrowser =
-    Name "elm" "browser"
+  Name "elm" "browser"
 
 
 elmCore :: Name
 elmCore =
-    Name "elm" "core"
+  Name "elm" "core"
 
 
 elmHtml :: Name
 elmHtml =
-    Name "elm" "html"
+  Name "elm" "html"
 
 
 elmJson :: Name
 elmJson =
-    Name "elm" "json"
+  Name "elm" "json"
 
 
 elmTime :: Name
 elmTime =
-    Name "elm" "time"
+  Name "elm" "time"
 
 
 elmUrl :: Name
 elmUrl =
-    Name "elm" "url"
+  Name "elm" "url"
 
 
 elmVirtualDom :: Name
 elmVirtualDom =
-    Name "elm" "virtual-dom"
+  Name "elm" "virtual-dom"
 
 
 data FromTextError
-    = EmptyAuthor
-    | EmptyPackage
-    | MissingForwardSlash
-    deriving (Eq, Show)
+  = EmptyAuthor
+  | EmptyPackage
+  | MissingForwardSlash
+  deriving (Eq, Show)
 
 
 fromText :: Text -> Either FromTextError Name
 fromText t =
-    let
-        ( author, slashPackage ) =
-            T.breakOn "/" t
-    in
-    case T.uncons slashPackage of
-        Just ( '/', package ) ->
-            if isBlank author then
-                Left EmptyAuthor
+  let
+    ( author, slashPackage ) =
+      T.breakOn "/" t
+  in
+  case T.uncons slashPackage of
+    Just ( '/', package ) ->
+      if isBlank author then
+        Left EmptyAuthor
 
-            else if isBlank package then
-                Left EmptyPackage
+      else if isBlank package then
+        Left EmptyPackage
 
-            else
-                Right $ Name author package
+      else
+        Right $ Name author package
 
-        _ ->
-            Left MissingForwardSlash
+    _ ->
+      Left MissingForwardSlash
 
 
 isBlank :: Text -> Bool
 isBlank =
-    T.null . T.strip
+  T.null . T.strip
 
 
 
@@ -145,12 +145,12 @@ toPackage (Name _ package) = package
 
 toText :: Text -> Name -> Text
 toText separator (Name author package) =
-    author <> separator <> package
+  author <> separator <> package
 
 
 toString :: Text -> Name -> String
 toString separator =
-    T.unpack . toText separator
+  T.unpack . toText separator
 
 
 fromTextErrorToString :: FromTextError -> String

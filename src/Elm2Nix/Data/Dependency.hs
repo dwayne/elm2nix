@@ -10,8 +10,8 @@ import Elm2Nix.Lib.Nix (Url)
 
 
 data Dependency
-    = Dependency Name Version
-    deriving (Eq, Ord)
+  = Dependency Name Version
+  deriving (Eq, Ord)
 
 
 
@@ -20,7 +20,7 @@ data Dependency
 
 
 instance Show Dependency where
-    show = toString
+  show = toString
 
 
 
@@ -30,9 +30,9 @@ instance Show Dependency where
 
 toString :: Dependency -> String
 toString (Dependency name version) =
-    Name.toString "-" name ++ "-" ++ show version
+  Name.toString "-" name ++ "-" ++ show version
 
 
 toUrl :: Dependency -> Url
 toUrl (Dependency name version) =
-    "https://github.com/" ++ show name ++ "/archive/" ++ show version ++ ".tar.gz"
+  "https://github.com/" ++ show name ++ "/archive/" ++ show version ++ ".tar.gz"

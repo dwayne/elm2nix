@@ -17,382 +17,382 @@ import Test.Hspec
 
 spec :: Spec
 spec =
-    describe "Elm2Nix.Data.ElmJson" $ do
-        dependenciesDecoderSpec
-        decoderSpec
-        fromFileSpec
-        fromFilesSpec
+  describe "Elm2Nix.Data.ElmJson" $ do
+    dependenciesDecoderSpec
+    decoderSpec
+    fromFileSpec
+    fromFilesSpec
 
 
 dependenciesDecoderSpec :: Spec
 dependenciesDecoderSpec =
-    describe "dependenciesDecoder" $ do
-        it "example 1" $
-            JD.decodeText ElmJson.dependenciesDecoder "{}" `shouldBe` Right []
+  describe "dependenciesDecoder" $ do
+    it "example 1" $
+      JD.decodeText ElmJson.dependenciesDecoder "{}" `shouldBe` Right []
 
-        it "example 2" $
-            let
-                input =
-                    "{                               \
-                    \    \"elm/browser\": \"1.0.2\", \
-                    \    \"elm/core\": \"1.0.5\",    \
-                    \    \"elm/html\": \"1.0.0\",    \
-                    \    \"elm/json\": \"1.1.3\",    \
-                    \    \"elm/url\": \"1.0.0\"      \
-                    \}                               "
+    it "example 2" $
+      let
+        input =
+          "{                               \
+          \    \"elm/browser\": \"1.0.2\", \
+          \    \"elm/core\": \"1.0.5\",    \
+          \    \"elm/html\": \"1.0.0\",    \
+          \    \"elm/json\": \"1.1.3\",    \
+          \    \"elm/url\": \"1.0.0\"      \
+          \}                               "
 
-                output =
-                    [ Dependency Name.elmBrowser (Version 1 0 2)
-                    , Dependency Name.elmCore (Version 1 0 5)
-                    , Dependency Name.elmHtml (Version 1 0 0)
-                    , Dependency Name.elmJson (Version 1 1 3)
-                    , Dependency Name.elmUrl (Version 1 0 0)
-                    ]
-            in
-            JD.decodeText ElmJson.dependenciesDecoder input `shouldBe` Right output
+        output =
+          [ Dependency Name.elmBrowser (Version 1 0 2)
+          , Dependency Name.elmCore (Version 1 0 5)
+          , Dependency Name.elmHtml (Version 1 0 0)
+          , Dependency Name.elmJson (Version 1 1 3)
+          , Dependency Name.elmUrl (Version 1 0 0)
+          ]
+      in
+      JD.decodeText ElmJson.dependenciesDecoder input `shouldBe` Right output
 
-        it "example 3" $
-            let
-                input =
-                    "{                           \
-                    \    \"/browser\": \"1.0.2\" \
-                    \}                           "
-            in
-            JD.decodeText ElmJson.dependenciesDecoder input `shouldSatisfy`
-                \case
-                    Left (JD.DecodeError (JD.FieldError "/browser" (JD.Failure "author is empty" _))) ->
-                        True
+    it "example 3" $
+      let
+        input =
+          "{                           \
+          \    \"/browser\": \"1.0.2\" \
+          \}                           "
+      in
+      JD.decodeText ElmJson.dependenciesDecoder input `shouldSatisfy`
+        \case
+          Left (JD.DecodeError (JD.FieldError "/browser" (JD.Failure "author is empty" _))) ->
+            True
 
-                    _ ->
-                        False
+          _ ->
+            False
 
-        it "example 4" $
-            let
-                input =
-                    "{                            \
-                    \    \"elm/browser\": \"1.0\" \
-                    \}                            "
-            in
-            JD.decodeText ElmJson.dependenciesDecoder input `shouldSatisfy`
-                \case
-                    Left (JD.DecodeError (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _))) ->
-                        True
+    it "example 4" $
+      let
+        input =
+          "{                            \
+          \    \"elm/browser\": \"1.0\" \
+          \}                            "
+      in
+      JD.decodeText ElmJson.dependenciesDecoder input `shouldSatisfy`
+        \case
+          Left (JD.DecodeError (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _))) ->
+            True
 
-                    _ ->
-                        False
+          _ ->
+            False
 
 
 decoderSpec :: Spec
 decoderSpec =
-    describe "decoder" $ do
-        describe "valid input" $ do
-            it "example 1" $
-                let
-                    input =
-                        "{                                      \
-                        \    \"type\": \"application\",         \
-                        \    \"dependencies\": {                \
-                        \        \"direct\": {                  \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \        },                             \
-                        \        \"indirect\": {                \
-                        \            \"elm/core\": \"1.0.5\"    \
-                        \        }                              \
-                        \    },                                 \
-                        \    \"test-dependencies\": {           \
-                        \        \"direct\": {                  \
-                        \            \"elm/html\": \"1.0.0\"    \
-                        \         },                            \
-                        \        \"indirect\": {                \
-                        \            \"elm/json\": \"1.1.3\"    \
-                        \         }                             \
-                        \    }                                  \
-                        \}                                      "
+  describe "decoder" $ do
+    describe "valid input" $ do
+      it "example 1" $
+        let
+          input =
+            "{                                      \
+            \    \"type\": \"application\",         \
+            \    \"dependencies\": {                \
+            \        \"direct\": {                  \
+            \            \"elm/browser\": \"1.0.2\" \
+            \        },                             \
+            \        \"indirect\": {                \
+            \            \"elm/core\": \"1.0.5\"    \
+            \        }                              \
+            \    },                                 \
+            \    \"test-dependencies\": {           \
+            \        \"direct\": {                  \
+            \            \"elm/html\": \"1.0.0\"    \
+            \         },                            \
+            \        \"indirect\": {                \
+            \            \"elm/json\": \"1.1.3\"    \
+            \         }                             \
+            \    }                                  \
+            \}                                      "
 
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            , Dependency Name.elmCore (Version 1 0 5)
-                            , Dependency Name.elmHtml (Version 1 0 0)
-                            , Dependency Name.elmJson (Version 1 1 3)
-                            ]
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              , Dependency Name.elmCore (Version 1 0 5)
+              , Dependency Name.elmHtml (Version 1 0 0)
+              , Dependency Name.elmJson (Version 1 1 3)
+              ]
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 2" $
-                let
-                    input =
-                        "{                                      \
-                        \    \"type\": \"application\",         \
-                        \    \"dependencies\": {                \
-                        \        \"direct\": {                  \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \        },                             \
-                        \        \"indirect\": {                \
-                        \            \"elm/core\": \"1.0.5\"    \
-                        \        }                              \
-                        \    },                                 \
-                        \    \"test-dependencies\": {           \
-                        \        \"direct\": {                  \
-                        \            \"elm/html\": \"1.0.0\"    \
-                        \         }                             \
-                        \    }                                  \
-                        \}                                      "
+      it "example 2" $
+        let
+          input =
+            "{                                      \
+            \    \"type\": \"application\",         \
+            \    \"dependencies\": {                \
+            \        \"direct\": {                  \
+            \            \"elm/browser\": \"1.0.2\" \
+            \        },                             \
+            \        \"indirect\": {                \
+            \            \"elm/core\": \"1.0.5\"    \
+            \        }                              \
+            \    },                                 \
+            \    \"test-dependencies\": {           \
+            \        \"direct\": {                  \
+            \            \"elm/html\": \"1.0.0\"    \
+            \         }                             \
+            \    }                                  \
+            \}                                      "
 
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            , Dependency Name.elmCore (Version 1 0 5)
-                            , Dependency Name.elmHtml (Version 1 0 0)
-                            ]
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              , Dependency Name.elmCore (Version 1 0 5)
+              , Dependency Name.elmHtml (Version 1 0 0)
+              ]
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 3" $
-                let
-                    input =
-                        "{                                      \
-                        \    \"type\": \"application\",         \
-                        \    \"dependencies\": {                \
-                        \        \"direct\": {                  \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \        },                             \
-                        \        \"indirect\": {                \
-                        \            \"elm/core\": \"1.0.5\"    \
-                        \        }                              \
-                        \    },                                 \
-                        \    \"test-dependencies\": {           \
-                        \    }                                  \
-                        \}                                      "
+      it "example 3" $
+        let
+          input =
+            "{                                      \
+            \    \"type\": \"application\",         \
+            \    \"dependencies\": {                \
+            \        \"direct\": {                  \
+            \            \"elm/browser\": \"1.0.2\" \
+            \        },                             \
+            \        \"indirect\": {                \
+            \            \"elm/core\": \"1.0.5\"    \
+            \        }                              \
+            \    },                                 \
+            \    \"test-dependencies\": {           \
+            \    }                                  \
+            \}                                      "
 
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            , Dependency Name.elmCore (Version 1 0 5)
-                            ]
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              , Dependency Name.elmCore (Version 1 0 5)
+              ]
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 4" $
-                let
-                    input =
-                        "{                                      \
-                        \    \"type\": \"application\",         \
-                        \    \"dependencies\": {                \
-                        \        \"direct\": {                  \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \        },                             \
-                        \        \"indirect\": {                \
-                        \            \"elm/core\": \"1.0.5\"    \
-                        \        }                              \
-                        \    }                                  \
-                        \}                                      "
+      it "example 4" $
+        let
+          input =
+            "{                                      \
+            \    \"type\": \"application\",         \
+            \    \"dependencies\": {                \
+            \        \"direct\": {                  \
+            \            \"elm/browser\": \"1.0.2\" \
+            \        },                             \
+            \        \"indirect\": {                \
+            \            \"elm/core\": \"1.0.5\"    \
+            \        }                              \
+            \    }                                  \
+            \}                                      "
 
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            , Dependency Name.elmCore (Version 1 0 5)
-                            ]
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              , Dependency Name.elmCore (Version 1 0 5)
+              ]
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 5" $
-                let
-                    input =
-                        "{                                      \
-                        \    \"type\": \"application\",         \
-                        \    \"dependencies\": {                \
-                        \    \"type\": \"application\",         \
-                        \        \"direct\": {                  \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \        }                              \
-                        \    }                                  \
-                        \}                                      "
+      it "example 5" $
+        let
+          input =
+            "{                                      \
+            \    \"type\": \"application\",         \
+            \    \"dependencies\": {                \
+            \    \"type\": \"application\",         \
+            \        \"direct\": {                  \
+            \            \"elm/browser\": \"1.0.2\" \
+            \        }                              \
+            \    }                                  \
+            \}                                      "
 
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            ]
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              ]
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 6" $
-                let
-                    input =
-                        "{                              \
-                        \    \"type\": \"application\", \
-                        \    \"dependencies\": {        \
-                        \        \"direct\": {          \
-                        \        }                      \
-                        \    }                          \
-                        \}                              "
+      it "example 6" $
+        let
+          input =
+            "{                              \
+            \    \"type\": \"application\", \
+            \    \"dependencies\": {        \
+            \        \"direct\": {          \
+            \        }                      \
+            \    }                          \
+            \}                              "
 
-                    elmJson =
-                        ElmJson.fromList []
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList []
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 7" $
-                let
-                    input =
-                        "{                              \
-                        \    \"type\": \"application\", \
-                        \    \"dependencies\": {        \
-                        \    }                          \
-                        \}                              "
+      it "example 7" $
+        let
+          input =
+            "{                              \
+            \    \"type\": \"application\", \
+            \    \"dependencies\": {        \
+            \    }                          \
+            \}                              "
 
-                    elmJson = ElmJson.fromList []
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson = ElmJson.fromList []
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 8" $
-                let
-                    input = "{ \"type\": \"application\" }"
-                    elmJson = ElmJson.fromList []
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+      it "example 8" $
+        let
+          input = "{ \"type\": \"application\" }"
+          elmJson = ElmJson.fromList []
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 9" $
-                let
-                    input =
-                        "{                                      \
-                        \    \"type\": \"application\",         \
-                        \    \"dependencies\": {                \
-                        \        \"direct\": {                  \
-                        \            \"elm/html\": \"1.0.0\"    \
-                        \        },                             \
-                        \        \"indirect\": {                \
-                        \            \"elm/json\": \"1.1.3\"    \
-                        \        }                              \
-                        \    },                                 \
-                        \    \"test-dependencies\": {           \
-                        \        \"direct\": {                  \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \         },                            \
-                        \        \"indirect\": {                \
-                        \            \"elm/core\": \"1.0.5\"    \
-                        \         }                             \
-                        \    }                                  \
-                        \}                                      "
+      it "example 9" $
+        let
+          input =
+            "{                                      \
+            \    \"type\": \"application\",         \
+            \    \"dependencies\": {                \
+            \        \"direct\": {                  \
+            \            \"elm/html\": \"1.0.0\"    \
+            \        },                             \
+            \        \"indirect\": {                \
+            \            \"elm/json\": \"1.1.3\"    \
+            \        }                              \
+            \    },                                 \
+            \    \"test-dependencies\": {           \
+            \        \"direct\": {                  \
+            \            \"elm/browser\": \"1.0.2\" \
+            \         },                            \
+            \        \"indirect\": {                \
+            \            \"elm/core\": \"1.0.5\"    \
+            \         }                             \
+            \    }                                  \
+            \}                                      "
 
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            , Dependency Name.elmCore (Version 1 0 5)
-                            , Dependency Name.elmHtml (Version 1 0 0)
-                            , Dependency Name.elmJson (Version 1 1 3)
-                            ]
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              , Dependency Name.elmCore (Version 1 0 5)
+              , Dependency Name.elmHtml (Version 1 0 0)
+              , Dependency Name.elmJson (Version 1 1 3)
+              ]
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
-            it "example 10" $
-                let
-                    input =
-                        "{                                      \
-                        \    \"type\": \"application\",         \
-                        \    \"dependencies\": {                \
-                        \        \"direct\": {                  \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \        },                             \
-                        \        \"indirect\": {                \
-                        \            \"elm/browser\": \"1.0.2\" \
-                        \        }                              \
-                        \    }                                  \
-                        \}                                      "
+      it "example 10" $
+        let
+          input =
+            "{                                      \
+            \    \"type\": \"application\",         \
+            \    \"dependencies\": {                \
+            \        \"direct\": {                  \
+            \            \"elm/browser\": \"1.0.2\" \
+            \        },                             \
+            \        \"indirect\": {                \
+            \            \"elm/browser\": \"1.0.2\" \
+            \        }                              \
+            \    }                                  \
+            \}                                      "
 
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            ]
-                in
-                JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              ]
+        in
+        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
 
 
 fromFileSpec :: Spec
 fromFileSpec =
-    describe "fromFile" $ do
-        describe "valid input" $
-            it "example 1" $
-                let
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            , Dependency Name.elmCore (Version 1 0 5)
-                            , Dependency Name.elmHtml (Version 1 0 0)
-                            , Dependency Name.elmJson (Version 1 1 3)
-                            , Dependency Name.elmTime (Version 1 0 0)
-                            , Dependency Name.elmUrl (Version 1 0 0)
-                            , Dependency Name.elmVirtualDom (Version 1 0 3)
-                            ]
-                in
-                (ElmJson.fromFile =<< fixture "elm.json") `shouldReturn` Right elmJson
+  describe "fromFile" $ do
+    describe "valid input" $
+      it "example 1" $
+        let
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              , Dependency Name.elmCore (Version 1 0 5)
+              , Dependency Name.elmHtml (Version 1 0 0)
+              , Dependency Name.elmJson (Version 1 1 3)
+              , Dependency Name.elmTime (Version 1 0 0)
+              , Dependency Name.elmUrl (Version 1 0 0)
+              , Dependency Name.elmVirtualDom (Version 1 0 3)
+              ]
+        in
+        (ElmJson.fromFile =<< fixture "elm.json") `shouldReturn` Right elmJson
 
-        describe "invalid input" $ do
-            it "when the file does not exist" $
-                ElmJson.fromFile "path/to/missing/elm.json" `shouldThrow` isDoesNotExistError
+    describe "invalid input" $ do
+      it "when the file does not exist" $
+        ElmJson.fromFile "path/to/missing/elm.json" `shouldThrow` isDoesNotExistError
 
-            it "when / is missing" $ do
-                path <- fixture "name-missing-forward-slash.json"
-                Left err <- ElmJson.fromFile path
-                err `shouldSatisfy`
-                    \case
-                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _)))) ->
-                            True
+      it "when / is missing" $ do
+        path <- fixture "name-missing-forward-slash.json"
+        Left err <- ElmJson.fromFile path
+        err `shouldSatisfy`
+          \case
+            JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _)))) ->
+              True
 
-                        _ ->
-                            False
+            _ ->
+              False
 
-            it "when version is incorrectly formatted" $ do
-                path <- fixture "version-incorrect-format.json"
-                Left err <- ElmJson.fromFile path
-                err `shouldSatisfy`
-                    \case
-                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _)))) ->
-                            True
+      it "when version is incorrectly formatted" $ do
+        path <- fixture "version-incorrect-format.json"
+        Left err <- ElmJson.fromFile path
+        err `shouldSatisfy`
+          \case
+            JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0" _)))) ->
+              True
 
-                        _ ->
-                            False
+            _ ->
+              False
 
-            it "when version has a part with leading zeros" $ do
-                path <- fixture "version-leading-zeros.json"
-                Left err <- ElmJson.fromFile path
-                err `shouldSatisfy`
-                    \case
-                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0.02" _)))) ->
-                            True
+      it "when version has a part with leading zeros" $ do
+        path <- fixture "version-leading-zeros.json"
+        Left err <- ElmJson.fromFile path
+        err `shouldSatisfy`
+          \case
+            JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elm/browser" (JD.Failure "version is invalid: 1.0.02" _)))) ->
+              True
 
-                        _ ->
-                            False
+            _ ->
+              False
 
 
 fromFilesSpec :: Spec
 fromFilesSpec =
-    describe "fromFiles" $ do
-        describe "valid input" $
-            it "example 1" $
-                let
-                    elmJson =
-                        ElmJson.fromList
-                            [ Dependency Name.elmBrowser (Version 1 0 2)
-                            , Dependency Name.elmCore (Version 1 0 5)
-                            , Dependency Name.elmHtml (Version 1 0 0)
-                            ]
-                in
-                (ElmJson.fromFiles =<< traverse fixture [ "elm1.json", "elm2.json", "elm3.json" ]) `shouldReturn` Right elmJson
+  describe "fromFiles" $ do
+    describe "valid input" $
+      it "example 1" $
+        let
+          elmJson =
+            ElmJson.fromList
+              [ Dependency Name.elmBrowser (Version 1 0 2)
+              , Dependency Name.elmCore (Version 1 0 5)
+              , Dependency Name.elmHtml (Version 1 0 0)
+              ]
+        in
+        (ElmJson.fromFiles =<< traverse fixture [ "elm1.json", "elm2.json", "elm3.json" ]) `shouldReturn` Right elmJson
 
-        describe "invalid input" $ do
-            it "when one of the files does not exist" $ do
-                paths <- traverse fixture [ "elm1.json", "path/to/missing/elm.json", "elm3.json" ]
-                ElmJson.fromFiles paths `shouldThrow` isDoesNotExistError
+    describe "invalid input" $ do
+      it "when one of the files does not exist" $ do
+        paths <- traverse fixture [ "elm1.json", "path/to/missing/elm.json", "elm3.json" ]
+        ElmJson.fromFiles paths `shouldThrow` isDoesNotExistError
 
-            it "when there is an error in one of the files" $ do
-                paths <- traverse fixture [ "elm1.json", "name-missing-forward-slash.json", "elm3.json" ]
-                Left ( badPath, err ) <- ElmJson.fromFiles paths
-                ("name-missing-forward-slash.json" `isSuffixOf` badPath) `shouldBe` True
-                err `shouldSatisfy`
-                    \case
-                        JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _)))) ->
-                            True
+      it "when there is an error in one of the files" $ do
+        paths <- traverse fixture [ "elm1.json", "name-missing-forward-slash.json", "elm3.json" ]
+        Left ( badPath, err ) <- ElmJson.fromFiles paths
+        ("name-missing-forward-slash.json" `isSuffixOf` badPath) `shouldBe` True
+        err `shouldSatisfy`
+          \case
+            JD.DecodeError (JD.FieldError "dependencies" (JD.FieldError "direct" (JD.FieldError "elmbrowser" (JD.Failure "/ is missing" _)))) ->
+              True
 
-                        _ ->
-                            False
+            _ ->
+              False

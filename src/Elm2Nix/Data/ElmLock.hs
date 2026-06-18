@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Elm2Nix.Data.ElmLock
-    ( ElmLock
-    , fromFile, fromList, decoder
-    , toSet
-    ) where
+  ( ElmLock
+  , fromFile, fromList, decoder
+  , toSet
+  ) where
 
 import qualified Data.Set as Set
 import qualified Data.Text as T
@@ -21,7 +21,7 @@ import Elm2Nix.Data.Version (Version)
 
 
 newtype ElmLock = ElmLock (Set Dependency)
-    deriving (Eq, Show)
+  deriving (Eq, Show)
 
 
 
@@ -47,14 +47,14 @@ dependencyDecoder = Dependency <$> nameDecoder <*> versionDecoder
 
 nameDecoder :: JD.Decoder Name
 nameDecoder = do
-    author <- JD.field "author" JD.text
-    package <- JD.field "package" JD.text
-    case Name.fromText (author <> "/" <> package) of
-        Right name ->
-            JD.succeed name
+  author <- JD.field "author" JD.text
+  package <- JD.field "package" JD.text
+  case Name.fromText (author <> "/" <> package) of
+    Right name ->
+      JD.succeed name
 
-        Left err ->
-            JD.fail (T.pack $ Name.fromTextErrorToString err)
+    Left err ->
+      JD.fail (T.pack $ Name.fromTextErrorToString err)
 
 
 versionDecoder :: JD.Decoder Version

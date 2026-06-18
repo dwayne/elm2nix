@@ -1,171 +1,171 @@
 module Elm2Nix.CLI
-    ( CLI(..)
-    , LockOptions(..)
-    , RegistryCommands(..), GenerateOptions(..), ViewOptions(..)
-    , runIO, run
-    ) where
+  ( CLI(..)
+  , LockOptions(..)
+  , RegistryCommands(..), GenerateOptions(..), ViewOptions(..)
+  , runIO, run
+  ) where
 
 import Options.Applicative
 
 
 data CLI
-    = Lock LockOptions
-    | Registry RegistryCommands
-    deriving (Eq, Show)
+  = Lock LockOptions
+  | Registry RegistryCommands
+  deriving (Eq, Show)
 
 
 data LockOptions
-    = LockOptions
-        { loInputs :: [FilePath]
-        , loCompact :: Bool
-        , loOutput :: FilePath
-        }
-    deriving (Eq, Show)
+  = LockOptions
+    { loInputs :: [FilePath]
+    , loCompact :: Bool
+    , loOutput :: FilePath
+    }
+  deriving (Eq, Show)
 
 
 data RegistryCommands
-    = Generate GenerateOptions
-    | View ViewOptions
-    deriving (Eq, Show)
+  = Generate GenerateOptions
+  | View ViewOptions
+  deriving (Eq, Show)
 
 
 data GenerateOptions
-    = GenerateOptions
-        { goInput :: FilePath
-        , goOutput :: FilePath
-        }
-    deriving (Eq, Show)
+  = GenerateOptions
+    { goInput :: FilePath
+    , goOutput :: FilePath
+    }
+  deriving (Eq, Show)
 
 
 data ViewOptions
-    = ViewOptions
-        { voCompact :: Bool
-        , voInput :: FilePath
-        }
-    deriving (Eq, Show)
+  = ViewOptions
+    { voCompact :: Bool
+    , voInput :: FilePath
+    }
+  deriving (Eq, Show)
 
 
 runIO :: IO CLI
 runIO =
-    customExecParser preferences cli
+  customExecParser preferences cli
 
 
 run :: [String] -> ParserResult CLI
 run =
-    execParserPure preferences cli
+  execParserPure preferences cli
 
 
 preferences :: ParserPrefs
 preferences =
-    prefs $ mconcat
-        [ showHelpOnEmpty
-        , noBacktrack
-        ]
+  prefs $ mconcat
+    [ showHelpOnEmpty
+    , noBacktrack
+    ]
 
 
 cli :: ParserInfo CLI
 cli =
-    info (commands <**> helper) $ mconcat
-        [ header "Create Elm support files to be used when compiling Elm applications with Nix"
-        ]
+  info (commands <**> helper) $ mconcat
+    [ header "Create Elm support files to be used when compiling Elm applications with Nix"
+    ]
 
 
 commands :: Parser CLI
 commands =
-    hsubparser $ mconcat
-        [ command "lock" (info (Lock <$> lockOptions) (progDesc "Generate a lock file from one or more elm.json files"))
-        , command "registry" (info (Registry <$> registryCommands) (progDesc "Generate or view a registry.dat file"))
-        ]
+  hsubparser $ mconcat
+    [ command "lock" (info (Lock <$> lockOptions) (progDesc "Generate a lock file from one or more elm.json files"))
+    , command "registry" (info (Registry <$> registryCommands) (progDesc "Generate or view a registry.dat file"))
+    ]
 
 
 registryCommands :: Parser RegistryCommands
 registryCommands =
-    hsubparser $ mconcat
-        [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from a lock file"))
-        , command "view" (info (View <$> viewOptions) (progDesc "View a registry.dat file as JSON"))
-        ]
+  hsubparser $ mconcat
+    [ command "generate" (info (Generate <$> generateOptions) (progDesc "Generate a registry.dat file from a lock file"))
+    , command "view" (info (View <$> viewOptions) (progDesc "View a registry.dat file as JSON"))
+    ]
 
 
 lockOptions :: Parser LockOptions
 lockOptions =
-    LockOptions <$> elmJsonInputArgument <*> isCompactOption <*> elmLockOutputOption
+  LockOptions <$> elmJsonInputArgument <*> isCompactOption <*> elmLockOutputOption
 
 
 generateOptions :: Parser GenerateOptions
 generateOptions =
-    GenerateOptions <$> elmLockInputOption <*> registryOutputOption
+  GenerateOptions <$> elmLockInputOption <*> registryOutputOption
 
 
 viewOptions :: Parser ViewOptions
 viewOptions =
-    ViewOptions <$> isCompactOption <*> registryInputOption
+  ViewOptions <$> isCompactOption <*> registryInputOption
 
 
 elmJsonInputArgument :: Parser [FilePath]
 elmJsonInputArgument =
-    withDefault <$> many
-        (strArgument $ mconcat
-            [ metavar "FILE..."
-            , help "The paths to the elm.json files (default: \"elm.json\")"
-            ]
-        )
-    where
-        withDefault [] = [ "elm.json" ]
-        withDefault fs = fs
+  withDefault <$> many
+    (strArgument $ mconcat
+      [ metavar "FILE..."
+      , help "The paths to the elm.json files (default: \"elm.json\")"
+      ]
+    )
+  where
+    withDefault [] = [ "elm.json" ]
+    withDefault fs = fs
 
 
 isCompactOption :: Parser Bool
 isCompactOption =
-    switch $ mconcat
-        [ long "compact"
-        , showDefault
-        , help "Format the JSON as compactly as possible"
-        ]
+  switch $ mconcat
+    [ long "compact"
+    , showDefault
+    , help "Format the JSON as compactly as possible"
+    ]
 
 
 elmLockInputOption :: Parser FilePath
 elmLockInputOption =
-    strOption $ mconcat
-        [ long "input"
-        , short 'i'
-        , value "elm.lock"
-        , showDefault
-        , metavar "FILE"
-        , help "The path to the lock file"
-        ]
+  strOption $ mconcat
+    [ long "input"
+    , short 'i'
+    , value "elm.lock"
+    , showDefault
+    , metavar "FILE"
+    , help "The path to the lock file"
+    ]
 
 
 elmLockOutputOption :: Parser FilePath
 elmLockOutputOption =
-    strOption $ mconcat
-        [ long "output"
-        , short 'o'
-        , value "elm.lock"
-        , showDefault
-        , metavar "FILE"
-        , help "The path to the lock file"
-        ]
+  strOption $ mconcat
+    [ long "output"
+    , short 'o'
+    , value "elm.lock"
+    , showDefault
+    , metavar "FILE"
+    , help "The path to the lock file"
+    ]
 
 
 registryInputOption :: Parser FilePath
 registryInputOption =
-    strOption $ mconcat
-        [ long "input"
-        , short 'i'
-        , value "registry.dat"
-        , showDefault
-        , metavar "FILE"
-        , help "The path to the registry.dat file"
-        ]
+  strOption $ mconcat
+    [ long "input"
+    , short 'i'
+    , value "registry.dat"
+    , showDefault
+    , metavar "FILE"
+    , help "The path to the registry.dat file"
+    ]
 
 
 registryOutputOption :: Parser FilePath
 registryOutputOption =
-    strOption $ mconcat
-        [ long "output"
-        , short 'o'
-        , value "registry.dat"
-        , showDefault
-        , metavar "FILE"
-        , help "The path to the registry.dat file"
-        ]
+  strOption $ mconcat
+    [ long "output"
+    , short 'o'
+    , value "registry.dat"
+    , showDefault
+    , metavar "FILE"
+    , help "The path to the registry.dat file"
+    ]

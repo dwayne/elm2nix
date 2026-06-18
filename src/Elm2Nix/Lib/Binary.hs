@@ -10,19 +10,19 @@ import System.IO.Error (isDoesNotExistError)
 
 
 data DecodeFileError
-    = FileNotFound FilePath
-    | DecodeError FilePath String
-    deriving (Eq, Show)
+  = FileNotFound FilePath
+  | DecodeError FilePath String
+  deriving (Eq, Show)
 
 
 decodeFile :: Binary a => FilePath -> IO (Either DecodeFileError a)
 decodeFile path =
-    join <$> tryJust (handleNotFound . isDoesNotExistError) decodeFileOrFail
-    where
-        decodeFileOrFail :: Binary a => IO (Either DecodeFileError a)
-        decodeFileOrFail =
-            first (DecodeError path . snd) <$> Binary.decodeFileOrFail path
+  join <$> tryJust (handleNotFound . isDoesNotExistError) decodeFileOrFail
+  where
+    decodeFileOrFail :: Binary a => IO (Either DecodeFileError a)
+    decodeFileOrFail =
+      first (DecodeError path . snd) <$> Binary.decodeFileOrFail path
 
-        handleNotFound :: Bool -> Maybe DecodeFileError
-        handleNotFound b =
-            if b then Just (FileNotFound path) else Nothing
+    handleNotFound :: Bool -> Maybe DecodeFileError
+    handleNotFound b =
+      if b then Just (FileNotFound path) else Nothing

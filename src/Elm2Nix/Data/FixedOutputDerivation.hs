@@ -2,11 +2,11 @@
 {-# LANGUAGE TupleSections #-}
 
 module Elm2Nix.Data.FixedOutputDerivation
-    ( FixedOutputDerivation
-    , FromDependencyError, fromDependency, fromNameAndVersion
-    , FromDependenciesError, fromDependencies, fromElmJson
-    , toDependency, toHash, toPath
-    ) where
+  ( FixedOutputDerivation
+  , FromDependencyError, fromDependency, fromNameAndVersion
+  , FromDependenciesError, fromDependencies, fromElmJson
+  , toDependency, toHash, toPath
+  ) where
 
 import qualified Data.Aeson as Json
 
@@ -27,12 +27,12 @@ import Elm2Nix.Lib.Nix (NixPrefetchUrlError, NixPrefetchUrlOutput(..), Sha256, n
 
 
 data FixedOutputDerivation
-    = FixedOutputDerivation
-        { _dependency :: Dependency
-        , _hash :: Sha256
-        , _path :: FilePath
-        }
-    deriving (Eq, Ord, Show)
+  = FixedOutputDerivation
+    { _dependency :: Dependency
+    , _hash :: Sha256
+    , _path :: FilePath
+    }
+  deriving (Eq, Ord, Show)
 
 
 
@@ -41,20 +41,20 @@ data FixedOutputDerivation
 
 
 instance ToJSON FixedOutputDerivation where
-    toJSON (FixedOutputDerivation (Dependency name version) hash _) =
-        Json.object
-            [ "author"  .= Name.toAuthor name
-            , "package" .= Name.toPackage name
-            , "version" .= show version
-            , "sha256"  .= hash
-            ]
+  toJSON (FixedOutputDerivation (Dependency name version) hash _) =
+    Json.object
+      [ "author"  .= Name.toAuthor name
+      , "package" .= Name.toPackage name
+      , "version" .= show version
+      , "sha256"  .= hash
+      ]
 
-    toEncoding (FixedOutputDerivation (Dependency name version) hash _) =
-        Json.pairs $
-            "author"  .= Name.toAuthor name <>
-            "package" .= Name.toPackage name <>
-            "version" .= show version <>
-            "sha256"  .= hash
+  toEncoding (FixedOutputDerivation (Dependency name version) hash _) =
+    Json.pairs $
+      "author"  .= Name.toAuthor name <>
+      "package" .= Name.toPackage name <>
+      "version" .= show version <>
+      "sha256"  .= hash
 
 
 
@@ -67,11 +67,11 @@ type FromDependencyError = NixPrefetchUrlError
 
 fromDependency :: Dependency -> IO (Either FromDependencyError FixedOutputDerivation)
 fromDependency dependency =
-    fmap toFOD <$> nixPrefetchUrl (Dependency.toUrl dependency) (Dependency.toString dependency)
-    where
-        toFOD :: NixPrefetchUrlOutput -> FixedOutputDerivation
-        toFOD (NixPrefetchUrlOutput hash path) =
-            FixedOutputDerivation dependency hash path
+  fmap toFOD <$> nixPrefetchUrl (Dependency.toUrl dependency) (Dependency.toString dependency)
+  where
+    toFOD :: NixPrefetchUrlOutput -> FixedOutputDerivation
+    toFOD (NixPrefetchUrlOutput hash path) =
+      FixedOutputDerivation dependency hash path
 
 
 fromNameAndVersion :: Name -> Version -> IO (Either FromDependencyError FixedOutputDerivation)
@@ -83,15 +83,15 @@ type FromDependenciesError = [( Dependency, NixPrefetchUrlError )]
 
 fromDependencies :: [Dependency] -> IO (Either FromDependenciesError [FixedOutputDerivation])
 fromDependencies =
-    fmap (resolve . partitionEithers) . pooledMapConcurrently (\d -> first (d,) <$> fromDependency d)
-    where
-        resolve :: ( FromDependenciesError, [FixedOutputDerivation] ) -> Either FromDependenciesError [FixedOutputDerivation]
-        resolve ( err, fods ) =
-            if null err then
-                Right fods
+  fmap (resolve . partitionEithers) . pooledMapConcurrently (\d -> first (d,) <$> fromDependency d)
+  where
+    resolve :: ( FromDependenciesError, [FixedOutputDerivation] ) -> Either FromDependenciesError [FixedOutputDerivation]
+    resolve ( err, fods ) =
+      if null err then
+        Right fods
 
-            else
-                Left err
+      else
+        Left err
 
 
 fromElmJson :: ElmJson -> IO (Either FromDependenciesError [FixedOutputDerivation])
