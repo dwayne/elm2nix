@@ -5,14 +5,12 @@ module Test.Elm2Nix.Data.VersionSpec (spec) where
 
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
-
-import Control.Exception (evaluate)
-import Test.Hspec
-
 import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.Version as Version
 
+import Control.Exception (evaluate)
 import Elm2Nix.Data.Version (Version(..))
+import Test.Hspec
 
 
 spec :: Spec

@@ -4,11 +4,10 @@ module Test.Elm2Nix.Data.NameSpec (spec) where
 
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
+import qualified Elm2Nix.Data.Name as Name
 
 import Data.Foldable (traverse_)
 import Test.Hspec
-
-import qualified Elm2Nix.Data.Name as Name
 
 
 spec :: Spec

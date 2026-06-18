@@ -1,15 +1,14 @@
 module Test.Elm2Nix.Data.FixedOutputDerivationSpec (spec) where
 
-import Data.Bifunctor (second)
-import Test.Hspec
-
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.Name as Name
 
+import Data.Bifunctor (second)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.FixedOutputDerivation (FromDependenciesError)
 import Elm2Nix.Data.Version (Version(..))
 import Elm2Nix.Lib.Nix (NixPrefetchUrlError(..), Sha256)
+import Test.Hspec
 
 
 spec :: Spec

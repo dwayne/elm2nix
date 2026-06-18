@@ -15,7 +15,7 @@ data Dependency
 
 
 
--- INSTANCES
+-- Instances
 
 
 
@@ -24,7 +24,7 @@ instance Show Dependency where
 
 
 
--- CONVERT
+-- Convert
 
 
 

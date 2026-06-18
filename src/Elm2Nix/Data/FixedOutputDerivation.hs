@@ -9,21 +9,19 @@ module Elm2Nix.Data.FixedOutputDerivation
   ) where
 
 import qualified Data.Aeson as Json
-
-import Data.Aeson (ToJSON(..), (.=))
-import Data.Bifunctor (first)
-import Data.Either (partitionEithers)
-import UnliftIO.Async (pooledMapConcurrently)
-
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.Name as Name
 
+import Data.Aeson (ToJSON(..), (.=))
+import Data.Bifunctor (first)
+import Data.Either (partitionEithers)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
 import Elm2Nix.Lib.Nix (NixPrefetchUrlError, NixPrefetchUrlOutput(..), Sha256, nixPrefetchUrl)
+import UnliftIO.Async (pooledMapConcurrently)
 
 
 data FixedOutputDerivation
@@ -36,7 +34,7 @@ data FixedOutputDerivation
 
 
 
--- INSTANCES
+-- Instances
 
 
 
@@ -58,7 +56,7 @@ instance ToJSON FixedOutputDerivation where
 
 
 
--- CONSTRUCT
+-- Construct
 
 
 
@@ -99,7 +97,7 @@ fromElmJson = fromDependencies . ElmJson.toAscList
 
 
 
--- CONVERT
+-- Convert
 
 
 

@@ -2,13 +2,12 @@ module Main (main) where
 
 import qualified Control.Exception as E
 import qualified Data.Text.IO as TIO
+import qualified Elm2Nix
+import qualified Elm2Nix.CLI as CLI
 
 import Data.Text (Text)
 import System.Exit (ExitCode, exitFailure)
 import System.IO (hPutStrLn, stderr)
-
-import qualified Elm2Nix
-import qualified Elm2Nix.CLI as CLI
 
 
 main :: IO ()

@@ -1,7 +1,5 @@
 module Test.Elm2Nix.Lib.BinarySpec (spec) where
 
-import Test.Hspec
-
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
@@ -10,6 +8,7 @@ import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.RegistryDat (RegistryDat)
 import Elm2Nix.Data.Version (Version(..))
 import Test.Fixtures (fixture)
+import Test.Hspec
 
 
 spec :: Spec

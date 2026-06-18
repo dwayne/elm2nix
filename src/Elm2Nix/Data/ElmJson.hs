@@ -26,7 +26,7 @@ newtype ElmJson = ElmJson (Set Dependency)
 
 
 
--- INSTANCES
+-- Instances
 
 
 
@@ -35,7 +35,7 @@ instance Show ElmJson where
 
 
 
--- CONSTRUCT
+-- Construct
 
 
 
@@ -103,7 +103,7 @@ toName = first (T.pack . Name.fromTextErrorToString) . Name.fromText
 
 
 
--- CONVERT
+-- Convert
 
 
 

@@ -32,7 +32,7 @@ type Package = Text
 
 
 
--- INSTANCES
+-- Instances
 
 
 
@@ -58,7 +58,7 @@ getText =
 
 
 
--- CONSTRUCT
+-- Construct
 
 
 
@@ -131,7 +131,7 @@ isBlank =
 
 
 
--- CONVERT
+-- Convert
 
 
 

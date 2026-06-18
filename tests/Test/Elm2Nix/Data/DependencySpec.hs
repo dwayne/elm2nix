@@ -2,13 +2,12 @@
 
 module Test.Elm2Nix.Data.DependencySpec (spec) where
 
-import Test.Hspec
-
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.Name as Name
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
+import Test.Hspec
 
 
 spec :: Spec

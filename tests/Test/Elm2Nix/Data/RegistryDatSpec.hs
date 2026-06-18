@@ -5,14 +5,12 @@ module Test.Elm2Nix.Data.RegistryDatSpec (spec) where
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
-
-import Test.Hspec
-
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
+import Test.Hspec
 
 
 spec :: Spec

@@ -9,6 +9,9 @@ module Elm2Nix.Data.RegistryDat
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
+import qualified Elm2Nix.Data.ElmJson as ElmJson
+import qualified Elm2Nix.Data.ElmLock as ElmLock
+import qualified Elm2Nix.Data.Name as Name
 
 import Data.Binary (Binary(..))
 import Data.Function ((&))
@@ -16,11 +19,6 @@ import Data.List (sort)
 import Data.Map (Map)
 import Data.Set (Set)
 import Data.Text (Text)
-
-import qualified Elm2Nix.Data.ElmJson as ElmJson
-import qualified Elm2Nix.Data.ElmLock as ElmLock
-import qualified Elm2Nix.Data.Name as Name
-
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.ElmLock (ElmLock)
@@ -55,7 +53,7 @@ newtype Versions =
 
 
 
--- INSTANCES
+-- Instances
 
 
 
@@ -75,7 +73,7 @@ instance Binary Versions where
 
 
 
--- CONSTRUCT
+-- Construct
 
 
 
@@ -101,7 +99,7 @@ fromSet =
 
 
 
--- CONVERT
+-- Convert
 
 
 

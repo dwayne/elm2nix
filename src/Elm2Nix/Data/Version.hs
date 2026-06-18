@@ -2,16 +2,15 @@
 
 module Elm2Nix.Data.Version (Version(..), fromText, decoder) where
 
-import qualified Data.Char as Char
-import qualified Data.Text as T
-
 import Control.Applicative (liftA3)
 import Control.Monad (liftM3)
 import Data.Binary (Binary(..), getWord8, putWord8)
 import Data.Text (Text)
 import Data.Word (Word16)
 
+import qualified Data.Char as Char
 import qualified Data.Json.Decode as JD
+import qualified Data.Text as T
 
 
 data Version
@@ -24,7 +23,7 @@ data Version
 
 
 
--- INSTANCES
+-- Instances
 
 
 
@@ -56,7 +55,7 @@ instance Binary Version where
 
 
 
--- CONSTRUCT
+-- Construct
 
 
 

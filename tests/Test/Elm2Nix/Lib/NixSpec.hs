@@ -1,8 +1,7 @@
 module Test.Elm2Nix.Lib.NixSpec (spec) where
 
-import Test.Hspec
-
 import Elm2Nix.Lib.Nix (NixPrefetchUrlError(..), NixPrefetchUrlOutput(..), Url, nixPrefetchUrl)
+import Test.Hspec
 
 
 spec :: Spec

@@ -6,15 +6,13 @@ module Elm2Nix.Data.ElmLock
   , toSet
   ) where
 
+import qualified Data.Json.Decode as JD
 import qualified Data.Set as Set
 import qualified Data.Text as T
-
-import Data.Set (Set)
-
-import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.Version as Version
 
+import Data.Set (Set)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
@@ -25,7 +23,7 @@ newtype ElmLock = ElmLock (Set Dependency)
 
 
 
--- CONSTRUCT
+-- Construct
 
 
 
@@ -62,7 +60,7 @@ versionDecoder = JD.field "version" Version.decoder
 
 
 
--- CONVERT
+-- Convert
 
 
 
