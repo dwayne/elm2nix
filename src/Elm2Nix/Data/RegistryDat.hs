@@ -3,9 +3,10 @@
 module Elm2Nix.Data.RegistryDat
   ( RegistryDat
   , fromElmLock, fromElmJson, fromList, fromSet
-  , toCount, toPackages, toAllPackages
+  , toCount, toPackages
   ) where
 
+import qualified Data.Json.Encode as JE
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
@@ -15,10 +16,10 @@ import qualified Elm2Nix.Data.Name as Name
 
 import Data.Binary (Binary(..))
 import Data.Function ((&))
+import Data.Json.Encode (ToJson(encode))
 import Data.List (sort)
 import Data.Map (Map)
 import Data.Set (Set)
-import Data.Text (Text)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.ElmLock (ElmLock)
@@ -72,6 +73,18 @@ instance Binary Versions where
   get = Versions <$> ((:) <$> get <*> get)
 
 
+instance ToJson RegistryDat where
+  encode (RegistryDat _ packages) =
+    --
+    -- Maps "author/package" to a list of version strings such that
+    -- the versions have been sorted from oldest to latest
+    --
+    packages
+      & Map.toAscList
+      & map (\( name, Versions versions ) -> ( Name.toText "/" name, JE.encode $ map T.show (sort versions) ))
+      & JE.object
+
+
 
 -- Construct
 
@@ -109,15 +122,3 @@ toCount (RegistryDat count _) = count
 
 toPackages :: RegistryDat -> Map Name [Version]
 toPackages (RegistryDat _ packages) = Map.map toVersions packages
-
-
-toAllPackages :: RegistryDat -> Map Text [Text]
-toAllPackages (RegistryDat _ packages) =
-  --
-  -- Maps "author/package" to a list of version strings such that
-  -- the versions have been sorted from oldest to latest
-  --
-  packages
-    & Map.toAscList
-    & map (\( name, Versions versions ) -> ( Name.toText "/" name, map (T.pack . show) (sort versions) ))
-    & Map.fromList

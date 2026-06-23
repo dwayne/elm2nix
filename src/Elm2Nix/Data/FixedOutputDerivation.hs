@@ -8,12 +8,13 @@ module Elm2Nix.Data.FixedOutputDerivation
   , toDependency, toHash, toPath
   ) where
 
-import qualified Data.Aeson as Json
+import qualified Data.Json.Encode as JE
+import qualified Data.Text as T
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.Name as Name
 
-import Data.Aeson (ToJSON(..), (.=))
+import Data.Json.Encode (ToJson(encode))
 import Data.Bifunctor (first)
 import Data.Either (partitionEithers)
 import Elm2Nix.Data.Dependency (Dependency(..))
@@ -38,21 +39,14 @@ data FixedOutputDerivation
 
 
 
-instance ToJSON FixedOutputDerivation where
-  toJSON (FixedOutputDerivation (Dependency name version) hash _) =
-    Json.object
-      [ "author"  .= Name.toAuthor name
-      , "package" .= Name.toPackage name
-      , "version" .= show version
-      , "sha256"  .= hash
+instance ToJson FixedOutputDerivation where
+  encode (FixedOutputDerivation (Dependency name version) hash _) =
+    JE.object
+      [ ( "author", encode $ Name.toAuthor name )
+      , ( "package", encode $ Name.toPackage name )
+      , ( "version", encode $ T.show version )
+      , ( "sha256", encode $ T.pack hash )
       ]
-
-  toEncoding (FixedOutputDerivation (Dependency name version) hash _) =
-    Json.pairs $
-      "author"  .= Name.toAuthor name <>
-      "package" .= Name.toPackage name <>
-      "version" .= show version <>
-      "sha256"  .= hash
 
 
 

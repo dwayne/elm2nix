@@ -9,13 +9,12 @@ module Elm2Nix
   , ViewRegistryDatFileError, viewRegistryDatFileErrorToText
   ) where
 
-import qualified Data.Aeson as Json
-import qualified Data.Aeson.Encode.Pretty as Json
 import qualified Data.Binary as Binary hiding (decodeFile)
-import qualified Data.ByteString.Lazy as LBS
-import qualified Data.ByteString.Lazy.Char8 as Char8
+import qualified Data.Json as Json
 import qualified Data.Json.Decode as JD
+import qualified Data.Json.Encode as JE
 import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
@@ -24,8 +23,10 @@ import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
 import qualified Elm2Nix.Lib.Nix as Nix
 
+import Data.Json (Json)
 import Data.Text (Text)
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
+import Elm2Nix.Data.RegistryDat (RegistryDat)
 import System.IO (stdout)
 
 
@@ -63,19 +64,12 @@ writeElmLockFile inputs compact output = do
 
 
 encodeCompact :: FilePath -> [FixedOutputDerivation] -> IO ()
-encodeCompact = Json.encodeFile
+encodeCompact output = Json.writeCompact output . JE.encode
 
 
 encodeExpanded :: FilePath -> [FixedOutputDerivation] -> IO ()
 encodeExpanded output =
-  LBS.writeFile output . Json.encodePretty' config
-  where
-    config :: Json.Config
-    config =
-      Json.defConfig
-        { Json.confCompare = Json.keyOrder [ "author", "package", "version", "sha256" ]
-        , Json.confTrailingNewline = True
-        }
+  Json.writePretty output 4 . JE.encode
 
 
 writeElmLockFileErrorToText :: WriteElmLockFileError -> Text
@@ -157,17 +151,17 @@ viewRegistryDatFile compact input = do
   case result of
     Right registryDat ->
       let
-        allPackages =
-          RegistryDat.toAllPackages registryDat
-
-        ( put, encode ) =
+        ( put, toText ) =
           if compact then
-            ( LBS.hPut, Json.encode )
+            ( TIO.hPutStr, Json.compact )
 
           else
-            ( Char8.hPutStrLn, Json.encodePretty )
+            ( TIO.hPutStrLn, Json.pretty 4 )
+
+        encode :: RegistryDat -> Json
+        encode = JE.encode
       in
-      Right <$> put stdout (encode allPackages)
+      Right <$> put stdout (toText $ encode registryDat)
 
     Left err ->
       return $ Left err

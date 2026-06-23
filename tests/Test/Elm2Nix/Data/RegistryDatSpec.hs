@@ -18,7 +18,6 @@ spec =
   describe "Elm2Nix.Data.RegistryDat" $ do
     fromListSpec
     binarySerializationSpec
-    toAllPackagesSpec
 
 
 fromListSpec :: Spec
@@ -118,28 +117,3 @@ binarySerializationSpec =
               ]
         in
         Binary.encode registryDat `shouldBe` expectedByteString
-
-
-toAllPackagesSpec :: Spec
-toAllPackagesSpec =
-  describe "toAllPackages" $
-    it "example 1" $
-      let
-        dependencies =
-          [ Dependency Name.elmBrowser (Version 1 0 0)
-          , Dependency Name.elmBrowser (Version 1 0 1)
-          , Dependency Name.elmBrowser (Version 1 0 2)
-          , Dependency Name.elmCore (Version 1 0 0)
-          , Dependency Name.elmCore (Version 1 0 0)
-          , Dependency Name.elmCore (Version 1 0 5)
-          ]
-
-        registryDat = RegistryDat.fromList dependencies
-
-        expectedAllPackages =
-          Map.fromList
-            [ ( "elm/browser", [ "1.0.0", "1.0.1", "1.0.2" ] )
-            , ( "elm/core", [ "1.0.0", "1.0.5" ] )
-            ]
-      in
-      RegistryDat.toAllPackages registryDat `shouldBe` expectedAllPackages
