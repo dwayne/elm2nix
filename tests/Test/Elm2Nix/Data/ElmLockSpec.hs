@@ -7,6 +7,7 @@ import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
 
 import Elm2Nix.Data.Dependency (Dependency(..))
+import Elm2Nix.Data.ElmLock (elmLockDecoder)
 import Elm2Nix.Data.Version (Version(..))
 import Test.Fixtures (fixture)
 import Test.Hspec
@@ -15,13 +16,13 @@ import Test.Hspec
 spec :: Spec
 spec =
   describe "Elm2Nix.Data.ElmLock" $ do
-    decoderSpec
+    elmLockDecoderSpec
     fromFileSpec
 
 
-decoderSpec :: Spec
-decoderSpec =
-  describe "decoder" $ do
+elmLockDecoderSpec :: Spec
+elmLockDecoderSpec =
+  describe "elmLockDecoder" $ do
     describe "valid input" $
       it "example 1" $
         let
@@ -57,7 +58,7 @@ decoderSpec =
               , Dependency Name.elmJson (Version 1 1 4)
               ]
         in
-        JD.decodeText ElmLock.decoder input `shouldBe` Right elmLock
+        JD.decodeText elmLockDecoder input `shouldBe` Right elmLock
 
 
 fromFileSpec :: Spec

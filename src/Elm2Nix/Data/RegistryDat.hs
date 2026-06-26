@@ -4,6 +4,7 @@ module Elm2Nix.Data.RegistryDat
   ( RegistryDat
   , fromElmLock, fromElmJson, fromList, fromSet
   , toCount, toPackages, toAllPackages
+  , encodeRegistryDat
   ) where
 
 import qualified Data.Json.Encode as JE
@@ -17,7 +18,7 @@ import qualified Elm2Nix.Data.Name as Name
 import Data.Bifunctor (second)
 import Data.Binary (Binary(..))
 import Data.Function ((&))
-import Data.Json.Encode (ToJson(encode))
+import Data.Json.Encode (Json, ToJson)
 import Data.List (sort)
 import Data.Map (Map)
 import Data.Set (Set)
@@ -31,27 +32,27 @@ import Elm2Nix.Data.Version (Version)
 
 data RegistryDat
   = RegistryDat
-    --
-    -- _count    - The number of unique dependencies in _packages
-    -- _packages - Maps the name of a package to its versions where
-    --             the versions are in descending order
-    --
-    -- For e.g. if _packages = fromList [ ( elm/browser, [ 1.0.2, 1.0.1, 1.0.0 ] ), ( elm/core, [ 1.0.5, 1.0.0 ] ) ]
-    -- then _count = 5.
-    --
-    { _count :: !Int
-    , _packages :: !(Map Name Versions)
-    }
+      --
+      -- _count    - The number of unique dependencies in _packages
+      -- _packages - Maps the name of a package to its versions where
+      --             the versions are in descending order
+      --
+      -- For e.g. if _packages = fromList [ ( elm/browser, [ 1.0.2, 1.0.1, 1.0.0 ] ), ( elm/core, [ 1.0.5, 1.0.0 ] ) ]
+      -- then _count = 5.
+      --
+      { _count :: !Int
+      , _packages :: !(Map Name Versions)
+      }
   deriving (Eq, Show)
 
 
 --
 -- N.B. This type is primarily used so that we can provide a different binary serialization of the list type.
 --
-newtype Versions =
-  Versions
-    { toVersions :: [Version]
-    }
+newtype Versions
+  = Versions
+      { toVersions :: [Version]
+      }
   deriving (Eq, Show)
 
 
@@ -76,7 +77,7 @@ instance Binary Versions where
 
 
 instance ToJson RegistryDat where
-  encode = JE.object . map (second JE.encode) . toAllPackages
+  encode = encodeRegistryDat
 
 
 
@@ -127,3 +128,13 @@ toAllPackages (RegistryDat _ packages) =
   packages
       & Map.toAscList
       & map (\( name, Versions versions ) -> ( Name.toText "/" name, map T.show (sort versions) ))
+
+
+
+-- Encoder
+
+
+
+encodeRegistryDat :: RegistryDat -> Json
+encodeRegistryDat =
+  JE.object . map (second JE.encode) . toAllPackages

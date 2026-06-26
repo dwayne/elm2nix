@@ -3,7 +3,7 @@
 module Elm2Nix.Data.ElmJson
   ( ElmJson
   , fromFile, fromFiles, fromList
-  , decoder, dependenciesDecoder
+  , elmJsonDecoder, dependenciesDecoder
   , toAscList, toSet
   ) where
 
@@ -11,9 +11,9 @@ import qualified Data.Json.Decode as JD
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.Name as Name
-import qualified Elm2Nix.Data.Version as Version
 
 import Data.Bifunctor (first)
+import Data.Json.Decode (FromJson)
 import Data.Maybe (fromMaybe)
 import Data.Set (Set)
 import Data.Text (Text)
@@ -34,13 +34,17 @@ instance Show ElmJson where
   show (ElmJson dependencies) = show dependencies
 
 
+instance FromJson ElmJson where
+  decoder = elmJsonDecoder
+
+
 
 -- Construct
 
 
 
 fromFile :: FilePath -> IO (Either JD.Error ElmJson)
-fromFile = JD.decodeFile decoder
+fromFile = JD.decodeFile elmJsonDecoder
 
 
 fromFiles :: [FilePath] -> IO (Either (FilePath, JD.Error) ElmJson)
@@ -68,8 +72,13 @@ fromList :: [Dependency] -> ElmJson
 fromList = ElmJson . Set.fromList
 
 
-decoder :: JD.Decoder ElmJson
-decoder =
+
+-- Decoder
+
+
+
+elmJsonDecoder :: JD.Decoder ElmJson
+elmJsonDecoder =
   JD.field "type" (literal "application") >>
     ((\a b c d -> fromList $ a ++ b ++ c ++ d)
       <$> pathToDependenciesDecoder [ "dependencies", "direct" ]
@@ -95,7 +104,7 @@ pathToDependenciesDecoder path =
 
 dependenciesDecoder :: JD.Decoder [Dependency]
 dependenciesDecoder =
-  JD.keyValuePairsWithKeyTransformer toName Version.decoder >>= JD.succeed . map (uncurry Dependency)
+  JD.keyValuePairsWithKeyTransformer toName JD.decoder >>= JD.succeed . map (uncurry Dependency)
 
 
 toName :: Text -> Either Text Name

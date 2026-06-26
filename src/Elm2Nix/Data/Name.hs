@@ -21,9 +21,9 @@ import Data.Text (Text)
 
 data Name
   = Name
-    { _author :: Author
-    , _package :: Package
-    }
+      { _author :: Author
+      , _package :: Package
+      }
   deriving (Eq, Ord)
 
 

@@ -1,24 +1,25 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Elm2Nix.Data.Version (Version(..), fromText, decoder) where
-
-import Control.Applicative (liftA3)
-import Control.Monad (liftM3)
-import Data.Binary (Binary(..), getWord8, putWord8)
-import Data.Text (Text)
-import Data.Word (Word16)
+module Elm2Nix.Data.Version (Version(..), fromText, versionDecoder) where
 
 import qualified Data.Char as Char
 import qualified Data.Json.Decode as JD
 import qualified Data.Text as T
 
+import Control.Applicative (liftA3)
+import Control.Monad (liftM3)
+import Data.Binary (Binary(..), getWord8, putWord8)
+import Data.Json.Decode (FromJson)
+import Data.Text (Text)
+import Data.Word (Word16)
+
 
 data Version
   = Version
-    { toMajor :: {-# UNPACK #-} !Word16
-    , toMinor :: {-# UNPACK #-} !Word16
-    , toPatch :: {-# UNPACK #-} !Word16
-    }
+      { toMajor :: {-# UNPACK #-} !Word16
+      , toMinor :: {-# UNPACK #-} !Word16
+      , toPatch :: {-# UNPACK #-} !Word16
+      }
   deriving (Eq, Ord)
 
 
@@ -52,6 +53,10 @@ instance Binary Version where
       minor <- fmap fromIntegral getWord8
       patch <- fmap fromIntegral getWord8
       return (Version (fromIntegral word) minor patch)
+
+
+instance FromJson Version where
+  decoder = versionDecoder
 
 
 
@@ -122,8 +127,13 @@ maxWord16 =
   fromIntegral (maxBound :: Word16)
 
 
-decoder :: JD.Decoder Version
-decoder =
+
+-- Decoder
+
+
+
+versionDecoder :: JD.Decoder Version
+versionDecoder =
   JD.text >>= \t ->
     case fromText t of
       Just version ->

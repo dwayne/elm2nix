@@ -9,6 +9,7 @@ import qualified Elm2Nix.Data.Name as Name
 
 import Data.List (isSuffixOf)
 import Elm2Nix.Data.Dependency (Dependency(..))
+import Elm2Nix.Data.ElmJson (elmJsonDecoder)
 import Elm2Nix.Data.Version (Version(..))
 import System.IO.Error (isDoesNotExistError)
 import Test.Fixtures (fixture)
@@ -19,7 +20,7 @@ spec :: Spec
 spec =
   describe "Elm2Nix.Data.ElmJson" $ do
     dependenciesDecoderSpec
-    decoderSpec
+    elmJsonDecoderSpec
     fromFileSpec
     fromFilesSpec
 
@@ -82,9 +83,9 @@ dependenciesDecoderSpec =
             False
 
 
-decoderSpec :: Spec
-decoderSpec =
-  describe "decoder" $ do
+elmJsonDecoderSpec :: Spec
+elmJsonDecoderSpec =
+  describe "elmJsonDecoder" $ do
     describe "valid input" $ do
       it "example 1" $
         let
@@ -117,7 +118,7 @@ decoderSpec =
               , Dependency Name.elmJson (Version 1 1 3)
               ]
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 2" $
         let
@@ -146,7 +147,7 @@ decoderSpec =
               , Dependency Name.elmHtml (Version 1 0 0)
               ]
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 3" $
         let
@@ -171,7 +172,7 @@ decoderSpec =
               , Dependency Name.elmCore (Version 1 0 5)
               ]
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 4" $
         let
@@ -194,7 +195,7 @@ decoderSpec =
               , Dependency Name.elmCore (Version 1 0 5)
               ]
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 5" $
         let
@@ -214,7 +215,7 @@ decoderSpec =
               [ Dependency Name.elmBrowser (Version 1 0 2)
               ]
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 6" $
         let
@@ -230,7 +231,7 @@ decoderSpec =
           elmJson =
             ElmJson.fromList []
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 7" $
         let
@@ -243,14 +244,14 @@ decoderSpec =
 
           elmJson = ElmJson.fromList []
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 8" $
         let
           input = "{ \"type\": \"application\" }"
           elmJson = ElmJson.fromList []
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 9" $
         let
@@ -283,7 +284,7 @@ decoderSpec =
               , Dependency Name.elmJson (Version 1 1 3)
               ]
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
       it "example 10" $
         let
@@ -305,7 +306,7 @@ decoderSpec =
               [ Dependency Name.elmBrowser (Version 1 0 2)
               ]
         in
-        JD.decodeText ElmJson.decoder input `shouldBe` Right elmJson
+        JD.decodeText elmJsonDecoder input `shouldBe` Right elmJson
 
 
 fromFileSpec :: Spec

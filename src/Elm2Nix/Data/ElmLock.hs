@@ -2,7 +2,8 @@
 
 module Elm2Nix.Data.ElmLock
   ( ElmLock
-  , fromFile, fromList, decoder
+  , fromFile, fromList
+  , elmLockDecoder
   , toSet
   ) where
 
@@ -10,7 +11,6 @@ import qualified Data.Json.Decode as JD
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.Name as Name
-import qualified Elm2Nix.Data.Version as Version
 
 import Data.Set (Set)
 import Elm2Nix.Data.Dependency (Dependency(..))
@@ -28,15 +28,20 @@ newtype ElmLock = ElmLock (Set Dependency)
 
 
 fromFile :: FilePath -> IO (Either JD.Error ElmLock)
-fromFile = JD.decodeFile decoder
+fromFile = JD.decodeFile elmLockDecoder
 
 
 fromList :: [Dependency] -> ElmLock
 fromList = ElmLock . Set.fromList
 
 
-decoder :: JD.Decoder ElmLock
-decoder = fromList <$> JD.list dependencyDecoder
+
+-- Decoder
+
+
+
+elmLockDecoder :: JD.Decoder ElmLock
+elmLockDecoder = fromList <$> JD.list dependencyDecoder
 
 
 dependencyDecoder :: JD.Decoder Dependency
@@ -56,7 +61,7 @@ nameDecoder = do
 
 
 versionDecoder :: JD.Decoder Version
-versionDecoder = JD.field "version" Version.decoder
+versionDecoder = JD.field "version" JD.decoder
 
 
 

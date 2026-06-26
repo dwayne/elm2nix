@@ -27,10 +27,10 @@ import UnliftIO.Async (pooledMapConcurrently)
 
 data FixedOutputDerivation
   = FixedOutputDerivation
-    { _dependency :: Dependency
-    , _hash :: Sha256
-    , _path :: FilePath
-    }
+      { _dependency :: Dependency
+      , _hash :: Sha256
+      , _path :: FilePath
+      }
   deriving (Eq, Ord, Show)
 
 
