@@ -32,6 +32,9 @@ data-files:
   tests/fixtures/*.json
   tests/fixtures/*.lock
 
+extra-doc-files:
+  README.md
+
 source-repository head
   type: git
   location: https://github.com/dwayne/elm2nix
