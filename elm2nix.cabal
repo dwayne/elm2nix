@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: elm2nix
-version: 0.1.0.0
+version: 0.2.0.0
 
 synopsis: Create Elm support files to be used when compiling Elm applications with Nix
 description:
