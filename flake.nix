@@ -30,16 +30,16 @@
             export HSPEC_SKIP="(skip:network)"
 
             b () {
-              cabal build
+              cabal build "$@"
             }
 
             lint () {
-              hlint "$PROJECT_ROOT/src" "$PROJECT_ROOT/tests"
+              hlint "$PROJECT_ROOT/src" "$PROJECT_ROOT/tests" "$@"
             }
-            alias l='lint'
+            alias l=lint
 
             t () {
-              cabal test
+              cabal test "$@"
             }
 
             c () {
