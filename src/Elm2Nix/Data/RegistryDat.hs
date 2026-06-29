@@ -7,18 +7,17 @@ module Elm2Nix.Data.RegistryDat
   , encodeRegistryDat
   ) where
 
-import qualified Data.Json.Encode as JE
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
+import qualified Json.Encode as JE
 
 import Data.Bifunctor (second)
 import Data.Binary (Binary(..))
 import Data.Function ((&))
-import Data.Json.Encode (Json, ToJson)
 import Data.List (sort)
 import Data.Map (Map)
 import Data.Set (Set)
@@ -28,6 +27,7 @@ import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.ElmLock (ElmLock)
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
+import Json.Encode (Json, ToJson)
 
 
 data RegistryDat

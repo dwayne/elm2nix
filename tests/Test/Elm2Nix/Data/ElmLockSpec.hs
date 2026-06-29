@@ -2,9 +2,9 @@
 
 module Test.Elm2Nix.Data.ElmLockSpec (spec) where
 
-import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
+import qualified Json.Decode as JD
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmLock (elmLockDecoder)

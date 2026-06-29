@@ -2,10 +2,16 @@ packages: .
 
 source-repository-package
   type: git
-  location: git@github.com:dwayne/hs-json-codec.git
-  tag: 0defc1f7405e93df10e8b0483ed976404e3a10aa
+  location: https://github.com/dwayne/hs-json-codec.git
+
+  -- When you change this tag, remember to update it in `nix/generated/README.md` and
+  -- to regenerate `nix/generated/json-codec.nix`
+  tag: 838de8206a5b6192e910ce0dc2fe61e0da1aea12
 
 source-repository-package
   type: git
-  location: git@github.com:dwayne/hs-json-parser.git
-  tag: 89ad8f624f549196cd299141da6f99bf0887c7d6
+  location: https://github.com/dwayne/hs-json-parser.git
+
+  -- When you change this tag, remember to update it in `nix/generated/README.md` and
+  -- to regenerate `nix/generated/json-parser.nix`
+  tag: 5764dec55b7928f42b4d35ba062f50f1e23b8041

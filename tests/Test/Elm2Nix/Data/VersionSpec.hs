@@ -5,8 +5,8 @@ module Test.Elm2Nix.Data.VersionSpec (spec) where
 
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
-import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.Version as Version
+import qualified Json.Decode as JD
 
 import Control.Exception (evaluate)
 import Elm2Nix.Data.Version (Version(..), versionDecoder)

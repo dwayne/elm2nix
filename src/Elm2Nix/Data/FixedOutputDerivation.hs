@@ -8,13 +8,12 @@ module Elm2Nix.Data.FixedOutputDerivation
   , toDependency, toHash, toPath
   ) where
 
-import qualified Data.Json.Encode as JE
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.Name as Name
+import qualified Json.Encode as JE
 
-import Data.Json.Encode (ToJson(encode))
 import Data.Bifunctor (first)
 import Data.Either (partitionEithers)
 import Elm2Nix.Data.Dependency (Dependency(..))
@@ -22,6 +21,7 @@ import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
 import Elm2Nix.Lib.Nix (NixPrefetchUrlError, NixPrefetchUrlOutput(..), Sha256, nixPrefetchUrl)
+import Json.Encode (ToJson(encode))
 import UnliftIO.Async (pooledMapConcurrently)
 
 

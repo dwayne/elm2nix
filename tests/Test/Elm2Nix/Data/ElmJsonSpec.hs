@@ -3,9 +3,9 @@
 
 module Test.Elm2Nix.Data.ElmJsonSpec (spec) where
 
-import qualified Data.Json.Decode as JD
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.Name as Name
+import qualified Json.Decode as JD
 
 import Data.List (isSuffixOf)
 import Elm2Nix.Data.Dependency (Dependency(..))

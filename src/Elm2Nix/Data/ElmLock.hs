@@ -7,10 +7,10 @@ module Elm2Nix.Data.ElmLock
   , toSet
   ) where
 
-import qualified Data.Json.Decode as JD
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.Name as Name
+import qualified Json.Decode as JD
 
 import Data.Set (Set)
 import Elm2Nix.Data.Dependency (Dependency(..))

@@ -7,18 +7,18 @@ module Elm2Nix.Data.ElmJson
   , toAscList, toSet
   ) where
 
-import qualified Data.Json.Decode as JD
 import qualified Data.Set as Set
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.Name as Name
+import qualified Json.Decode as JD
 
 import Data.Bifunctor (first)
-import Data.Json.Decode (FromJson)
 import Data.Maybe (fromMaybe)
 import Data.Set (Set)
 import Data.Text (Text)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Name (Name)
+import Json.Decode (FromJson)
 
 
 newtype ElmJson = ElmJson (Set Dependency)

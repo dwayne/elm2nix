@@ -1,5 +1,5 @@
-{ mkDerivation, aeson, aeson-pretty, base, binary, bytestring
-, containers, hspec, indexed-traversable, json, lib
+{ mkDerivation, base, binary, bytestring, containers, hspec
+, hspec-discover, indexed-traversable, json-codec, json-parser, lib
 , optparse-applicative, text, typed-process, unliftio
 }:
 mkDerivation {
@@ -8,15 +8,16 @@ mkDerivation {
   src = ../..;
   isLibrary = true;
   isExecutable = true;
+  enableSeparateDataOutput = true;
   libraryHaskellDepends = [
-    aeson aeson-pretty base binary bytestring containers
-    indexed-traversable json optparse-applicative text typed-process
-    unliftio
+    base binary bytestring containers indexed-traversable json-codec
+    json-parser optparse-applicative text typed-process unliftio
   ];
   executableHaskellDepends = [ base text ];
   testHaskellDepends = [
-    aeson base binary bytestring containers hspec text
+    base binary bytestring containers hspec json-codec text
   ];
+  testToolDepends = [ hspec-discover ];
   doHaddock = false;
   doCheck = false;
   description = "Create Elm support files to be used when compiling Elm applications with Nix";

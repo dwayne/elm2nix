@@ -10,9 +10,6 @@ module Elm2Nix
   ) where
 
 import qualified Data.Binary as Binary hiding (decodeFile)
-import qualified Data.Json as Json
-import qualified Data.Json.Decode as JD
-import qualified Data.Json.Encode as JE
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import qualified Elm2Nix.Data.Dependency as Dependency
@@ -22,6 +19,9 @@ import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Binary as Binary
 import qualified Elm2Nix.Lib.Nix as Nix
+import qualified Json
+import qualified Json.Decode as JD
+import qualified Json.Encode as JE
 
 import Data.Text (Text)
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)

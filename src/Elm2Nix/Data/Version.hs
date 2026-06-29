@@ -3,15 +3,15 @@
 module Elm2Nix.Data.Version (Version(..), fromText, versionDecoder) where
 
 import qualified Data.Char as Char
-import qualified Data.Json.Decode as JD
 import qualified Data.Text as T
+import qualified Json.Decode as JD
 
 import Control.Applicative (liftA3)
 import Control.Monad (liftM3)
 import Data.Binary (Binary(..), getWord8, putWord8)
-import Data.Json.Decode (FromJson)
 import Data.Text (Text)
 import Data.Word (Word16)
+import Json.Decode (FromJson)
 
 
 data Version

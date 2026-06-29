@@ -1,9 +1,17 @@
-{ haskellPackages, lib }:
+{ haskell, haskellPackages, lib }:
 
 let
   fs = lib.fileset;
+  hlib = haskell.lib;
+
+  myHaskellPackages = haskellPackages.override {
+    overrides = self: super: {
+      json-parser = self.callPackage ./generated/json-parser.nix {};
+      json-codec = self.callPackage ./generated/json-codec.nix  {};
+    };
+  };
 in
-(haskellPackages.callPackage ./generated/elm2nix.nix {}).overrideAttrs (old: {
+(myHaskellPackages.callPackage ./generated/elm2nix.nix {}).overrideAttrs (old: {
   src = fs.toSource {
     root = ../.;
     fileset = fs.unions [
