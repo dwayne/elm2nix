@@ -1,8 +1,9 @@
 { callPackage
 , lib
+, elmPackages
 
 , elmHome ? ".elm"
-, elmVersion ? "0.19.1"
+, elmVersion ? elmPackages.elm.version
 }:
 
 let
