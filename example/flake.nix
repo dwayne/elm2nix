@@ -13,7 +13,16 @@
   outputs = { self, nixpkgs, flake-utils, elm2nix }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [
+            (final: prev: {
+              elmPackages = prev.elmPackages.overrideScope (efinal: eprev: {
+                elm = efinal.callPackage ../nix/elm.nix { };
+              });
+            })
+          ];
+        };
         fs = pkgs.lib.fileset;
         inherit (elm2nix.lib.elm2nix pkgs)
           buildElmApplication
@@ -115,6 +124,8 @@
             omnibsElmCss
             testScripts
             ;
+
+          elm = pkgs.elmPackages.elm;
 
           default = example;
 
