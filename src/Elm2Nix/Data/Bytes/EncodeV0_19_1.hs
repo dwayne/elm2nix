@@ -1,25 +1,14 @@
-module Elm2Nix.Data.Bytes.EncodeV0_19_1
-  ( Encoder
-  , w8, w16, w16To8
-  , int
-  , text
-  , list
-  , dict
-  , encode
-  ) where
+module Elm2Nix.Data.Bytes.EncodeV0_19_1 (w8, w16, w16To8, int, text, list, dict) where
 
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as TE
 
-import Data.Binary.Builder (Builder, fromByteString, putInt64be, putWord16be, singleton, toLazyByteString)
+import Data.Binary.Builder (fromByteString, putInt64be, putWord16be, singleton)
 import Data.Map (Map)
 import Data.Text (Text)
 import Data.Word (Word8, Word16)
-
-
-type Encoder = Builder
+import Elm2Nix.Data.Bytes.Encode (Encoder)
 
 
 w8 :: Word8 -> Encoder
@@ -59,7 +48,3 @@ dict encodeKey encodeValue m =
   where
     n     = int $ Map.size m
     elems = foldMap (\(k, v) -> encodeKey k <> encodeValue v) (Map.toAscList m)
-
-
-encode :: Encoder -> LBS.ByteString
-encode = toLazyByteString

@@ -12,12 +12,12 @@ module Elm2Nix
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
+import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
-import qualified Elm2Nix.Lib.Binary as Binary
 import qualified Elm2Nix.Lib.Nix as Nix
 import qualified Json
 import qualified Json.Decode as JD
@@ -141,48 +141,37 @@ writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText
 
 
 
-type ViewRegistryDatFileError = Binary.DecodeFileError
+data ViewRegistryDatFileError
+  = DecodeError FilePath BD.DecodeError
 
 
 viewRegistryDatFile :: Bool -> FilePath -> IO (Either ViewRegistryDatFileError ())
 viewRegistryDatFile compact input = do
-  registryDat <- RegistryDat.fromLazyByteString V0_19_1 <$> LBS.readFile input
+  --
+  -- TODO: Improve error handling.
+  --
+  result <- RegistryDat.fromLazyByteString V0_19_1 <$> LBS.readFile input
 
-  let
-    ( put, toText ) =
-      if compact then
-        ( TIO.hPutStr, Json.compact )
+  case result of
+    Right registryDat ->
+      let
+        ( put, toText ) =
+          if compact then
+            ( TIO.hPutStr, Json.compact )
 
-      else
-        ( TIO.hPutStrLn, Json.pretty 4 )
+          else
+            ( TIO.hPutStrLn, Json.pretty 4 )
+      in
+      Right <$> put stdout (toText $ RegistryDat.toJson registryDat)
 
-  Right <$> put stdout (toText $ RegistryDat.toJson registryDat)
-
-  -- case result of
-  --   Right registryDat ->
-  --     let
-  --       ( put, toText ) =
-  --         if compact then
-  --           ( TIO.hPutStr, Json.compact )
-
-  --         else
-  --           ( TIO.hPutStrLn, Json.pretty 4 )
-  --     in
-  --     Right <$> put stdout (toText $ encodeRegistryDat registryDat)
-
-  --   Left err ->
-  --     return $ Left err
+    Left err ->
+      return $ Left $ DecodeError input err
 
 
 viewRegistryDatFileErrorToText :: ViewRegistryDatFileError -> Text
-viewRegistryDatFileErrorToText = binaryDecodeFileErrorToText
-
-
-binaryDecodeFileErrorToText :: Binary.DecodeFileError -> Text
-binaryDecodeFileErrorToText err =
+viewRegistryDatFileErrorToText err =
   case err of
-    Binary.FileNotFound path ->
-      "File not found: " <> T.pack path
-
-    Binary.DecodeError path details ->
-      "Syntax error in " <> T.pack path <> ": " <> T.pack details
+    DecodeError path details ->
+      case details of
+        BD.Failure _ _ message ->
+          "Corrupted bytes in " <> T.pack path <> ": " <> T.pack message

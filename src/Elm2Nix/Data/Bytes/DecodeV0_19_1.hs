@@ -1,25 +1,14 @@
-module Elm2Nix.Data.Bytes.DecodeV0_19_1
-  ( Decoder
-  , w8, w16, w8To16
-  , int
-  , text
-  , list
-  , dict
-  , decode
-  ) where
+module Elm2Nix.Data.Bytes.DecodeV0_19_1 (w8, w16, w8To16, int, text, list, dict) where
 
-import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
 import qualified Data.Text.Encoding as TE
 
 import Control.Applicative (empty)
-import Data.Binary.Get (Get, getByteString, getInt64be, getWord8, getWord16be, runGet)
+import Data.Binary.Get (getByteString, getInt64be, getWord8, getWord16be)
 import Data.Map (Map)
 import Data.Text (Text)
 import Data.Word (Word8, Word16)
-
-
-type Decoder = Get
+import Elm2Nix.Data.Bytes.Decode (Decoder)
 
 
 w8 :: Decoder Word8
@@ -61,7 +50,3 @@ dict keyDecoder valueDecoder =
   where
     loop 0 = empty
     loop n = (\k v rest -> (k, v) : rest) <$> keyDecoder <*> valueDecoder <*> loop (n - 1)
-
-
-decode :: Decoder a -> LBS.ByteString -> a
-decode = runGet

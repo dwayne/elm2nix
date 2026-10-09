@@ -11,7 +11,9 @@ module Elm2Nix.Data.Name
   ) where
 
 import qualified Data.Text as T
+import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.Encode as BE
 import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 
 import Data.Text (Text)
@@ -145,11 +147,11 @@ fromTextErrorToString MissingForwardSlash = "/ is missing"
 
 
 
-binaryEncoderV0_19_1 :: Name -> EV0_19_1.Encoder
+binaryEncoderV0_19_1 :: Name -> BE.Encoder
 binaryEncoderV0_19_1 (Name author project) =
   EV0_19_1.text author <> EV0_19_1.text project
 
 
-binaryDecoderV0_19_1 :: DV0_19_1.Decoder Name
+binaryDecoderV0_19_1 :: BD.Decoder Name
 binaryDecoderV0_19_1 =
   Name <$> DV0_19_1.text <*> DV0_19_1.text

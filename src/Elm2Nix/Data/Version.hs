@@ -9,7 +9,9 @@ module Elm2Nix.Data.Version
 
 import qualified Data.Char as Char
 import qualified Data.Text as T
+import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.Encode as BE
 import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Json.Decode as JD
 
@@ -131,7 +133,7 @@ jsonDecoder =
 
 
 
-binaryEncoderV0_19_1 :: Version -> EV0_19_1.Encoder
+binaryEncoderV0_19_1 :: Version -> BE.Encoder
 binaryEncoderV0_19_1 (Version major minor patch) =
   if major < 256 && minor < 256 && patch < 256 then
     EV0_19_1.w16To8 major <> EV0_19_1.w16To8 minor <> EV0_19_1.w16To8 patch
@@ -140,7 +142,7 @@ binaryEncoderV0_19_1 (Version major minor patch) =
     EV0_19_1.w8 255 <> EV0_19_1.w16 major <> EV0_19_1.w16 minor <> EV0_19_1.w16 patch
 
 
-binaryDecoderV0_19_1 :: DV0_19_1.Decoder Version
+binaryDecoderV0_19_1 :: BD.Decoder Version
 binaryDecoderV0_19_1 = do
   major <- DV0_19_1.w8To16
   if major == 255 then

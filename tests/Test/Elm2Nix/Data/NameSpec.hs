@@ -3,8 +3,8 @@
 module Test.Elm2Nix.Data.NameSpec (spec) where
 
 import qualified Data.ByteString.Lazy as LBS
-import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
-import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
+import qualified Elm2Nix.Data.Bytes.Decode as BD
+import qualified Elm2Nix.Data.Bytes.Encode as BE
 import qualified Elm2Nix.Data.Name as Name
 
 import Data.Foldable (traverse_)
@@ -66,8 +66,8 @@ binarySerializationV0_19_1Spec =
               , 0x63, 0x6F, 0x72, 0x65 -- UTF-8 encoding of "core"
               ]
         in
-        EV0_19_1.encode (Name.binaryEncoderV0_19_1 Name.elmCore) `shouldBe` expectedByteString
+        BE.encode (Name.binaryEncoderV0_19_1 Name.elmCore) `shouldBe` expectedByteString
 
     describe "decode" $
       it "example 1" $
-        DV0_19_1.decode Name.binaryDecoderV0_19_1 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Name.elmHtml
+        BD.decode Name.binaryDecoderV0_19_1 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Right Name.elmHtml

@@ -11,7 +11,9 @@ import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
+import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.Encode as BE
 import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
@@ -95,11 +97,11 @@ fromSet =
       ( count + 1, Map.insertWith (<>) name (Set.singleton version) packages )
 
 
-fromLazyByteString :: ElmVersion -> LBS.ByteString -> RegistryDat
+fromLazyByteString :: ElmVersion -> LBS.ByteString -> Either BD.DecodeError RegistryDat
 fromLazyByteString v =
   case v of
     V0_19_1 ->
-      DV0_19_1.decode binaryDecoderV0_19_1
+      BD.decode binaryDecoderV0_19_1
 
 
 
@@ -135,7 +137,7 @@ toLazyByteString :: ElmVersion -> RegistryDat -> LBS.ByteString
 toLazyByteString v =
   case v of
     V0_19_1 ->
-      EV0_19_1.encode . binaryEncoderV0_19_1
+      BE.encode . binaryEncoderV0_19_1
 
 
 
@@ -143,12 +145,12 @@ toLazyByteString v =
 
 
 
-binaryEncoderV0_19_1 :: RegistryDat -> EV0_19_1.Encoder
+binaryEncoderV0_19_1 :: RegistryDat -> BE.Encoder
 binaryEncoderV0_19_1 (RegistryDat count packages) =
   EV0_19_1.int count <> EV0_19_1.dict Name.binaryEncoderV0_19_1 versionsBinaryEncoderV0_19_1 packages
 
 
-versionsBinaryEncoderV0_19_1 :: Versions -> EV0_19_1.Encoder
+versionsBinaryEncoderV0_19_1 :: Versions -> BE.Encoder
 versionsBinaryEncoderV0_19_1 (Versions versions) =
   case versions of
     v : vs ->
@@ -158,11 +160,11 @@ versionsBinaryEncoderV0_19_1 (Versions versions) =
       error "logic error: no versions found"
 
 
-binaryDecoderV0_19_1 :: DV0_19_1.Decoder RegistryDat
+binaryDecoderV0_19_1 :: BD.Decoder RegistryDat
 binaryDecoderV0_19_1 =
   RegistryDat <$> DV0_19_1.int <*> DV0_19_1.dict Name.binaryDecoderV0_19_1 versionsBinaryDecoderV0_19_1
 
 
-versionsBinaryDecoderV0_19_1 :: DV0_19_1.Decoder Versions
+versionsBinaryDecoderV0_19_1 :: BD.Decoder Versions
 versionsBinaryDecoderV0_19_1 =
   (\v vs -> Versions $ v : vs) <$> Version.binaryDecoderV0_19_1 <*> DV0_19_1.list Version.binaryDecoderV0_19_1
