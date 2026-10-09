@@ -2,12 +2,13 @@
 
 module Elm2Nix.Data.RegistryDat
   ( RegistryDat
-  , fromElmLock, fromElmJson, fromList, fromSet
-  , toCount, toPackages, toAllPackages
+  , fromElmLock, fromElmJson, fromList, fromSet, fromLazyByteString
+  , toCount, toPackages, toAllPackages, toLazyByteString
   , binaryEncoderV0_19_1, binaryDecoderV0_19_1
   , encodeRegistryDat
   ) where
 
+import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
@@ -28,6 +29,7 @@ import Data.Text (Text)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.ElmLock (ElmLock)
+import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
 import Json.Encode (Json, ToJson)
@@ -94,6 +96,13 @@ fromSet =
       ( count + 1, Map.insertWith (<>) name (Set.singleton version) packages )
 
 
+fromLazyByteString :: ElmVersion -> LBS.ByteString -> RegistryDat
+fromLazyByteString v =
+  case v of
+    V0_19_1 ->
+      DV0_19_1.decode binaryDecoderV0_19_1
+
+
 
 -- Convert
 
@@ -116,6 +125,13 @@ toAllPackages (RegistryDat _ packages) =
   packages
       & Map.toAscList
       & map (\( name, Versions versions ) -> ( Name.toText "/" name, map T.show (sort versions) ))
+
+
+toLazyByteString :: ElmVersion -> RegistryDat -> LBS.ByteString
+toLazyByteString v =
+  case v of
+    V0_19_1 ->
+      EV0_19_1.encode . binaryEncoderV0_19_1
 
 
 

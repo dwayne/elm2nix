@@ -6,7 +6,6 @@ module Elm2Nix.Data.Bytes.DecodeV0_19_1
   , list
   , dict
   , decode
-  , readFile
   ) where
 
 import qualified Data.ByteString.Lazy as LBS
@@ -18,7 +17,6 @@ import Data.Binary.Get (Get, getByteString, getInt64be, getWord8, getWord16be, r
 import Data.Map (Map)
 import Data.Text (Text)
 import Data.Word (Word8, Word16)
-import Prelude hiding (readFile)
 
 
 type Decoder = Get
@@ -67,8 +65,3 @@ dict keyDecoder valueDecoder =
 
 decode :: Decoder a -> LBS.ByteString -> a
 decode = runGet
-
-
-readFile :: FilePath -> Decoder a -> IO a
-readFile f decoder =
-  decode decoder <$> LBS.readFile f

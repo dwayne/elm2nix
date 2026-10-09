@@ -2,7 +2,6 @@
 
 module Test.Elm2Nix.Data.RegistryDatSpec (spec) where
 
-import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
 import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
@@ -18,8 +17,8 @@ spec :: Spec
 spec =
   describe "Elm2Nix.Data.RegistryDat" $ do
     fromListSpec
-    binarySerializationSpec
     toAllPackagesSpec
+    binarySerializationV0_19_1Spec
 
 
 fromListSpec :: Spec
@@ -72,9 +71,33 @@ fromListSpec =
       RegistryDat.toPackages registryDat `shouldBe` expectedPackages
 
 
-binarySerializationSpec :: Spec
-binarySerializationSpec =
-  describe "binary serialization" $ do
+toAllPackagesSpec :: Spec
+toAllPackagesSpec =
+  describe "toAllPackages" $
+    it "example 1" $
+      let
+        dependencies =
+          [ Dependency Name.elmBrowser (Version 1 0 0)
+          , Dependency Name.elmBrowser (Version 1 0 1)
+          , Dependency Name.elmBrowser (Version 1 0 2)
+          , Dependency Name.elmCore (Version 1 0 0)
+          , Dependency Name.elmCore (Version 1 0 0)
+          , Dependency Name.elmCore (Version 1 0 5)
+          ]
+
+        registryDat = RegistryDat.fromList dependencies
+
+        expectedAllPackages =
+          [ ( "elm/browser", [ "1.0.0", "1.0.1", "1.0.2" ] )
+          , ( "elm/core", [ "1.0.0", "1.0.5" ] )
+          ]
+      in
+      RegistryDat.toAllPackages registryDat `shouldBe` expectedAllPackages
+
+
+binarySerializationV0_19_1Spec :: Spec
+binarySerializationV0_19_1Spec =
+  describe "binary serialization v0.19.1" $ do
     describe "encode" $
       it "example 1" $
         let
@@ -119,27 +142,3 @@ binarySerializationSpec =
               ]
         in
         EV0_19_1.encode (RegistryDat.binaryEncoderV0_19_1 registryDat) `shouldBe` expectedByteString
-
-
-toAllPackagesSpec :: Spec
-toAllPackagesSpec =
-  describe "toAllPackages" $
-    it "example 1" $
-      let
-        dependencies =
-          [ Dependency Name.elmBrowser (Version 1 0 0)
-          , Dependency Name.elmBrowser (Version 1 0 1)
-          , Dependency Name.elmBrowser (Version 1 0 2)
-          , Dependency Name.elmCore (Version 1 0 0)
-          , Dependency Name.elmCore (Version 1 0 0)
-          , Dependency Name.elmCore (Version 1 0 5)
-          ]
-
-        registryDat = RegistryDat.fromList dependencies
-
-        expectedAllPackages =
-          [ ( "elm/browser", [ "1.0.0", "1.0.1", "1.0.2" ] )
-          , ( "elm/core", [ "1.0.0", "1.0.5" ] )
-          ]
-      in
-      RegistryDat.toAllPackages registryDat `shouldBe` expectedAllPackages

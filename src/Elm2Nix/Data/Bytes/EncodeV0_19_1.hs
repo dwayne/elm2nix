@@ -6,7 +6,6 @@ module Elm2Nix.Data.Bytes.EncodeV0_19_1
   , list
   , dict
   , encode
-  , writeFile
   ) where
 
 import qualified Data.ByteString as BS
@@ -18,7 +17,6 @@ import Data.Binary.Builder (Builder, fromByteString, putInt64be, putWord16be, si
 import Data.Map (Map)
 import Data.Text (Text)
 import Data.Word (Word8, Word16)
-import Prelude hiding (writeFile)
 
 
 type Encoder = Builder
@@ -65,8 +63,3 @@ dict encodeKey encodeValue m =
 
 encode :: Encoder -> LBS.ByteString
 encode = toLazyByteString
-
-
-writeFile :: FilePath -> Encoder -> IO ()
-writeFile f =
-  LBS.writeFile f . encode

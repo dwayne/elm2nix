@@ -21,7 +21,7 @@ spec =
     versionDecoderSpec
     orderSpec
     showSpec
-    binarySerializationSpec
+    binarySerializationV0_19_1Spec
 
 
 fromTextSpec :: Spec
@@ -75,9 +75,9 @@ showSpec =
       show (Version 1 2 3) `shouldBe` "1.2.3"
 
 
-binarySerializationSpec :: Spec
-binarySerializationSpec =
-  describe "binary serialization" $ do
+binarySerializationV0_19_1Spec :: Spec
+binarySerializationV0_19_1Spec =
+  describe "binary serialization v0.19.1" $ do
     describe "encode" $ do
       describe "when major, minor, and patch are all less than 256" $
         it "encodes using 8-bits each" $

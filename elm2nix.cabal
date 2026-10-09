@@ -53,6 +53,7 @@ library
     Elm2Nix.Data.Dependency
     Elm2Nix.Data.ElmJson
     Elm2Nix.Data.ElmLock
+    Elm2Nix.Data.ElmVersion
     Elm2Nix.Data.FixedOutputDerivation
     Elm2Nix.Data.Name
     Elm2Nix.Data.RegistryDat

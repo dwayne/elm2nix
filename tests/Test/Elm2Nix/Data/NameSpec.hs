@@ -2,7 +2,6 @@
 
 module Test.Elm2Nix.Data.NameSpec (spec) where
 
-import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
 import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
 import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
@@ -17,7 +16,7 @@ spec =
   describe "Elm2Nix.Data.Name" $ do
     fromTextSpec
     toTextSpec
-    binarySerializationSpec
+    binarySerializationV0_19_1Spec
 
 
 fromTextSpec :: Spec
@@ -53,9 +52,9 @@ toTextSpec =
       Name.toText "-" Name.elmCore `shouldBe` "elm-core"
 
 
-binarySerializationSpec :: Spec
-binarySerializationSpec =
-  describe "binary serialization" $ do
+binarySerializationV0_19_1Spec :: Spec
+binarySerializationV0_19_1Spec =
+  describe "binary serialization v0.19.1" $ do
     describe "encode" $
       it "example 1" $
         let

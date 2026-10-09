@@ -9,10 +9,9 @@ module Elm2Nix
   , ViewRegistryDatFileError, viewRegistryDatFileErrorToText
   ) where
 
+import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
-import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
-import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
@@ -25,6 +24,7 @@ import qualified Json.Decode as JD
 import qualified Json.Encode as JE
 
 import Data.Text (Text)
+import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
 import Elm2Nix.Data.RegistryDat (encodeRegistryDat)
 import System.IO (stdout)
@@ -127,7 +127,7 @@ writeRegistryDatFile input output = do
   result <- ElmLock.fromFile input
   case result of
     Right elmLock ->
-      Right <$> EV0_19_1.writeFile output (RegistryDat.binaryEncoderV0_19_1 $ RegistryDat.fromElmLock elmLock)
+      Right <$> LBS.writeFile output (RegistryDat.toLazyByteString V0_19_1 $ RegistryDat.fromElmLock elmLock)
 
     Left err ->
       return $ Left (input, err)
@@ -147,7 +147,7 @@ type ViewRegistryDatFileError = Binary.DecodeFileError
 
 viewRegistryDatFile :: Bool -> FilePath -> IO (Either ViewRegistryDatFileError ())
 viewRegistryDatFile compact input = do
-  registryDat <- DV0_19_1.readFile input RegistryDat.binaryDecoderV0_19_1
+  registryDat <- RegistryDat.fromLazyByteString V0_19_1 <$> LBS.readFile input
 
   let
     ( put, toText ) =
