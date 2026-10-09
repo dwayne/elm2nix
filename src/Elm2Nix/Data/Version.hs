@@ -1,14 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Elm2Nix.Data.Version (Version(..), fromText, versionDecoder) where
+module Elm2Nix.Data.Version
+  ( Version(..)
+  , fromText
+  , versionDecoder
+  , binaryEncoderV0_19_1, binaryDecoderV0_19_1
+  ) where
 
 import qualified Data.Char as Char
 import qualified Data.Text as T
+import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Json.Decode as JD
 
 import Control.Applicative (liftA3)
-import Control.Monad (liftM3)
-import Data.Binary (Binary(..), getWord8, putWord8)
 import Data.Text (Text)
 import Data.Word (Word16)
 import Json.Decode (FromJson)
@@ -31,28 +36,6 @@ data Version
 instance Show Version where
   show (Version major minor patch) =
     show major ++ "." ++ show minor ++ "." ++ show patch
-
-
-instance Binary Version where
-  put (Version major minor patch) =
-    if major < 256 && minor < 256 && patch < 256 then do
-      putWord8 (fromIntegral major)
-      putWord8 (fromIntegral minor)
-      putWord8 (fromIntegral patch)
-    else do
-      putWord8 255
-      put major
-      put minor
-      put patch
-
-  get = do
-    word <- getWord8
-    if word == 255 then
-      liftM3 Version get get get
-    else do
-      minor <- fmap fromIntegral getWord8
-      patch <- fmap fromIntegral getWord8
-      return (Version (fromIntegral word) minor patch)
 
 
 instance FromJson Version where
@@ -128,7 +111,7 @@ maxWord16 =
 
 
 
--- Decoder
+-- JSON Decoder
 
 
 
@@ -141,3 +124,31 @@ versionDecoder =
 
       Nothing ->
         JD.fail $ "version is invalid: " <> t
+
+
+
+-- Binary Encoder
+
+
+
+binaryEncoderV0_19_1 :: Version -> EV0_19_1.Encoder
+binaryEncoderV0_19_1 (Version major minor patch) =
+  if major < 256 && minor < 256 && patch < 256 then
+    EV0_19_1.w16To8 major <> EV0_19_1.w16To8 minor <> EV0_19_1.w16To8 patch
+
+  else
+    EV0_19_1.w8 255 <> EV0_19_1.w16 major <> EV0_19_1.w16 minor <> EV0_19_1.w16 patch
+
+
+
+-- Binary Decoder
+
+
+
+binaryDecoderV0_19_1 :: DV0_19_1.Decoder Version
+binaryDecoderV0_19_1 = do
+  major <- DV0_19_1.w8To16
+  if major == 255 then
+    Version <$> DV0_19_1.w16 <*> DV0_19_1.w16 <*> DV0_19_1.w16
+  else
+    Version major <$> DV0_19_1.w8To16 <*> DV0_19_1.w8To16

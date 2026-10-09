@@ -4,19 +4,22 @@ module Elm2Nix.Data.RegistryDat
   ( RegistryDat
   , fromElmLock, fromElmJson, fromList, fromSet
   , toCount, toPackages, toAllPackages
+  , binaryEncoderV0_19_1, binaryDecoderV0_19_1
   , encodeRegistryDat
   ) where
 
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
+import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
+import qualified Elm2Nix.Data.Version as Version
 import qualified Json.Encode as JE
 
 import Data.Bifunctor (second)
-import Data.Binary (Binary(..))
 import Data.Function ((&))
 import Data.List (sort)
 import Data.Map (Map)
@@ -59,21 +62,6 @@ newtype Versions
 
 -- Instances
 
-
-
-instance Binary RegistryDat where
-  put (RegistryDat count packages) = put count >> put packages
-  get = RegistryDat <$> get <*> get
-
-
-instance Binary Versions where
-  put (Versions (v : vs)) = put v >> put vs
-  --
-  -- It should be non-empty by construction. If this occurs then there's an error in your logic.
-  --
-  put _ = error "logic error: no versions found"
-
-  get = Versions <$> ((:) <$> get <*> get)
 
 
 instance ToJson RegistryDat where
@@ -131,7 +119,42 @@ toAllPackages (RegistryDat _ packages) =
 
 
 
--- Encoder
+-- Binary Encoder
+
+
+
+binaryEncoderV0_19_1 :: RegistryDat -> EV0_19_1.Encoder
+binaryEncoderV0_19_1 (RegistryDat count packages) =
+  EV0_19_1.int count <> EV0_19_1.dict Name.binaryEncoderV0_19_1 versionsBinaryEncoderV0_19_1 packages
+
+
+versionsBinaryEncoderV0_19_1 :: Versions -> EV0_19_1.Encoder
+versionsBinaryEncoderV0_19_1 (Versions versions) =
+  case versions of
+    v : vs ->
+      Version.binaryEncoderV0_19_1 v <> EV0_19_1.list Version.binaryEncoderV0_19_1 vs
+
+    _ ->
+      error "logic error: no versions found"
+
+
+
+-- Binary Decoder
+
+
+
+binaryDecoderV0_19_1 :: DV0_19_1.Decoder RegistryDat
+binaryDecoderV0_19_1 =
+  RegistryDat <$> DV0_19_1.int <*> DV0_19_1.dict Name.binaryDecoderV0_19_1 versionsBinaryDecoderV0_19_1
+
+
+versionsBinaryDecoderV0_19_1 :: DV0_19_1.Decoder Versions
+versionsBinaryDecoderV0_19_1 =
+  (\v vs -> Versions $ v : vs) <$> Version.binaryDecoderV0_19_1 <*> DV0_19_1.list Version.binaryDecoderV0_19_1
+
+
+
+-- JSON Encoder
 
 
 

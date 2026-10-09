@@ -5,6 +5,7 @@ module Test.Elm2Nix.Data.RegistryDatSpec (spec) where
 import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
+import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 
@@ -117,7 +118,7 @@ binarySerializationSpec =
               , 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
               ]
         in
-        Binary.encode registryDat `shouldBe` expectedByteString
+        EV0_19_1.encode (RegistryDat.binaryEncoderV0_19_1 registryDat) `shouldBe` expectedByteString
 
 
 toAllPackagesSpec :: Spec

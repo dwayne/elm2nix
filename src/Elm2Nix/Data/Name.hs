@@ -4,18 +4,16 @@ module Elm2Nix.Data.Name
   ( Name, Author, Package
   , elmBrowser, elmCore, elmHtml, elmJson, elmTime, elmUrl, elmVirtualDom
   , FromTextError(..), fromText
+  , binaryEncoderV0_19_1, binaryDecoderV0_19_1
   , toAuthor, toPackage
   , toText, toString
   , fromTextErrorToString
   ) where
 
-import qualified Data.ByteString as BS
 import qualified Data.Text as T
-import qualified Data.Text.Encoding as TE
+import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 
-import Data.Binary (Binary(..), Get, Put, getWord8, putWord8)
-import Data.Binary.Get (getByteString)
-import Data.Binary.Put (putByteString)
 import Data.Text (Text)
 
 
@@ -38,23 +36,6 @@ type Package = Text
 
 instance Show Name where
   show = toString "/"
-
-
-instance Binary Name where
-  put (Name author project) = putText author <> putText project
-  get = Name <$> getText <*> getText
-
-
-putText :: Text -> Put
-putText t =
-  putWord8 (fromIntegral $ BS.length bs) <> putByteString bs
-  where
-    bs = TE.encodeUtf8 t
-
-
-getText :: Get Text
-getText =
-  getWord8 >>= fmap TE.decodeUtf8 . getByteString . fromIntegral
 
 
 
@@ -128,6 +109,26 @@ fromText t =
 isBlank :: Text -> Bool
 isBlank =
   T.null . T.strip
+
+
+
+-- Binary Encoder
+
+
+
+binaryEncoderV0_19_1 :: Name -> EV0_19_1.Encoder
+binaryEncoderV0_19_1 (Name author project) =
+  EV0_19_1.text author <> EV0_19_1.text project
+
+
+
+-- Binary Decoder
+
+
+
+binaryDecoderV0_19_1 :: DV0_19_1.Decoder Name
+binaryDecoderV0_19_1 =
+  Name <$> DV0_19_1.text <*> DV0_19_1.text
 
 
 

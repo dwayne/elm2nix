@@ -9,9 +9,10 @@ module Elm2Nix
   , ViewRegistryDatFileError, viewRegistryDatFileErrorToText
   ) where
 
-import qualified Data.Binary as Binary hiding (decodeFile)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
+import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
@@ -126,7 +127,7 @@ writeRegistryDatFile input output = do
   result <- ElmLock.fromFile input
   case result of
     Right elmLock ->
-      Right <$> Binary.encodeFile output (RegistryDat.fromElmLock elmLock)
+      Right <$> EV0_19_1.writeFile output (RegistryDat.binaryEncoderV0_19_1 $ RegistryDat.fromElmLock elmLock)
 
     Left err ->
       return $ Left (input, err)
@@ -146,21 +147,32 @@ type ViewRegistryDatFileError = Binary.DecodeFileError
 
 viewRegistryDatFile :: Bool -> FilePath -> IO (Either ViewRegistryDatFileError ())
 viewRegistryDatFile compact input = do
-  result <- Binary.decodeFile input
-  case result of
-    Right registryDat ->
-      let
-        ( put, toText ) =
-          if compact then
-            ( TIO.hPutStr, Json.compact )
+  registryDat <- DV0_19_1.readFile input RegistryDat.binaryDecoderV0_19_1
 
-          else
-            ( TIO.hPutStrLn, Json.pretty 4 )
-      in
-      Right <$> put stdout (toText $ encodeRegistryDat registryDat)
+  let
+    ( put, toText ) =
+      if compact then
+        ( TIO.hPutStr, Json.compact )
 
-    Left err ->
-      return $ Left err
+      else
+        ( TIO.hPutStrLn, Json.pretty 4 )
+
+  Right <$> put stdout (toText $ encodeRegistryDat registryDat)
+
+  -- case result of
+  --   Right registryDat ->
+  --     let
+  --       ( put, toText ) =
+  --         if compact then
+  --           ( TIO.hPutStr, Json.compact )
+
+  --         else
+  --           ( TIO.hPutStrLn, Json.pretty 4 )
+  --     in
+  --     Right <$> put stdout (toText $ encodeRegistryDat registryDat)
+
+  --   Left err ->
+  --     return $ Left err
 
 
 viewRegistryDatFileErrorToText :: ViewRegistryDatFileError -> Text

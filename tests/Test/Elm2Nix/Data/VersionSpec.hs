@@ -3,8 +3,9 @@
 
 module Test.Elm2Nix.Data.VersionSpec (spec) where
 
-import qualified Data.Binary as Binary
 import qualified Data.ByteString.Lazy as LBS
+import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
 import qualified Elm2Nix.Data.Version as Version
 import qualified Json.Decode as JD
 
@@ -80,18 +81,18 @@ binarySerializationSpec =
     describe "encode" $ do
       describe "when major, minor, and patch are all less than 256" $
         it "encodes using 8-bits each" $
-          Binary.encode (Version 1 2 3) `shouldBe` LBS.pack [0x01, 0x02, 0x03]
+          EV0_19_1.encode (Version.binaryEncoderV0_19_1 $ Version 1 2 3) `shouldBe` LBS.pack [0x01, 0x02, 0x03]
 
       describe "when major is 256 or more" $
         it "encodes using a 255 tag followed by 16-bits each" $
-          Binary.encode (Version 256 2 3) `shouldBe` LBS.pack [0xFF, 0x01, 0x00, 0x00, 0x02, 0x00, 0x03]
+          EV0_19_1.encode (Version.binaryEncoderV0_19_1 $ Version 256 2 3) `shouldBe` LBS.pack [0xFF, 0x01, 0x00, 0x00, 0x02, 0x00, 0x03]
 
     describe "decode" $ do
       it "example 1" $
-        Binary.decode (LBS.pack [0x01, 0x00, 0x05]) `shouldBe` Version 1 0 5
+        DV0_19_1.decode Version.binaryDecoderV0_19_1 (LBS.pack [0x01, 0x00, 0x05]) `shouldBe` Version 1 0 5
 
       it "example 2" $
-        Binary.decode (LBS.pack [0xFF, 0x01, 0x01, 0x00, 0x00, 0xFF, 0xFF]) `shouldBe` Version 257 0 65535
+        DV0_19_1.decode Version.binaryDecoderV0_19_1 (LBS.pack [0xFF, 0x01, 0x01, 0x00, 0x00, 0xFF, 0xFF]) `shouldBe` Version 257 0 65535
 
     describe "when major is 255" $
       it "does the wrong thing" $
@@ -108,4 +109,4 @@ binarySerializationSpec =
         -- Even the following major < 255 && minor < 256 && patch < 256 works. We just can't have major = 255
         -- when encoding each part using 8-bits.
         --
-        evaluate (Binary.decode $ Binary.encode $ Version 255 2 3 :: Version) `shouldThrow` anyErrorCall
+        evaluate (DV0_19_1.decode Version.binaryDecoderV0_19_1 $ EV0_19_1.encode (Version.binaryEncoderV0_19_1 $ Version 255 2 3) :: Version) `shouldThrow` anyErrorCall
