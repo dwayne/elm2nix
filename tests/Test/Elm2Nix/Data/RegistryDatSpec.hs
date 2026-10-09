@@ -97,7 +97,7 @@ toAllPackagesSpec =
 
 binarySerializationV0_19_1Spec :: Spec
 binarySerializationV0_19_1Spec =
-  describe "binary serialization v0.19.1" $ do
+  describe "binary serialization for Elm 0.19.1" $ do
     describe "encode" $
       it "example 1" $
         let

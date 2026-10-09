@@ -26,7 +26,6 @@ import qualified Json.Encode as JE
 import Data.Text (Text)
 import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
-import Elm2Nix.Data.RegistryDat (encodeRegistryDat)
 import System.IO (stdout)
 
 
@@ -157,7 +156,7 @@ viewRegistryDatFile compact input = do
       else
         ( TIO.hPutStrLn, Json.pretty 4 )
 
-  Right <$> put stdout (toText $ encodeRegistryDat registryDat)
+  Right <$> put stdout (toText $ RegistryDat.toJson registryDat)
 
   -- case result of
   --   Right registryDat ->

@@ -3,9 +3,8 @@
 module Elm2Nix.Data.RegistryDat
   ( RegistryDat
   , fromElmLock, fromElmJson, fromList, fromSet, fromLazyByteString
-  , toCount, toPackages, toAllPackages, toLazyByteString
+  , toCount, toPackages, toAllPackages, toJson, toLazyByteString
   , binaryEncoderV0_19_1, binaryDecoderV0_19_1
-  , encodeRegistryDat
   ) where
 
 import qualified Data.ByteString.Lazy as LBS
@@ -67,7 +66,7 @@ newtype Versions
 
 
 instance ToJson RegistryDat where
-  encode = encodeRegistryDat
+  encode = toJson
 
 
 
@@ -127,6 +126,11 @@ toAllPackages (RegistryDat _ packages) =
       & map (\( name, Versions versions ) -> ( Name.toText "/" name, map T.show (sort versions) ))
 
 
+toJson :: RegistryDat -> Json
+toJson =
+  JE.object . map (second JE.encode) . toAllPackages
+
+
 toLazyByteString :: ElmVersion -> RegistryDat -> LBS.ByteString
 toLazyByteString v =
   case v of
@@ -135,7 +139,7 @@ toLazyByteString v =
 
 
 
--- Binary Encoder
+-- Binary Encoder/Decoder for Elm 0.19.1
 
 
 
@@ -154,11 +158,6 @@ versionsBinaryEncoderV0_19_1 (Versions versions) =
       error "logic error: no versions found"
 
 
-
--- Binary Decoder
-
-
-
 binaryDecoderV0_19_1 :: DV0_19_1.Decoder RegistryDat
 binaryDecoderV0_19_1 =
   RegistryDat <$> DV0_19_1.int <*> DV0_19_1.dict Name.binaryDecoderV0_19_1 versionsBinaryDecoderV0_19_1
@@ -167,13 +166,3 @@ binaryDecoderV0_19_1 =
 versionsBinaryDecoderV0_19_1 :: DV0_19_1.Decoder Versions
 versionsBinaryDecoderV0_19_1 =
   (\v vs -> Versions $ v : vs) <$> Version.binaryDecoderV0_19_1 <*> DV0_19_1.list Version.binaryDecoderV0_19_1
-
-
-
--- JSON Encoder
-
-
-
-encodeRegistryDat :: RegistryDat -> Json
-encodeRegistryDat =
-  JE.object . map (second JE.encode) . toAllPackages
