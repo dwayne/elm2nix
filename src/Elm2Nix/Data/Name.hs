@@ -4,10 +4,10 @@ module Elm2Nix.Data.Name
   ( Name, Author, Package
   , elmBrowser, elmCore, elmHtml, elmJson, elmTime, elmUrl, elmVirtualDom
   , FromTextError(..), fromText
-  , binaryEncoderV0_19_1, binaryDecoderV0_19_1
   , toAuthor, toPackage
   , toText, toString
   , fromTextErrorToString
+  , binaryEncoderV0_19_1, binaryDecoderV0_19_1
   ) where
 
 import qualified Data.Text as T
@@ -112,26 +112,6 @@ isBlank =
 
 
 
--- Binary Encoder
-
-
-
-binaryEncoderV0_19_1 :: Name -> EV0_19_1.Encoder
-binaryEncoderV0_19_1 (Name author project) =
-  EV0_19_1.text author <> EV0_19_1.text project
-
-
-
--- Binary Decoder
-
-
-
-binaryDecoderV0_19_1 :: DV0_19_1.Decoder Name
-binaryDecoderV0_19_1 =
-  Name <$> DV0_19_1.text <*> DV0_19_1.text
-
-
-
 -- Convert
 
 
@@ -158,3 +138,18 @@ fromTextErrorToString :: FromTextError -> String
 fromTextErrorToString EmptyAuthor         = "author is empty"
 fromTextErrorToString EmptyPackage        = "package is empty"
 fromTextErrorToString MissingForwardSlash = "/ is missing"
+
+
+
+-- Binary Encoder/Decoder for Elm 0.19.1
+
+
+
+binaryEncoderV0_19_1 :: Name -> EV0_19_1.Encoder
+binaryEncoderV0_19_1 (Name author project) =
+  EV0_19_1.text author <> EV0_19_1.text project
+
+
+binaryDecoderV0_19_1 :: DV0_19_1.Decoder Name
+binaryDecoderV0_19_1 =
+  Name <$> DV0_19_1.text <*> DV0_19_1.text
