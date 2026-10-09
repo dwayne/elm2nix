@@ -10,7 +10,7 @@ import qualified Elm2Nix.Data.Version as Version
 import qualified Json.Decode as JD
 
 import Control.Exception (evaluate)
-import Elm2Nix.Data.Version (Version(..), versionDecoder)
+import Elm2Nix.Data.Version (Version(..))
 import Test.Hspec
 
 
@@ -18,9 +18,9 @@ spec :: Spec
 spec =
   describe "Elm2Nix.Data.Version" $ do
     fromTextSpec
-    versionDecoderSpec
     orderSpec
     showSpec
+    jsonDecoderSpec
     binarySerializationV0_19_1Spec
 
 
@@ -42,22 +42,6 @@ fromTextSpec =
         Version.fromText "1.2.65536" `shouldBe` Nothing
 
 
-versionDecoderSpec :: Spec
-versionDecoderSpec =
-  describe "versionDecoder" $ do
-    it "example 1" $
-      JD.decodeText versionDecoder "\"1.2.3\"" `shouldBe` Right (Version 1 2 3)
-
-    it "example 2" $
-      JD.decodeText versionDecoder "\"1.2\"" `shouldSatisfy`
-        \case
-          Left (JD.DecodeError (JD.Failure "version is invalid: 1.2" _)) ->
-            True
-
-          _ ->
-            False
-
-
 orderSpec :: Spec
 orderSpec =
   describe "order" $
@@ -75,9 +59,25 @@ showSpec =
       show (Version 1 2 3) `shouldBe` "1.2.3"
 
 
+jsonDecoderSpec :: Spec
+jsonDecoderSpec =
+  describe "jsonDecoder" $ do
+    it "example 1" $
+      JD.decodeText Version.jsonDecoder "\"1.2.3\"" `shouldBe` Right (Version 1 2 3)
+
+    it "example 2" $
+      JD.decodeText Version.jsonDecoder "\"1.2\"" `shouldSatisfy`
+        \case
+          Left (JD.DecodeError (JD.Failure "version is invalid: 1.2" _)) ->
+            True
+
+          _ ->
+            False
+
+
 binarySerializationV0_19_1Spec :: Spec
 binarySerializationV0_19_1Spec =
-  describe "binary serialization v0.19.1" $ do
+  describe "binary serialization for Elm 0.19.1" $ do
     describe "encode" $ do
       describe "when major, minor, and patch are all less than 256" $
         it "encodes using 8-bits each" $

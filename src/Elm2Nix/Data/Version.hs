@@ -3,7 +3,7 @@
 module Elm2Nix.Data.Version
   ( Version(..)
   , fromText
-  , versionDecoder
+  , jsonDecoder
   , binaryEncoderV0_19_1, binaryDecoderV0_19_1
   ) where
 
@@ -39,7 +39,7 @@ instance Show Version where
 
 
 instance FromJson Version where
-  decoder = versionDecoder
+  decoder = jsonDecoder
 
 
 
@@ -115,8 +115,8 @@ maxWord16 =
 
 
 
-versionDecoder :: JD.Decoder Version
-versionDecoder =
+jsonDecoder :: JD.Decoder Version
+jsonDecoder =
   JD.text >>= \t ->
     case fromText t of
       Just version ->
@@ -127,7 +127,7 @@ versionDecoder =
 
 
 
--- Binary Encoder
+-- Binary Encoder/Decoder for Elm 0.19.1
 
 
 
@@ -138,11 +138,6 @@ binaryEncoderV0_19_1 (Version major minor patch) =
 
   else
     EV0_19_1.w8 255 <> EV0_19_1.w16 major <> EV0_19_1.w16 minor <> EV0_19_1.w16 patch
-
-
-
--- Binary Decoder
-
 
 
 binaryDecoderV0_19_1 :: DV0_19_1.Decoder Version
