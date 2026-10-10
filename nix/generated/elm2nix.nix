@@ -4,7 +4,7 @@
 }:
 mkDerivation {
   pname = "elm2nix";
-  version = "0.1.0.0";
+  version = "0.2.0.0";
   src = ../..;
   isLibrary = true;
   isExecutable = true;
@@ -21,6 +21,6 @@ mkDerivation {
   doHaddock = false;
   doCheck = false;
   description = "Create Elm support files to be used when compiling Elm applications with Nix";
-  license = lib.licenses.bsd3;
+  license = lib.meta.getLicenseFromSpdxId "BSD-3-Clause";
   mainProgram = "elm2nix";
 }

@@ -8,13 +8,16 @@ module Elm2Nix.Data.Name
   , toText, toString
   , fromTextErrorToString
   , binaryEncoderV0_19_1, binaryDecoderV0_19_1
+  , binaryEncoderV0_19_3, binaryDecoderV0_19_3
   ) where
 
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.Bytes.DecodeV0_19_3 as DV0_19_3
 import qualified Elm2Nix.Data.Bytes.Encode as BE
 import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
+import qualified Elm2Nix.Data.Bytes.EncodeV0_19_3 as EV0_19_3
 
 import Data.Text (Text)
 
@@ -155,3 +158,18 @@ binaryEncoderV0_19_1 (Name author project) =
 binaryDecoderV0_19_1 :: BD.Decoder Name
 binaryDecoderV0_19_1 =
   Name <$> DV0_19_1.text <*> DV0_19_1.text
+
+
+
+-- Binary Encoder/Decoder for Elm 0.19.3
+
+
+
+binaryEncoderV0_19_3 :: Name -> BE.Encoder
+binaryEncoderV0_19_3 (Name author project) =
+  EV0_19_3.string8 author <> EV0_19_3.string8 project
+
+
+binaryDecoderV0_19_3 :: BD.Decoder Name
+binaryDecoderV0_19_3 =
+  Name <$> DV0_19_3.string8 <*> DV0_19_3.string8
