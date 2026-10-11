@@ -17,6 +17,7 @@ spec =
     fromTextSpec
     toTextSpec
     binarySerializationV0_19_1Spec
+    binarySerializationV0_19_3Spec
 
 
 fromTextSpec :: Spec
@@ -71,3 +72,24 @@ binarySerializationV0_19_1Spec =
     describe "decode" $
       it "example 1" $
         BD.decode Name.binaryDecoderV0_19_1 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Right Name.elmHtml
+
+
+binarySerializationV0_19_3Spec :: Spec
+binarySerializationV0_19_3Spec =
+  describe "binary serialization for Elm 0.19.3" $ do
+    describe "encode" $
+      it "example 1" $
+        let
+          expectedByteString =
+            LBS.pack
+              [ 0x03                   -- length of the UTF-8 encoding of "elm" (mod 256)
+              , 0x65, 0x6C, 0x6D       -- UTF-8 encoding of "elm"
+              , 0x04                   -- length of the UTF-8 encoding of "core" (mod 256)
+              , 0x63, 0x6F, 0x72, 0x65 -- UTF-8 encoding of "core"
+              ]
+        in
+        BE.encode (Name.binaryEncoderV0_19_3 Name.elmCore) `shouldBe` expectedByteString
+
+    describe "decode" $
+      it "example 1" $
+        BD.decode Name.binaryDecoderV0_19_3 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Right Name.elmHtml

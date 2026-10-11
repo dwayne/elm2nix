@@ -126,7 +126,7 @@ writeRegistryDatFile input output = do
   result <- ElmLock.fromFile input
   case result of
     Right elmLock ->
-      Right <$> LBS.writeFile output (RegistryDat.toLazyByteString V0_19_1 $ RegistryDat.fromElmLock elmLock)
+      Right <$> LBS.writeFile output (RegistryDat.toLazyByteString V0_19_3 $ RegistryDat.fromElmLock elmLock)
 
     Left err ->
       return $ Left (input, err)
@@ -150,7 +150,7 @@ viewRegistryDatFile compact input = do
   --
   -- TODO: Improve error handling.
   --
-  result <- RegistryDat.fromLazyByteString V0_19_1 <$> LBS.readFile input
+  result <- RegistryDat.fromLazyByteString V0_19_3 <$> LBS.readFile input
 
   case result of
     Right registryDat ->

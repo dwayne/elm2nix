@@ -50,8 +50,10 @@ library
     Elm2Nix.CLI
     Elm2Nix.Data.Bytes.Decode
     Elm2Nix.Data.Bytes.DecodeV0_19_1
+    Elm2Nix.Data.Bytes.DecodeV0_19_3
     Elm2Nix.Data.Bytes.Encode
     Elm2Nix.Data.Bytes.EncodeV0_19_1
+    Elm2Nix.Data.Bytes.EncodeV0_19_3
     Elm2Nix.Data.Dependency
     Elm2Nix.Data.ElmJson
     Elm2Nix.Data.ElmLock
