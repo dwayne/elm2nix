@@ -17,9 +17,9 @@ data CLI
 
 data LockOptions
   = LockOptions
-    { loInputs :: [FilePath]
+    { loInFiles :: [FilePath]
     , loCompact :: Bool
-    , loOutput :: FilePath
+    , loOutFile :: FilePath
     }
   deriving (Eq, Show)
 
@@ -91,21 +91,21 @@ registryCommands =
 
 lockOptions :: Parser LockOptions
 lockOptions =
-  LockOptions <$> elmJsonInputArgument <*> isCompactOption <*> elmLockOutputOption
+  LockOptions <$> elmJsonInFilesArgument <*> isCompactOption <*> elmLockOutFileOption
 
 
 generateOptions :: Parser GenerateOptions
 generateOptions =
-  GenerateOptions <$> elmVersionOption <*> elmLockInputOption <*> registryOutputOption
+  GenerateOptions <$> elmVersionOption <*> elmLockInFileOption <*> registryOutFileOption
 
 
 viewOptions :: Parser ViewOptions
 viewOptions =
-  ViewOptions <$> elmVersionOption <*> isCompactOption <*> registryInputOption
+  ViewOptions <$> elmVersionOption <*> isCompactOption <*> registryInFileOption
 
 
-elmJsonInputArgument :: Parser [FilePath]
-elmJsonInputArgument =
+elmJsonInFilesArgument :: Parser [FilePath]
+elmJsonInFilesArgument =
   withDefault <$> many
     (strArgument $ mconcat
       [ metavar "FILE..."
@@ -126,8 +126,8 @@ isCompactOption =
     ]
 
 
-elmLockInputOption :: Parser FilePath
-elmLockInputOption =
+elmLockInFileOption :: Parser FilePath
+elmLockInFileOption =
   strOption $ mconcat
     [ long "input"
     , short 'i'
@@ -138,8 +138,8 @@ elmLockInputOption =
     ]
 
 
-elmLockOutputOption :: Parser FilePath
-elmLockOutputOption =
+elmLockOutFileOption :: Parser FilePath
+elmLockOutFileOption =
   strOption $ mconcat
     [ long "output"
     , short 'o'
@@ -150,8 +150,8 @@ elmLockOutputOption =
     ]
 
 
-registryInputOption :: Parser FilePath
-registryInputOption =
+registryInFileOption :: Parser FilePath
+registryInFileOption =
   strOption $ mconcat
     [ long "input"
     , short 'i'
@@ -162,8 +162,8 @@ registryInputOption =
     ]
 
 
-registryOutputOption :: Parser FilePath
-registryOutputOption =
+registryOutFileOption :: Parser FilePath
+registryOutFileOption =
   strOption $ mconcat
     [ long "output"
     , short 'o'
