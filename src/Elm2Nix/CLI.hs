@@ -177,6 +177,8 @@ elmVersionOption :: Parser ElmVersion
 elmVersionOption =
   option readElmVersion $ mconcat
     [ long "elm-version"
+    , value V0_19_3
+    , showDefault
     , metavar "ELM_VERSION"
     , help "The version, either 0.19.1 or 0.19.3, of the registry.dat file"
     ]
