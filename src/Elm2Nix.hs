@@ -5,14 +5,10 @@ module Elm2Nix
   , WriteElmLockFileError(..), writeElmLockFileErrorToText
   , writeRegistryDatFile
   , WriteRegistryDatFileError, writeRegistryDatFileErrorToText
-  , viewRegistryDatFile
-  , ViewRegistryDatFileError, viewRegistryDatFileErrorToText
   ) where
 
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
-import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
@@ -26,7 +22,6 @@ import qualified Json.Encode as JE
 import Data.Text (Text)
 import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
-import System.IO (stdout)
 
 
 
@@ -134,44 +129,3 @@ writeRegistryDatFile input output = do
 
 writeRegistryDatFileErrorToText :: FilePath -> WriteRegistryDatFileError -> Text
 writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText
-
-
-
--- viewRegistryDatFile
-
-
-
-data ViewRegistryDatFileError
-  = DecodeError FilePath BD.DecodeError
-
-
-viewRegistryDatFile :: Bool -> FilePath -> IO (Either ViewRegistryDatFileError ())
-viewRegistryDatFile compact input = do
-  --
-  -- TODO: Improve error handling.
-  --
-  result <- RegistryDat.fromLazyByteString V0_19_3 <$> LBS.readFile input
-
-  case result of
-    Right registryDat ->
-      let
-        ( put, toText ) =
-          if compact then
-            ( TIO.hPutStr, Json.compact )
-
-          else
-            ( TIO.hPutStrLn, Json.pretty 4 )
-      in
-      Right <$> put stdout (toText $ RegistryDat.toJson registryDat)
-
-    Left err ->
-      return $ Left $ DecodeError input err
-
-
-viewRegistryDatFileErrorToText :: ViewRegistryDatFileError -> Text
-viewRegistryDatFileErrorToText err =
-  case err of
-    DecodeError path details ->
-      case details of
-        BD.Failure _ _ message ->
-          "Corrupted bytes in " <> T.pack path <> ": " <> T.pack message

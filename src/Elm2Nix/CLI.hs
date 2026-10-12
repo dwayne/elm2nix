@@ -5,6 +5,7 @@ module Elm2Nix.CLI
   , runIO, run
   ) where
 
+import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Options.Applicative
 
 
@@ -39,7 +40,8 @@ data GenerateOptions
 
 data ViewOptions
   = ViewOptions
-    { voCompact :: Bool
+    { voElmVersion :: ElmVersion
+    , voCompact :: Bool
     , voInput :: FilePath
     }
   deriving (Eq, Show)
@@ -98,7 +100,7 @@ generateOptions =
 
 viewOptions :: Parser ViewOptions
 viewOptions =
-  ViewOptions <$> isCompactOption <*> registryInputOption
+  ViewOptions <$> elmVersionOption <*> isCompactOption <*> registryInputOption
 
 
 elmJsonInputArgument :: Parser [FilePath]
@@ -169,3 +171,28 @@ registryOutputOption =
     , metavar "FILE"
     , help "The path to the registry.dat file"
     ]
+
+
+elmVersionOption :: Parser ElmVersion
+elmVersionOption =
+  option readElmVersion $ mconcat
+    [ long "elm-version"
+    , metavar "ELM_VERSION"
+    , help "The version, either 0.19.1 or 0.19.3, of the registry.dat file"
+    ]
+
+
+readElmVersion :: ReadM ElmVersion
+readElmVersion =
+  eitherReader
+    (\s ->
+      case s of
+        "0.19.1" ->
+          Right V0_19_1
+
+        "0.19.3" ->
+          Right V0_19_3
+
+        _ ->
+          Left ("must be either 0.19.1 or 0.19.3: " ++ s)
+    )
