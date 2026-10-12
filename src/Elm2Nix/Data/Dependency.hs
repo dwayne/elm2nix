@@ -6,12 +6,14 @@ import qualified Elm2Nix.Data.Name as Name
 
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
-import Elm2Nix.Lib.Nix (Url)
 
 
 data Dependency
   = Dependency Name Version
   deriving (Eq, Ord)
+
+
+type Url = String
 
 
 

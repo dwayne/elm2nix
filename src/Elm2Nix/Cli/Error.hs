@@ -9,7 +9,7 @@ import qualified Elm2Nix.Command.WriteRegistryDatFile as WriteRegistryDatFile
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
-import qualified Elm2Nix.Lib.Nix as Nix
+import qualified Elm2Nix.Lib.NixPrefetchUrl as NixPrefetchUrl
 import qualified Json.Decode as JD
 
 import Data.Text (Text)
@@ -50,13 +50,13 @@ fromDependenciesErrorToText =
   T.unlines . map (\(d, err) -> T.pack (Dependency.toString d) <> ": " <> nixPrefetchUrlErrorToText err)
 
 
-nixPrefetchUrlErrorToText :: Nix.NixPrefetchUrlError -> Text
+nixPrefetchUrlErrorToText :: NixPrefetchUrl.Error -> Text
 nixPrefetchUrlErrorToText err =
   case err of
-    Nix.ProcessError details ->
+    NixPrefetchUrl.ProcessError details ->
       "nix-prefetch-url encountered problems: " <> T.pack details
 
-    Nix.BadOutput details ->
+    NixPrefetchUrl.BadOutput details ->
       "nix-prefetch-url got unexpected output: " <> T.pack details
 
 

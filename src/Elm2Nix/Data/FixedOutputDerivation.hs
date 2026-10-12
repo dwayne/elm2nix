@@ -12,6 +12,7 @@ import qualified Data.Text as T
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.Name as Name
+import qualified Elm2Nix.Lib.NixPrefetchUrl as NixPrefetchUrl
 import qualified Json.Encode as JE
 
 import Data.Bifunctor (first)
@@ -20,7 +21,6 @@ import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.Name (Name)
 import Elm2Nix.Data.Version (Version)
-import Elm2Nix.Lib.Nix (NixPrefetchUrlError, NixPrefetchUrlOutput(..), Sha256, nixPrefetchUrl)
 import Json.Encode (ToJson(encode))
 import UnliftIO.Async (pooledMapConcurrently)
 
@@ -28,7 +28,7 @@ import UnliftIO.Async (pooledMapConcurrently)
 data FixedOutputDerivation
   = FixedOutputDerivation
       { _dependency :: Dependency
-      , _hash :: Sha256
+      , _hash :: NixPrefetchUrl.Sha256
       , _path :: FilePath
       }
   deriving (Eq, Ord, Show)
@@ -54,15 +54,15 @@ instance ToJson FixedOutputDerivation where
 
 
 
-type FromDependencyError = NixPrefetchUrlError
+type FromDependencyError = NixPrefetchUrl.Error
 
 
 fromDependency :: Dependency -> IO (Either FromDependencyError FixedOutputDerivation)
 fromDependency dependency =
-  fmap toFOD <$> nixPrefetchUrl (Dependency.toUrl dependency) (Dependency.toString dependency)
+  fmap toFOD <$> NixPrefetchUrl.run (Dependency.toUrl dependency) (Dependency.toString dependency)
   where
-    toFOD :: NixPrefetchUrlOutput -> FixedOutputDerivation
-    toFOD (NixPrefetchUrlOutput hash path) =
+    toFOD :: NixPrefetchUrl.Output -> FixedOutputDerivation
+    toFOD (NixPrefetchUrl.Output hash path) =
       FixedOutputDerivation dependency hash path
 
 
@@ -70,7 +70,7 @@ fromNameAndVersion :: Name -> Version -> IO (Either FromDependencyError FixedOut
 fromNameAndVersion name = fromDependency . Dependency name
 
 
-type FromDependenciesError = [( Dependency, NixPrefetchUrlError )]
+type FromDependenciesError = [( Dependency, NixPrefetchUrl.Error )]
 
 
 fromDependencies :: [Dependency] -> IO (Either FromDependenciesError [FixedOutputDerivation])
@@ -99,7 +99,7 @@ toDependency :: FixedOutputDerivation -> Dependency
 toDependency (FixedOutputDerivation dependency _ _) = dependency
 
 
-toHash :: FixedOutputDerivation -> Sha256
+toHash :: FixedOutputDerivation -> NixPrefetchUrl.Sha256
 toHash (FixedOutputDerivation _ hash _) = hash
 
 

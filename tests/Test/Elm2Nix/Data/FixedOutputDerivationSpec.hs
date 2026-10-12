@@ -2,12 +2,12 @@ module Test.Elm2Nix.Data.FixedOutputDerivationSpec (spec) where
 
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
 import qualified Elm2Nix.Data.Name as Name
+import qualified Elm2Nix.Lib.NixPrefetchUrl as NixPrefetchUrl
 
 import Data.Bifunctor (second)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.FixedOutputDerivation (FromDependenciesError)
 import Elm2Nix.Data.Version (Version(..))
-import Elm2Nix.Lib.Nix (NixPrefetchUrlError(..), Sha256)
 import Test.Hspec
 
 
@@ -44,12 +44,12 @@ fromDependenciesSpec =
             , elmCore
             ]
         in do
-        Left [( dependency, ProcessError err )] <- fromDependencies dependencies
+        Left [( dependency, NixPrefetchUrl.ProcessError err )] <- fromDependencies dependencies
 
         dependency `shouldBe` elmCore
         err `shouldContain` "unable to download 'https://github.com/elm/core/archive/0.0.0.tar.gz'"
 
 
-fromDependencies :: [Dependency] -> IO (Either FromDependenciesError [(Sha256, FilePath)])
+fromDependencies :: [Dependency] -> IO (Either FromDependenciesError [(NixPrefetchUrl.Sha256, FilePath)])
 fromDependencies =
   fmap (second $ map $ (,) <$> FOD.toHash <*> FOD.toPath) . FOD.fromDependencies
