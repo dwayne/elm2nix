@@ -34,8 +34,8 @@ unsafeMain = do
     CLI.Registry (CLI.Generate (CLI.GenerateOptions elmVersion inFile outFile)) ->
       WriteRegistryDatFile.run elmVersion inFile outFile >>= either (die . writeRegistryDatFileErrorToText) return
 
-    CLI.Registry (CLI.View (CLI.ViewOptions elmVersion compact input)) ->
-      ViewRegistryDatFile.run (ViewRegistryDatFile.Input elmVersion compact input) >>= either (die . viewRegistryDatFileErrorToText) return
+    CLI.Registry (CLI.View (CLI.ViewOptions elmVersion compact inFile)) ->
+      ViewRegistryDatFile.run elmVersion compact inFile >>= either (die . viewRegistryDatFileErrorToText) return
 
 
 die :: Text -> IO ()

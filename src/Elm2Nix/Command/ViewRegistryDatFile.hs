@@ -1,4 +1,4 @@
-module Elm2Nix.Command.ViewRegistryDatFile (Input(..), Error(..), run, toRegistryDat) where
+module Elm2Nix.Command.ViewRegistryDatFile (Error(..), run, toRegistryDat) where
 
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text.IO as TIO
@@ -8,19 +8,11 @@ import qualified Json
 import qualified System.IO.Error as IOError
 
 import Control.Exception (tryJust)
+import Data.Function ((&))
 import Elm2Nix.Data.ElmVersion (ElmVersion)
 import Elm2Nix.Data.RegistryDat (RegistryDat)
 import Prelude hiding (readFile)
 import System.IO (stdout)
-
-
-data Input
-  = Input
-      { elmVersion :: ElmVersion
-      , compact :: Bool
-      , file :: FilePath
-      }
-  deriving (Eq, Show)
 
 
 data Error
@@ -29,9 +21,9 @@ data Error
   deriving (Eq, Show)
 
 
-run :: Input -> IO (Either Error ())
-run (Input elmVersion compact file) = do
-  registryDatOrErr <- toRegistryDat elmVersion file
+run :: ElmVersion -> Bool -> FilePath -> IO (Either Error ())
+run elmVersion compact inFile = do
+  registryDatOrErr <- toRegistryDat elmVersion inFile
 
   case registryDatOrErr of
     Right registryDat ->
@@ -42,36 +34,40 @@ run (Input elmVersion compact file) = do
           else
             ( TIO.hPutStrLn, Json.pretty 4 )
       in
-      Right <$> put stdout (toText (RegistryDat.toJson registryDat))
+      registryDat
+        & RegistryDat.toJson
+        & toText
+        & put stdout
+        & fmap Right
 
     Left err ->
-      return (Left err)
+      return $ Left err
 
 
 toRegistryDat :: ElmVersion -> FilePath -> IO (Either Error RegistryDat)
-toRegistryDat elmVersion file = do
-  contentsOrErr <- readFile file
+toRegistryDat elmVersion inFile = do
+  contentsOrErr <- readFile inFile
 
   case contentsOrErr of
     Right contents ->
       case RegistryDat.fromLazyByteString elmVersion contents of
         Right registryDat ->
-          return (Right registryDat)
+          return $ Right registryDat
 
         Left err ->
-          return (Left (DecodeError file err))
+          return $ Left $ DecodeError inFile err
 
     Left err ->
-      return (Left err)
+      return $ Left err
 
 
 readFile :: FilePath -> IO (Either Error LBS.ByteString)
-readFile file =
-  tryJust handleException (LBS.readFile file)
+readFile path =
+  tryJust handleException (LBS.readFile path)
   where
     handleException e =
       if IOError.isDoesNotExistError e then
-        Just (FileNotFound file)
+        Just $ FileNotFound path
 
       else
         Nothing
