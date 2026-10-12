@@ -4,8 +4,8 @@
 module Test.Elm2Nix.Data.VersionSpec (spec) where
 
 import qualified Data.ByteString.Lazy as LBS
-import qualified Elm2Nix.Data.Bytes.Decode as BD
-import qualified Elm2Nix.Data.Bytes.Encode as BE
+import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
+import qualified Elm2Nix.Data.RegistryDat.Encode as RDE
 import qualified Elm2Nix.Data.Version as Version
 import qualified Json.Decode as JD
 
@@ -81,18 +81,18 @@ binarySerializationV0_19_1Spec =
     describe "encode" $ do
       describe "when major, minor, and patch are all less than 256" $
         it "encodes using 8-bits each" $
-          BE.encode (Version.binaryEncoderV0_19_1 $ Version 1 2 3) `shouldBe` LBS.pack [0x01, 0x02, 0x03]
+          RDE.encode (Version.binaryEncoderV0_19_1 $ Version 1 2 3) `shouldBe` LBS.pack [0x01, 0x02, 0x03]
 
       describe "when major is 256 or more" $
         it "encodes using a 255 tag followed by 16-bits each" $
-          BE.encode (Version.binaryEncoderV0_19_1 $ Version 256 2 3) `shouldBe` LBS.pack [0xFF, 0x01, 0x00, 0x00, 0x02, 0x00, 0x03]
+          RDE.encode (Version.binaryEncoderV0_19_1 $ Version 256 2 3) `shouldBe` LBS.pack [0xFF, 0x01, 0x00, 0x00, 0x02, 0x00, 0x03]
 
     describe "decode" $ do
       it "example 1" $
-        BD.decode Version.binaryDecoderV0_19_1 (LBS.pack [0x01, 0x00, 0x05]) `shouldBe` Right (Version 1 0 5)
+        RDD.decode Version.binaryDecoderV0_19_1 (LBS.pack [0x01, 0x00, 0x05]) `shouldBe` Right (Version 1 0 5)
 
       it "example 2" $
-        BD.decode Version.binaryDecoderV0_19_1 (LBS.pack [0xFF, 0x01, 0x01, 0x00, 0x00, 0xFF, 0xFF]) `shouldBe` Right (Version 257 0 65535)
+        RDD.decode Version.binaryDecoderV0_19_1 (LBS.pack [0xFF, 0x01, 0x01, 0x00, 0x00, 0xFF, 0xFF]) `shouldBe` Right (Version 257 0 65535)
 
     describe "when major is 255" $
       it "does the wrong thing" $
@@ -109,9 +109,9 @@ binarySerializationV0_19_1Spec =
         -- Even the following major < 255 && minor < 256 && patch < 256 works. We just can't have major = 255
         -- when encoding each part using 8-bits.
         --
-        BD.decode Version.binaryDecoderV0_19_1 (BE.encode (Version.binaryEncoderV0_19_1 $ Version 255 2 3))
+        RDD.decode Version.binaryDecoderV0_19_1 (RDE.encode (Version.binaryEncoderV0_19_1 $ Version 255 2 3))
         `shouldBe`
-        Left (BD.Failure LBS.empty 3 "not enough bytes")
+        Left (RDD.Failure LBS.empty 3 "not enough bytes")
 
 
 binarySerializationV0_19_3Spec :: Spec
@@ -120,22 +120,22 @@ binarySerializationV0_19_3Spec =
     describe "encode" $ do
       describe "when major, minor, and patch are all less than 256" $
         it "encodes using 8-bits each" $
-          BE.encode (Version.binaryEncoderV0_19_3 $ Version 1 2 3) `shouldBe` LBS.pack [0x01, 0x02, 0x03]
+          RDE.encode (Version.binaryEncoderV0_19_3 $ Version 1 2 3) `shouldBe` LBS.pack [0x01, 0x02, 0x03]
 
       describe "when major is 256 or more" $
         it "encodes using a 255 tag followed by 16-bits each" $
-          BE.encode (Version.binaryEncoderV0_19_3 $ Version 256 2 3) `shouldBe` LBS.pack [0xFF, 0x00, 0x01, 0x02, 0x00, 0x03, 0x00]
+          RDE.encode (Version.binaryEncoderV0_19_3 $ Version 256 2 3) `shouldBe` LBS.pack [0xFF, 0x00, 0x01, 0x02, 0x00, 0x03, 0x00]
 
     describe "decode" $ do
       it "example 1" $
-        BD.decode Version.binaryDecoderV0_19_3 (LBS.pack [0x01, 0x00, 0x05]) `shouldBe` Right (Version 1 0 5)
+        RDD.decode Version.binaryDecoderV0_19_3 (LBS.pack [0x01, 0x00, 0x05]) `shouldBe` Right (Version 1 0 5)
 
       it "example 2" $
-        BD.decode Version.binaryDecoderV0_19_3 (LBS.pack [0xFF, 0x01, 0x01, 0x00, 0x00, 0xFF, 0xFF]) `shouldBe` Right (Version 257 0 65535)
+        RDD.decode Version.binaryDecoderV0_19_3 (LBS.pack [0xFF, 0x01, 0x01, 0x00, 0x00, 0xFF, 0xFF]) `shouldBe` Right (Version 257 0 65535)
 
     describe "when major is 255" $ do
       it "example 1" $
-        BE.encode (Version.binaryEncoderV0_19_3 $ Version 255 2 3) `shouldBe` LBS.pack [0xFF, 0xFF, 0x00, 0x02, 0x00, 0x03, 0x00]
+        RDE.encode (Version.binaryEncoderV0_19_3 $ Version 255 2 3) `shouldBe` LBS.pack [0xFF, 0xFF, 0x00, 0x02, 0x00, 0x03, 0x00]
 
       it "example 2" $
-        BD.decode Version.binaryDecoderV0_19_3 (LBS.pack [0xFF, 0xFF, 0x00, 0x02, 0x00, 0x03, 0x00]) `shouldBe` Right (Version 255 2 3)
+        RDD.decode Version.binaryDecoderV0_19_3 (LBS.pack [0xFF, 0xFF, 0x00, 0x02, 0x00, 0x03, 0x00]) `shouldBe` Right (Version 255 2 3)

@@ -1,4 +1,4 @@
-module Elm2Nix.Data.Bytes.Decode (Decoder, DecodeError(..), decode) where
+module Elm2Nix.Data.RegistryDat.Decode (Decoder, DecodeError(..), decode) where
 
 import qualified Data.ByteString.Lazy as LBS
 

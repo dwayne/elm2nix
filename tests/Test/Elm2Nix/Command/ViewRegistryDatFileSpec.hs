@@ -3,12 +3,12 @@
 module Test.Elm2Nix.Command.ViewRegistryDatFileSpec (spec) where
 
 import qualified Elm2Nix.Command.ViewRegistryDatFile as ViewRegistryDatFile
-import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
+import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
 
 import Elm2Nix.Data.Dependency (Dependency(..))
-import Elm2Nix.Data.ElmVersion (ElmVersion(..))
+import Elm2Nix.Data.RegistryDat.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.Version (Version(..))
 import Test.Fixtures (fixture)
 import Test.Hspec
@@ -50,7 +50,7 @@ toRegistryDatSpec =
 
         it "when the file is corrupted" $ do
           file <- fixture "0.19.1/corrupted.dat"
-          Left (ViewRegistryDatFile.DecodeError _ (BD.Failure _ _ message)) <- view file
+          Left (ViewRegistryDatFile.DecodeError _ (RDD.Failure _ _ message)) <- view file
           message `shouldBe` "not enough bytes"
 
     describe "when Elm 0.19.3" $
@@ -81,5 +81,5 @@ toRegistryDatSpec =
 
         it "when the file is corrupted" $ do
           file <- fixture "0.19.3/corrupted.dat"
-          Left (ViewRegistryDatFile.DecodeError _ (BD.Failure _ _ message)) <- view file
+          Left (ViewRegistryDatFile.DecodeError _ (RDD.Failure _ _ message)) <- view file
           message `shouldBe` "not enough bytes"

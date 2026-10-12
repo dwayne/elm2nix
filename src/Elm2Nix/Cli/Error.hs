@@ -6,9 +6,9 @@ import qualified Data.Text as T
 import qualified Elm2Nix.Command.ViewRegistryDatFile as ViewRegistryDatFile
 import qualified Elm2Nix.Command.WriteElmLockFile as WriteElmLockFile
 import qualified Elm2Nix.Command.WriteRegistryDatFile as WriteRegistryDatFile
-import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
+import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
 import qualified Elm2Nix.Lib.Nix as Nix
 import qualified Json.Decode as JD
 
@@ -92,5 +92,5 @@ viewRegistryDatFileErrorToText err =
 
     ViewRegistryDatFile.DecodeError path decodeError ->
       case decodeError of
-        BD.Failure _ _ message ->
+        RDD.Failure _ _ message ->
           "Corrupted bytes in " <> T.pack path <> ": " <> T.pack message

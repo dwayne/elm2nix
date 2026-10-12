@@ -1,4 +1,4 @@
-module Elm2Nix.Data.Bytes.EncodeV0_19_3 (u8, u16, int, string8, list32, dict32) where
+module Elm2Nix.Data.RegistryDat.EncodeV0_19_3 (u8, u16, int, string8, list32, dict32) where
 
 import qualified Data.ByteString as BS
 import qualified Data.Map as Map
@@ -8,7 +8,7 @@ import Data.Binary.Builder (fromByteString, putInt64le, putWord16le, putWord32le
 import Data.Map (Map)
 import Data.Text (Text)
 import Data.Word (Word8, Word16, Word32)
-import Elm2Nix.Data.Bytes.Encode (Encoder)
+import Elm2Nix.Data.RegistryDat.Encode (Encoder)
 
 
 u8 :: Word8 -> Encoder

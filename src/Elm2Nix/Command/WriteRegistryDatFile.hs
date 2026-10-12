@@ -6,7 +6,7 @@ import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Json.Decode as JD
 
 import Data.Function ((&))
-import Elm2Nix.Data.ElmVersion (ElmVersion)
+import Elm2Nix.Data.RegistryDat.ElmVersion (ElmVersion)
 
 
 data Error

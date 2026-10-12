@@ -10,12 +10,12 @@ module Elm2Nix.Data.Version
 
 import qualified Data.Char as Char
 import qualified Data.Text as T
-import qualified Elm2Nix.Data.Bytes.Decode as BD
-import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
-import qualified Elm2Nix.Data.Bytes.DecodeV0_19_3 as DV0_19_3
-import qualified Elm2Nix.Data.Bytes.Encode as BE
-import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
-import qualified Elm2Nix.Data.Bytes.EncodeV0_19_3 as EV0_19_3
+import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
+import qualified Elm2Nix.Data.RegistryDat.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.RegistryDat.DecodeV0_19_3 as DV0_19_3
+import qualified Elm2Nix.Data.RegistryDat.Encode as RDE
+import qualified Elm2Nix.Data.RegistryDat.EncodeV0_19_1 as EV0_19_1
+import qualified Elm2Nix.Data.RegistryDat.EncodeV0_19_3 as EV0_19_3
 import qualified Json.Decode as JD
 
 import Control.Applicative (liftA3)
@@ -136,7 +136,7 @@ jsonDecoder =
 
 
 
-binaryEncoderV0_19_1 :: Version -> BE.Encoder
+binaryEncoderV0_19_1 :: Version -> RDE.Encoder
 binaryEncoderV0_19_1 (Version major minor patch) =
   if major < 256 && minor < 256 && patch < 256 then
     EV0_19_1.w16To8 major <> EV0_19_1.w16To8 minor <> EV0_19_1.w16To8 patch
@@ -145,7 +145,7 @@ binaryEncoderV0_19_1 (Version major minor patch) =
     EV0_19_1.w8 255 <> EV0_19_1.w16 major <> EV0_19_1.w16 minor <> EV0_19_1.w16 patch
 
 
-binaryDecoderV0_19_1 :: BD.Decoder Version
+binaryDecoderV0_19_1 :: RDD.Decoder Version
 binaryDecoderV0_19_1 = do
   major <- DV0_19_1.w8To16
   if major == 255 then
@@ -159,7 +159,7 @@ binaryDecoderV0_19_1 = do
 
 
 
-binaryEncoderV0_19_3 :: Version -> BE.Encoder
+binaryEncoderV0_19_3 :: Version -> RDE.Encoder
 binaryEncoderV0_19_3 (Version major minor patch) =
   if major < 255 && minor < 256 && patch < 256 then
     EV0_19_3.u8 (fromIntegral major) <> EV0_19_3.u8 (fromIntegral minor) <> EV0_19_3.u8 (fromIntegral patch)
@@ -168,7 +168,7 @@ binaryEncoderV0_19_3 (Version major minor patch) =
     EV0_19_3.u8 255 <> EV0_19_3.u16 major <> EV0_19_3.u16 minor <> EV0_19_3.u16 patch
 
 
-binaryDecoderV0_19_3 :: BD.Decoder Version
+binaryDecoderV0_19_3 :: RDD.Decoder Version
 binaryDecoderV0_19_3 = do
   major <- DV0_19_3.u8
   if major == 255 then

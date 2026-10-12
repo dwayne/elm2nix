@@ -3,9 +3,9 @@
 module Test.Elm2Nix.Data.NameSpec (spec) where
 
 import qualified Data.ByteString.Lazy as LBS
-import qualified Elm2Nix.Data.Bytes.Decode as BD
-import qualified Elm2Nix.Data.Bytes.Encode as BE
 import qualified Elm2Nix.Data.Name as Name
+import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
+import qualified Elm2Nix.Data.RegistryDat.Encode as RDE
 
 import Data.Foldable (traverse_)
 import Test.Hspec
@@ -67,11 +67,11 @@ binarySerializationV0_19_1Spec =
               , 0x63, 0x6F, 0x72, 0x65 -- UTF-8 encoding of "core"
               ]
         in
-        BE.encode (Name.binaryEncoderV0_19_1 Name.elmCore) `shouldBe` expectedByteString
+        RDE.encode (Name.binaryEncoderV0_19_1 Name.elmCore) `shouldBe` expectedByteString
 
     describe "decode" $
       it "example 1" $
-        BD.decode Name.binaryDecoderV0_19_1 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Right Name.elmHtml
+        RDD.decode Name.binaryDecoderV0_19_1 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Right Name.elmHtml
 
 
 binarySerializationV0_19_3Spec :: Spec
@@ -88,8 +88,8 @@ binarySerializationV0_19_3Spec =
               , 0x63, 0x6F, 0x72, 0x65 -- UTF-8 encoding of "core"
               ]
         in
-        BE.encode (Name.binaryEncoderV0_19_3 Name.elmCore) `shouldBe` expectedByteString
+        RDE.encode (Name.binaryEncoderV0_19_3 Name.elmCore) `shouldBe` expectedByteString
 
     describe "decode" $
       it "example 1" $
-        BD.decode Name.binaryDecoderV0_19_3 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Right Name.elmHtml
+        RDD.decode Name.binaryDecoderV0_19_3 (LBS.pack [0x03, 0x65, 0x6C, 0x6D, 0x04, 0x68, 0x74, 0x6D, 0x6C]) `shouldBe` Right Name.elmHtml

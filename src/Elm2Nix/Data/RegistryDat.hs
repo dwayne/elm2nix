@@ -12,15 +12,15 @@ import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
-import qualified Elm2Nix.Data.Bytes.Decode as BD
-import qualified Elm2Nix.Data.Bytes.DecodeV0_19_1 as DV0_19_1
-import qualified Elm2Nix.Data.Bytes.DecodeV0_19_3 as DV0_19_3
-import qualified Elm2Nix.Data.Bytes.Encode as BE
-import qualified Elm2Nix.Data.Bytes.EncodeV0_19_1 as EV0_19_1
-import qualified Elm2Nix.Data.Bytes.EncodeV0_19_3 as EV0_19_3
 import qualified Elm2Nix.Data.ElmJson as ElmJson
 import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.Name as Name
+import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
+import qualified Elm2Nix.Data.RegistryDat.DecodeV0_19_1 as DV0_19_1
+import qualified Elm2Nix.Data.RegistryDat.DecodeV0_19_3 as DV0_19_3
+import qualified Elm2Nix.Data.RegistryDat.Encode as RDE
+import qualified Elm2Nix.Data.RegistryDat.EncodeV0_19_1 as EV0_19_1
+import qualified Elm2Nix.Data.RegistryDat.EncodeV0_19_3 as EV0_19_3
 import qualified Elm2Nix.Data.Version as Version
 import qualified Json.Encode as JE
 
@@ -33,8 +33,8 @@ import Data.Text (Text)
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.ElmJson (ElmJson)
 import Elm2Nix.Data.ElmLock (ElmLock)
-import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.Name (Name)
+import Elm2Nix.Data.RegistryDat.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.Version (Version)
 import Json.Encode (Json, ToJson)
 
@@ -100,14 +100,14 @@ fromSet =
       ( count + 1, Map.insertWith (<>) name (Set.singleton version) packages )
 
 
-fromLazyByteString :: ElmVersion -> LBS.ByteString -> Either BD.DecodeError RegistryDat
+fromLazyByteString :: ElmVersion -> LBS.ByteString -> Either RDD.DecodeError RegistryDat
 fromLazyByteString v =
   case v of
     V0_19_1 ->
-      BD.decode binaryDecoderV0_19_1
+      RDD.decode binaryDecoderV0_19_1
 
     V0_19_3 ->
-      BD.decode binaryDecoderV0_19_3
+      RDD.decode binaryDecoderV0_19_3
 
 
 
@@ -143,10 +143,10 @@ toLazyByteString :: ElmVersion -> RegistryDat -> LBS.ByteString
 toLazyByteString v =
   case v of
     V0_19_1 ->
-      BE.encode . binaryEncoderV0_19_1
+      RDE.encode . binaryEncoderV0_19_1
 
     V0_19_3 ->
-      BE.encode . binaryEncoderV0_19_3
+      RDE.encode . binaryEncoderV0_19_3
 
 
 
@@ -154,12 +154,12 @@ toLazyByteString v =
 
 
 
-binaryEncoderV0_19_1 :: RegistryDat -> BE.Encoder
+binaryEncoderV0_19_1 :: RegistryDat -> RDE.Encoder
 binaryEncoderV0_19_1 (RegistryDat count packages) =
   EV0_19_1.int count <> EV0_19_1.dict Name.binaryEncoderV0_19_1 versionsBinaryEncoderV0_19_1 packages
 
 
-versionsBinaryEncoderV0_19_1 :: Versions -> BE.Encoder
+versionsBinaryEncoderV0_19_1 :: Versions -> RDE.Encoder
 versionsBinaryEncoderV0_19_1 (Versions versions) =
   case versions of
     v : vs ->
@@ -169,12 +169,12 @@ versionsBinaryEncoderV0_19_1 (Versions versions) =
       error "logic error: no versions found"
 
 
-binaryDecoderV0_19_1 :: BD.Decoder RegistryDat
+binaryDecoderV0_19_1 :: RDD.Decoder RegistryDat
 binaryDecoderV0_19_1 =
   RegistryDat <$> DV0_19_1.int <*> DV0_19_1.dict Name.binaryDecoderV0_19_1 versionsBinaryDecoderV0_19_1
 
 
-versionsBinaryDecoderV0_19_1 :: BD.Decoder Versions
+versionsBinaryDecoderV0_19_1 :: RDD.Decoder Versions
 versionsBinaryDecoderV0_19_1 =
   (\v vs -> Versions $ v : vs) <$> Version.binaryDecoderV0_19_1 <*> DV0_19_1.list Version.binaryDecoderV0_19_1
 
@@ -184,12 +184,12 @@ versionsBinaryDecoderV0_19_1 =
 
 
 
-binaryEncoderV0_19_3 :: RegistryDat -> BE.Encoder
+binaryEncoderV0_19_3 :: RegistryDat -> RDE.Encoder
 binaryEncoderV0_19_3 (RegistryDat count packages) =
   EV0_19_3.int count <> EV0_19_3.dict32 Name.binaryEncoderV0_19_3 versionsBinaryEncoderV0_19_3 packages
 
 
-versionsBinaryEncoderV0_19_3 :: Versions -> BE.Encoder
+versionsBinaryEncoderV0_19_3 :: Versions -> RDE.Encoder
 versionsBinaryEncoderV0_19_3 (Versions versions) =
   case versions of
     v : vs ->
@@ -199,11 +199,11 @@ versionsBinaryEncoderV0_19_3 (Versions versions) =
       error "logic error: no versions found"
 
 
-binaryDecoderV0_19_3 :: BD.Decoder RegistryDat
+binaryDecoderV0_19_3 :: RDD.Decoder RegistryDat
 binaryDecoderV0_19_3 =
   RegistryDat <$> DV0_19_3.int <*> DV0_19_3.dict32 Name.binaryDecoderV0_19_3 versionsBinaryDecoderV0_19_3
 
 
-versionsBinaryDecoderV0_19_3 :: BD.Decoder Versions
+versionsBinaryDecoderV0_19_3 :: RDD.Decoder Versions
 versionsBinaryDecoderV0_19_3 =
   (\v vs -> Versions $ v : vs) <$> Version.binaryDecoderV0_19_3 <*> DV0_19_3.list32 Version.binaryDecoderV0_19_3

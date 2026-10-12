@@ -2,22 +2,22 @@ module Elm2Nix.Command.ViewRegistryDatFile (Error(..), run, toRegistryDat) where
 
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text.IO as TIO
-import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
+import qualified Elm2Nix.Data.RegistryDat.Decode as RDD
 import qualified Json
 import qualified System.IO.Error as IOError
 
 import Control.Exception (tryJust)
 import Data.Function ((&))
-import Elm2Nix.Data.ElmVersion (ElmVersion)
 import Elm2Nix.Data.RegistryDat (RegistryDat)
+import Elm2Nix.Data.RegistryDat.ElmVersion (ElmVersion)
 import Prelude hiding (readFile)
 import System.IO (stdout)
 
 
 data Error
   = FileNotFound FilePath
-  | DecodeError FilePath BD.DecodeError
+  | DecodeError FilePath RDD.DecodeError
   deriving (Eq, Show)
 
 

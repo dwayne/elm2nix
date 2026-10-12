@@ -4,9 +4,9 @@ module Test.Elm2Nix.Data.RegistryDatSpec (spec) where
 
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Map as Map
-import qualified Elm2Nix.Data.Bytes.Encode as BE
 import qualified Elm2Nix.Data.Name as Name
 import qualified Elm2Nix.Data.RegistryDat as RegistryDat
+import qualified Elm2Nix.Data.RegistryDat.Encode as RDE
 
 import Elm2Nix.Data.Dependency (Dependency(..))
 import Elm2Nix.Data.Version (Version(..))
@@ -142,7 +142,7 @@ binarySerializationV0_19_1Spec =
               , 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
               ]
         in
-        BE.encode (RegistryDat.binaryEncoderV0_19_1 registryDat) `shouldBe` expectedByteString
+        RDE.encode (RegistryDat.binaryEncoderV0_19_1 registryDat) `shouldBe` expectedByteString
 
 
 binarySerializationV0_19_3Spec :: Spec
@@ -191,4 +191,4 @@ binarySerializationV0_19_3Spec =
               , 0x00, 0x00, 0x00, 0x00
               ]
         in
-        BE.encode (RegistryDat.binaryEncoderV0_19_3 registryDat) `shouldBe` expectedByteString
+        RDE.encode (RegistryDat.binaryEncoderV0_19_3 registryDat) `shouldBe` expectedByteString

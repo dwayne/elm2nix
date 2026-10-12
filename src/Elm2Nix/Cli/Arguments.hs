@@ -5,7 +5,9 @@ module Elm2Nix.Cli.Arguments
   , parseIO, parse
   ) where
 
-import Elm2Nix.Data.ElmVersion (ElmVersion(..))
+import qualified Elm2Nix.Data.RegistryDat.ElmVersion as ElmVersion
+
+import Elm2Nix.Data.RegistryDat.ElmVersion (ElmVersion(..))
 import Options.Applicative
 
 
@@ -189,13 +191,10 @@ readElmVersion :: ReadM ElmVersion
 readElmVersion =
   eitherReader
     (\s ->
-      case s of
-        "0.19.1" ->
-          Right V0_19_1
+      case ElmVersion.fromString s of
+        Just elmVersion ->
+          Right elmVersion
 
-        "0.19.3" ->
-          Right V0_19_3
-
-        _ ->
-          Left ("must be either 0.19.1 or 0.19.3: " ++ s)
+        Nothing ->
+          Left $ "must be either 0.19.1 or 0.19.3: " ++ s
     )
