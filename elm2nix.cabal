@@ -28,7 +28,8 @@ maintainer: maintainer@dwaynecrooks.com
 category: Distribution, Nix
 
 data-files:
-  tests/fixtures/*.dat
+  tests/fixtures/0.19.1/*.dat
+  tests/fixtures/0.19.3/*.dat
   tests/fixtures/*.json
   tests/fixtures/*.lock
 
@@ -48,6 +49,7 @@ library
   exposed-modules:
     Elm2Nix
     Elm2Nix.CLI
+    Elm2Nix.Command.ViewRegistryDatFile
     Elm2Nix.Data.Bytes.Decode
     Elm2Nix.Data.Bytes.DecodeV0_19_1
     Elm2Nix.Data.Bytes.DecodeV0_19_3
@@ -62,7 +64,6 @@ library
     Elm2Nix.Data.Name
     Elm2Nix.Data.RegistryDat
     Elm2Nix.Data.Version
-    Elm2Nix.Lib.Binary
     Elm2Nix.Lib.Nix
 
   build-depends:
@@ -113,6 +114,7 @@ test-suite tests
 
   other-modules:
     Paths_elm2nix
+    Test.Elm2Nix.Command.ViewRegistryDatFileSpec
     Test.Elm2Nix.Data.DependencySpec
     Test.Elm2Nix.Data.ElmJsonSpec
     Test.Elm2Nix.Data.ElmLockSpec
@@ -120,7 +122,6 @@ test-suite tests
     Test.Elm2Nix.Data.NameSpec
     Test.Elm2Nix.Data.RegistryDatSpec
     Test.Elm2Nix.Data.VersionSpec
-    Test.Elm2Nix.Lib.BinarySpec
     Test.Elm2Nix.Lib.NixSpec
     Test.Fixtures
 
