@@ -47,7 +47,8 @@ library
   ghc-options: -Wall -Wno-name-shadowing
 
   exposed-modules:
-    Elm2Nix.CLI
+    Elm2Nix.Cli.Arguments
+    Elm2Nix.Cli.Error
     Elm2Nix.Command.ViewRegistryDatFile
     Elm2Nix.Command.WriteElmLockFile
     Elm2Nix.Command.WriteRegistryDatFile
@@ -101,7 +102,6 @@ executable elm2nix
   build-depends:
     base ^>=4.20.1,
     elm2nix,
-    json-codec ^>=0.1,
     text ^>=2.1.2
 
 test-suite tests

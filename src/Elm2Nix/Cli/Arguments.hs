@@ -1,15 +1,15 @@
-module Elm2Nix.CLI
-  ( CLI(..)
+module Elm2Nix.Cli.Arguments
+  ( Arguments(..)
   , LockOptions(..)
   , RegistryCommands(..), GenerateOptions(..), ViewOptions(..)
-  , runIO, run
+  , parseIO, parse
   ) where
 
 import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Options.Applicative
 
 
-data CLI
+data Arguments
   = Lock LockOptions
   | Registry RegistryCommands
   deriving (Eq, Show)
@@ -48,14 +48,14 @@ data ViewOptions
   deriving (Eq, Show)
 
 
-runIO :: IO CLI
-runIO =
-  customExecParser preferences cli
+parseIO :: IO Arguments
+parseIO =
+  customExecParser preferences arguments
 
 
-run :: [String] -> ParserResult CLI
-run =
-  execParserPure preferences cli
+parse :: [String] -> ParserResult Arguments
+parse =
+  execParserPure preferences arguments
 
 
 preferences :: ParserPrefs
@@ -66,14 +66,14 @@ preferences =
     ]
 
 
-cli :: ParserInfo CLI
-cli =
+arguments :: ParserInfo Arguments
+arguments =
   info (commands <**> helper) $ mconcat
     [ header "Create Elm support files to be used when compiling Elm applications with Nix"
     ]
 
 
-commands :: Parser CLI
+commands :: Parser Arguments
 commands =
   hsubparser $ mconcat
     [ command "lock" (info (Lock <$> lockOptions) (progDesc "Generate a lock file from one or more elm.json files"))
