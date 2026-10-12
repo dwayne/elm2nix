@@ -8,7 +8,9 @@ import qualified Data.Text.IO as TIO
 import qualified Elm2Nix
 import qualified Elm2Nix.Data.Bytes.Decode as BD
 import qualified Elm2Nix.Command.ViewRegistryDatFile as ViewRegistryDatFile
+import qualified Elm2Nix.Command.WriteRegistryDatFile as WriteRegistryDatFile
 import qualified Elm2Nix.CLI as CLI
+import qualified Json.Decode as JD
 
 import Data.Text (Text)
 import System.Exit (ExitCode, exitFailure)
@@ -26,8 +28,8 @@ unsafeMain = do
     CLI.Lock (CLI.LockOptions inputs compact output) ->
       Elm2Nix.writeElmLockFile inputs compact output >>= either (die . Elm2Nix.writeElmLockFileErrorToText) return
 
-    CLI.Registry (CLI.Generate (CLI.GenerateOptions input output)) ->
-      Elm2Nix.writeRegistryDatFile input output >>= either (die . uncurry Elm2Nix.writeRegistryDatFileErrorToText) return
+    CLI.Registry (CLI.Generate (CLI.GenerateOptions elmVersion inFile outFile)) ->
+      WriteRegistryDatFile.run elmVersion inFile outFile >>= either (die . writeRegistryDatFileErrorToText) return
 
     CLI.Registry (CLI.View (CLI.ViewOptions elmVersion compact input)) ->
       ViewRegistryDatFile.run (ViewRegistryDatFile.Input elmVersion compact input) >>= either (die . viewRegistryDatFileErrorToText) return
@@ -54,6 +56,30 @@ runSafely action =
     handleUnexpected :: E.SomeException -> IO ()
     handleUnexpected e =
       hPutStrLn stderr ("An unexpected error occurred: " ++ E.displayException e) >> exitFailure
+
+
+writeRegistryDatFileErrorToText :: WriteRegistryDatFile.Error -> Text
+writeRegistryDatFileErrorToText err =
+  case err of
+    WriteRegistryDatFile.JsonDecodeError path jsonDecodeError ->
+      jsonDecodeFileErrorToText path jsonDecodeError
+
+
+jsonDecodeFileErrorToText :: FilePath -> JD.Error -> Text
+--
+-- TODO: Improve error messages.
+--
+jsonDecodeFileErrorToText path (JD.EncodingError u) = "Unicode error in " <> T.pack path <> ": " <> T.show u
+jsonDecodeFileErrorToText path (JD.SyntaxError s) = "Syntax error in " <> T.pack path <> ": " <> T.show s
+jsonDecodeFileErrorToText path (JD.DecodeError err) = "JSON decoding error in " <> T.pack path <> ": " <> jsonDecodeErrorToText err
+
+
+jsonDecodeErrorToText :: JD.DecodeError -> Text
+jsonDecodeErrorToText =
+  --
+  -- TODO: Improve error messages.
+  --
+  T.show
 
 
 viewRegistryDatFileErrorToText :: ViewRegistryDatFile.Error -> Text

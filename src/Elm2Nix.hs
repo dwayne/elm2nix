@@ -3,24 +3,18 @@
 module Elm2Nix
   ( writeElmLockFile
   , WriteElmLockFileError(..), writeElmLockFileErrorToText
-  , writeRegistryDatFile
-  , WriteRegistryDatFileError, writeRegistryDatFileErrorToText
   ) where
 
-import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as T
 import qualified Elm2Nix.Data.Dependency as Dependency
 import qualified Elm2Nix.Data.ElmJson as ElmJson
-import qualified Elm2Nix.Data.ElmLock as ElmLock
 import qualified Elm2Nix.Data.FixedOutputDerivation as FOD
-import qualified Elm2Nix.Data.RegistryDat as RegistryDat
 import qualified Elm2Nix.Lib.Nix as Nix
 import qualified Json
 import qualified Json.Decode as JD
 import qualified Json.Encode as JE
 
 import Data.Text (Text)
-import Elm2Nix.Data.ElmVersion (ElmVersion(..))
 import Elm2Nix.Data.FixedOutputDerivation (FixedOutputDerivation)
 
 
@@ -106,26 +100,3 @@ nixPrefetchUrlErrorToText err =
 
     Nix.BadOutput details ->
       "nix-prefetch-url got unexpected output: " <> T.pack details
-
-
-
--- writeRegistryDatFile
-
-
-
-type WriteRegistryDatFileError = JD.Error
-
-
-writeRegistryDatFile :: FilePath -> FilePath -> IO (Either (FilePath, WriteRegistryDatFileError) ())
-writeRegistryDatFile input output = do
-  result <- ElmLock.fromFile input
-  case result of
-    Right elmLock ->
-      Right <$> LBS.writeFile output (RegistryDat.toLazyByteString V0_19_3 $ RegistryDat.fromElmLock elmLock)
-
-    Left err ->
-      return $ Left (input, err)
-
-
-writeRegistryDatFileErrorToText :: FilePath -> WriteRegistryDatFileError -> Text
-writeRegistryDatFileErrorToText = jsonDecodeFileErrorToText

@@ -50,6 +50,7 @@ library
     Elm2Nix
     Elm2Nix.CLI
     Elm2Nix.Command.ViewRegistryDatFile
+    Elm2Nix.Command.WriteRegistryDatFile
     Elm2Nix.Data.Bytes.Decode
     Elm2Nix.Data.Bytes.DecodeV0_19_1
     Elm2Nix.Data.Bytes.DecodeV0_19_3
@@ -100,6 +101,7 @@ executable elm2nix
   build-depends:
     base ^>=4.20.1,
     elm2nix,
+    json-codec ^>=0.1,
     text ^>=2.1.2
 
 test-suite tests

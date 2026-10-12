@@ -32,8 +32,9 @@ data RegistryCommands
 
 data GenerateOptions
   = GenerateOptions
-    { goInput :: FilePath
-    , goOutput :: FilePath
+    { goElmVersion :: ElmVersion
+    , goInFile :: FilePath
+    , goOutFile :: FilePath
     }
   deriving (Eq, Show)
 
@@ -95,7 +96,7 @@ lockOptions =
 
 generateOptions :: Parser GenerateOptions
 generateOptions =
-  GenerateOptions <$> elmLockInputOption <*> registryOutputOption
+  GenerateOptions <$> elmVersionOption <*> elmLockInputOption <*> registryOutputOption
 
 
 viewOptions :: Parser ViewOptions
