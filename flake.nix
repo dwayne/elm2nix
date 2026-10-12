@@ -15,12 +15,12 @@
           name = "elm2nix";
 
           packages = [
+            pkgs.actionlint
+            pkgs.cabal2nix
+            pkgs.cabal-install
+            pkgs.elmPackages.elm
             pkgs.ghc
             pkgs.hlint
-            pkgs.cabal-install
-            pkgs.cabal2nix
-            pkgs.elmPackages.elm
-            pkgs.actionlint
           ];
 
           shellHook = ''
