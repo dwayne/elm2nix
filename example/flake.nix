@@ -18,7 +18,8 @@
           overlays = [
             (final: prev: {
               elmPackages = prev.elmPackages.overrideScope (efinal: eprev: {
-                elm = efinal.callPackage ../nix/elm.nix { };
+                elm = efinal.callPackage ../nix/elm-packages/elm.nix {};
+                elm-test = efinal.callPackage ../nix/elm-packages/elm-test.nix {};
               });
             })
           ];
@@ -126,6 +127,7 @@
             ;
 
           elm = pkgs.elmPackages.elm;
+          elm-test = pkgs.elmPackages.elm-test;
 
           default = example;
 
