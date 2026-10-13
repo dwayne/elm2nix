@@ -24,47 +24,12 @@
             pkgs.elmPackages.elm
             pkgs.ghc
             pkgs.hlint
+            pkgs.just
           ];
 
           env = {
             HSPEC_SKIP = "(skip:network)";
           };
-
-          shellHook = ''
-            export PROJECT_ROOT="$(git rev-parse --show-toplevel)"
-            export PS1="($name)\n$PS1"
-
-            b () {
-              cabal build "$@"
-            }
-
-            lint () {
-              hlint "$PROJECT_ROOT/src" "$PROJECT_ROOT/tests" "$@"
-            }
-            alias l=lint
-
-            t () {
-              cabal test "$@"
-            }
-
-            c () {
-              lint
-              t
-              actionlint
-              nix flake check -L
-              (cd example && nix flake check -L)
-            }
-
-            alias d='cabal haddock'
-            alias do='cabal haddock --open'
-
-            echo "Type 'b' to build"
-            echo "Type 'l' to lint"
-            echo "Type 't' to test"
-            echo "Type 'c' to run all checks"
-            echo "Type 'd' to generate Haddock docs"
-            echo "Type 'do' to generate Haddock docs and open it in a browser"
-          '';
         };
 
         packages = {
