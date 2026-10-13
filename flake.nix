@@ -26,10 +26,13 @@
             pkgs.hlint
           ];
 
+          env = {
+            HSPEC_SKIP = "(skip:network)";
+          };
+
           shellHook = ''
             export PROJECT_ROOT="$(git rev-parse --show-toplevel)"
             export PS1="($name)\n$PS1"
-            export HSPEC_SKIP="(skip:network)"
 
             b () {
               cabal build "$@"
