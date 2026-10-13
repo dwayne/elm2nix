@@ -15,14 +15,7 @@
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [
-            (final: prev: {
-              elmPackages = prev.elmPackages.overrideScope (efinal: eprev: {
-                elm = efinal.callPackage ../nix/elm-packages/elm.nix {};
-                elm-test = efinal.callPackage ../nix/elm-packages/elm-test.nix {};
-              });
-            })
-          ];
+          overlays = [ elm2nix.overlays.default ];
         };
         fs = pkgs.lib.fileset;
         inherit (elm2nix.lib.elm2nix pkgs)

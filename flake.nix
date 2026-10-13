@@ -7,7 +7,10 @@
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ self.overlays.default ];
+        };
         elm2nix = pkgs.callPackage ./nix/elm2nix.nix {};
       in
       {
@@ -151,5 +154,12 @@
             ];
           };
         };
+
+      overlays.default = final: prev: {
+        elmPackages = prev.elmPackages.overrideScope (efinal: eprev: {
+          elm = efinal.callPackage ./nix/elm-packages/elm.nix {};
+          elm-test = efinal.callPackage ./nix/elm-packages/elm-test.nix {};
+        });
+      };
     };
 }
