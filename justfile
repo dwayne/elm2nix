@@ -26,6 +26,7 @@ docs-open:
 
 # Run every check: tests, the flake checks, and actionlint
 check: test
+    cabal check
     nix flake check -L
     cd example && nix flake check -L
     actionlint
