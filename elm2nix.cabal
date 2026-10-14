@@ -139,6 +139,3 @@ test-suite tests
     hspec,
     json-codec,
     text
-
-  build-tool-depends:
-    hspec-discover:hspec-discover
