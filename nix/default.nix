@@ -1,22 +1,26 @@
-{ callPackage
+{ elmPackages
+, haskellPackages
 , lib
-, elmPackages
-
-, elmHome ? ".elm"
-, elmVersion ? elmPackages.elm.version
+, newScope
 }:
 
-let
-  elm2nix = callPackage ./elm2nix.nix {};
-in
-rec {
-  buildElmApplication = lib.makeOverridable (callPackage ./build-elm-application.nix { inherit generateRegistryDat installPatchesScript prepareElmHomeScript; });
-  generateRegistryDat = callPackage ./generate-registry-dat.nix { inherit elm2nix; };
-  prepareElmHomeScript = callPackage ./prepare-elm-home-script.nix { inherit dotElmLinks elmHome; };
-  installPatchesScript = callPackage ./install-patches-script.nix { inherit installPatchScript mkPatch; };
-  installPatchScript = callPackage ./install-patch-script.nix { inherit elmHome elmVersion; };
-  mkPatch = callPackage ./mk-patch.nix {};
-  dotElmLinks = callPackage ./dot-elm-links.nix { inherit elmVersion symbolicLinksToPackagesScript; };
-  symbolicLinksToPackagesScript = callPackage ./symbolic-links-to-packages-script.nix { inherit fetchElmPackage; };
-  fetchElmPackage = callPackage ./fetch-elm-package.nix {};
-}
+lib.makeScope newScope (self: {
+  elmHome = ".elm";
+  elm = elmPackages.elm;
+  elmVersion = self.elm.version;
+
+  haskellPackagesExtension = self.callPackage ./haskell-packages-extension.nix {};
+  baseHaskellPackages = haskellPackages;
+  haskellPackages = self.baseHaskellPackages.extend self.haskellPackagesExtension;
+  elm2nix = self.haskellPackages.elm2nix;
+
+  buildElmApplication = lib.makeOverridable (self.callPackage ./build-elm-application.nix {});
+  generateRegistryDat = self.callPackage ./generate-registry-dat.nix {};
+  prepareElmHomeScript = self.callPackage ./prepare-elm-home-script.nix {};
+  installPatchesScript = self.callPackage ./install-patches-script.nix {};
+  installPatchScript = self.callPackage ./install-patch-script.nix {};
+  mkPatch = self.callPackage ./mk-patch.nix {};
+  dotElmLinks = self.callPackage ./dot-elm-links.nix {};
+  symbolicLinksToPackagesScript = self.callPackage ./symbolic-links-to-packages-script.nix {};
+  fetchElmPackage = self.callPackage ./fetch-elm-package.nix {};
+})

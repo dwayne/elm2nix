@@ -4,6 +4,7 @@
   outputs = { self, nixpkgs }:
     let
       lib = nixpkgs.lib;
+
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
       forAllSystems = f:
         lib.genAttrs supportedSystems (system:
@@ -22,9 +23,12 @@
           default = pkgs.mkShell {
             name = "elm2nix";
 
-            inputsFrom = [
-              self.packages.${system}.elm2nix.env
-            ];
+            inputsFrom =
+              let
+                elm2nix = self.packages.${system}.elm2nix;
+                elm2nixEnv = (pkgs.haskell.lib.doCheck elm2nix).env;
+              in
+              [ elm2nixEnv ];
 
             packages = [
               pkgs.actionlint
@@ -45,7 +49,7 @@
       packages = forAllSystems (system: pkgs:
         {
           default = self.packages.${system}.elm2nix;
-          elm2nix = pkgs.callPackage ./nix/elm2nix.nix {};
+          elm2nix = (self.lib.mkLib pkgs).elm2nix;
         }
       );
 
@@ -68,7 +72,7 @@
 
       lib =
         rec {
-          elm2nix = pkgs: pkgs.callPackage ./nix {};
+          mkLib = pkgs: pkgs.callPackage ./nix {};
 
           patches = {
             #

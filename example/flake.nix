@@ -1,12 +1,12 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # TODO: Remove the flake-utils dependency from here as well.
     flake-utils.url = "github:numtide/flake-utils";
 
     elm2nix = {
       url = "./..";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
   };
 
@@ -18,7 +18,8 @@
           overlays = [ elm2nix.overlays.default ];
         };
         fs = pkgs.lib.fileset;
-        inherit (elm2nix.lib.elm2nix pkgs)
+        elm2nixLib = elm2nix.lib.mkLib pkgs;
+        inherit (elm2nixLib)
           buildElmApplication
           generateRegistryDat
           prepareElmHomeScript
@@ -94,7 +95,7 @@
           name = "example";
 
           packages = [
-            elm2nix.packages.${system}.default
+            elm2nixLib.elm2nix
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
             pkgs.elmPackages.elm-json
