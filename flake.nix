@@ -17,17 +17,20 @@
         );
     in
     {
-      devShells = forAllSystems (_: pkgs:
+      devShells = forAllSystems (system: pkgs:
         {
           default = pkgs.mkShell {
             name = "elm2nix";
+
+            inputsFrom = [
+              self.packages.${system}.elm2nix.env
+            ];
 
             packages = [
               pkgs.actionlint
               pkgs.cabal2nix
               pkgs.cabal-install
               pkgs.elmPackages.elm
-              pkgs.ghc
               pkgs.hlint
               pkgs.just
             ];
