@@ -54,10 +54,10 @@
           inherit elmLock registryDat;
         };
 
-        lydellBrowser = mkPatch elm2nix.lib.patches.lydellBrowser;
-        lydellHtml = mkPatch elm2nix.lib.patches.lydellHtml;
-        lydellVirtualDom = mkPatch elm2nix.lib.patches.lydellVirtualDom;
-        omnibsElmCss = mkPatch elm2nix.lib.patches.omnibsElmCss;
+        lydellBrowser = mkPatch elm2nix.lib.elmPackagePatches.lydellBrowser;
+        lydellHtml = mkPatch elm2nix.lib.elmPackagePatches.lydellHtml;
+        lydellVirtualDom = mkPatch elm2nix.lib.elmPackagePatches.lydellVirtualDom;
+        omnibsElmCss = mkPatch elm2nix.lib.elmPackagePatches.omnibsElmCss;
 
         installLydellBrowserScript = installPatchScript lydellBrowser;
         installLydellHtmlScript = installPatchScript lydellHtml;
@@ -162,7 +162,7 @@
             #
             # Try using only the arguments to mkPatch
             #
-            elmPackagePatches = elm2nix.lib.elmSafeVirtualDom.elmCss;
+            elmPackagePatches = elm2nix.lib.elmSafeVirtualDomPatches.elmCss;
           };
 
           testedExample = formattingCheckedExample.override {
