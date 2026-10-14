@@ -1,56 +1,68 @@
 {
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ self.overlays.default ];
-        };
-        elm2nix = pkgs.callPackage ./nix/elm2nix.nix {};
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          name = "elm2nix";
+  outputs = { self, nixpkgs }:
+    let
+      lib = nixpkgs.lib;
+      supportedSystems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
+      forAllSystems = f:
+        lib.genAttrs supportedSystems (system:
+          let
+            pkgs = import nixpkgs {
+              inherit system;
+              overlays = [ self.overlays.default ];
+            };
+          in
+          f system pkgs
+        );
+    in
+    {
+      devShells = forAllSystems (_: pkgs:
+        {
+          default = pkgs.mkShell {
+            name = "elm2nix";
 
-          packages = [
-            pkgs.actionlint
-            pkgs.cabal2nix
-            pkgs.cabal-install
-            pkgs.elmPackages.elm
-            pkgs.ghc
-            pkgs.hlint
-            pkgs.just
-          ];
+            packages = [
+              pkgs.actionlint
+              pkgs.cabal2nix
+              pkgs.cabal-install
+              pkgs.elmPackages.elm
+              pkgs.ghc
+              pkgs.hlint
+              pkgs.just
+            ];
 
-          env = {
-            HSPEC_SKIP = "(skip:network)";
+            env = {
+              HSPEC_SKIP = "(skip:network)";
+            };
           };
-        };
+        }
+      );
 
-        packages = {
-          default = elm2nix;
-          inherit elm2nix;
-        };
+      packages = forAllSystems (system: pkgs:
+        {
+          default = self.packages.${system}.elm2nix;
+          elm2nix = pkgs.callPackage ./nix/elm2nix.nix {};
+        }
+      );
 
-        apps = {
+      apps = forAllSystems (system: pkgs:
+        {
           default = self.apps.${system}.elm2nix;
           elm2nix = {
             type = "app";
-            program = pkgs.lib.getExe elm2nix;
+            program = lib.getExe self.packages.${system}.elm2nix;
             meta.description = "The elm2nix CLI application";
           };
-        };
+        }
+      );
 
-        checks = {
-          inherit elm2nix;
-        };
-      }
-    ) // {
+      checks = forAllSystems (system: _:
+        {
+          elm2nix = self.packages.${system}.elm2nix;
+        }
+      );
+
       lib =
         rec {
           elm2nix = pkgs: pkgs.callPackage ./nix {};
