@@ -1,5 +1,5 @@
 { elmPackages
-, haskellPackages
+, haskell
 , lib
 , newScope
 }:
@@ -10,7 +10,7 @@ lib.makeScope newScope (self: {
   elmVersion = self.elm.version;
 
   haskellPackagesExtension = self.callPackage ./haskell-packages-extension.nix {};
-  baseHaskellPackages = haskellPackages;
+  baseHaskellPackages = haskell.packages.ghc9103;
   haskellPackages = self.baseHaskellPackages.extend self.haskellPackagesExtension;
   elm2nix = self.haskellPackages.elm2nix;
 
