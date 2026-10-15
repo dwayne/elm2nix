@@ -31,6 +31,10 @@ check: test
     cd example && nix flake check -L
     actionlint
 
+# Remove generated artifacts
+clean:
+    rm -rf dist-newstyle result example/elm-stuff example/result
+
 alias b := build
 alias l := lint
 alias t := test
