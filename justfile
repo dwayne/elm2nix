@@ -24,7 +24,7 @@ docs:
 docs-open:
     cabal haddock --open
 
-# Run every check: tests, the flake checks, and actionlint
+# Run every check
 check: test
     cabal check
     nix flake check -L
