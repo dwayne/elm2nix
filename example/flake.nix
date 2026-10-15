@@ -17,7 +17,8 @@
           overlays = [ elm2nix.overlays.default ];
         };
 
-        fs = nixpkgs.lib.fileset;
+        lib = nixpkgs.lib;
+        fs = lib.fileset;
 
         elm2nixLib = elm2nix.lib.mkLib pkgs;
         inherit (elm2nixLib)
@@ -81,15 +82,25 @@
           elmLock = ./elm.lock;
         };
 
-        testScripts = pkgs.runCommand "test-scripts" {} ''
-          mkdir "$out"
-          echo "${examplePrepareElmHomeScript}" > "$out/examplePrepareElmHomeScript.txt"
-          echo "${exampleSymbolicLinksToPackagesScript}" > "$out/exampleSymbolicLinksToPackagesScript.txt"
-          echo "${installLydellBrowserScript}" > "$out/installLydellBrowserScript.txt"
-          echo "${installLydellHtmlScript}" > "$out/installLydellHtmlScript.txt"
-          echo "${installLydellVirtualDomScript}" > "$out/installLydellVirtualDomScript.txt"
-          echo "${installOmnibsElmCssScript}" > "$out/installOmnibsElmCssScript.txt"
-        '';
+        testScripts = pkgs.linkFarm "test-scripts" (
+          lib.mapAttrsToList
+            (name: text:
+              {
+                name = "${name}.txt";
+                path = pkgs.writeText "${name}.txt" text;
+              }
+            )
+            {
+              inherit
+                examplePrepareElmHomeScript
+                exampleSymbolicLinksToPackagesScript
+                installLydellBrowserScript
+                installLydellHtmlScript
+                installLydellVirtualDomScript
+                installOmnibsElmCssScript
+                ;
+            }
+        );
       in
       {
         devShells.default = pkgs.mkShell {
