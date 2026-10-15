@@ -16,7 +16,9 @@
           inherit system;
           overlays = [ elm2nix.overlays.default ];
         };
-        fs = pkgs.lib.fileset;
+
+        fs = nixpkgs.lib.fileset;
+
         elm2nixLib = elm2nix.lib.mkLib pkgs;
         inherit (elm2nixLib)
           buildElmApplication
