@@ -1,7 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # TODO: Remove the flake-utils dependency from here as well.
     flake-utils.url = "github:numtide/flake-utils";
 
     elm2nix = {
