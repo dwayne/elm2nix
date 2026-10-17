@@ -1,5 +1,5 @@
 { mkDerivation, base, binary, bytestring, containers, hspec
-, hspec-discover, indexed-traversable, json-codec, json-parser, lib
+, indexed-traversable, json-codec, json-parser, lib
 , optparse-applicative, text, typed-process, unliftio
 }:
 mkDerivation {
@@ -17,7 +17,6 @@ mkDerivation {
   testHaskellDepends = [
     base binary bytestring containers hspec json-codec text
   ];
-  testToolDepends = [ hspec-discover ];
   doHaddock = false;
   doCheck = false;
   description = "Create Elm support files to be used when compiling Elm applications with Nix";
