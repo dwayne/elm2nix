@@ -1,20 +1,13 @@
 set positional-arguments
 
 # List the available recipes
+[private]
 default:
-    @just --list
+    @just --list --unsorted
 
-# Build the project
+# Build elm2nix
 build *args:
     cabal build "$@"
-
-# Lint src/ and tests/ with HLint
-lint *args:
-    hlint src tests "$@"
-
-# Run the test suite
-test *args:
-    cabal test "$@"
 
 # Generate the Haddock docs
 docs:
@@ -24,20 +17,27 @@ docs:
 docs-open:
     cabal haddock --open
 
-# Run every check
-check: test
-    cabal check
-    nix flake check -L
-    cd example && nix flake check -L
+# Static checks (fast, platform-independent)
+lint:
     actionlint
+    cabal check
+    hlint app src tests
+
+# Run the test suite
+test *args:
+    cabal test "$@"
+
+# Check the flakes
+flake-check:
+    nix flake check -L
+    nix flake check ./example -L
 
 # Remove generated artifacts
 clean:
     rm -rf dist-newstyle result example/elm-stuff example/result
 
 alias b := build
-alias l := lint
-alias t := test
 alias d := docs
 alias o := docs-open
-alias c := check
+alias l := lint
+alias t := test

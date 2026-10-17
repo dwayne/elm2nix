@@ -1,10 +1,18 @@
-name: Check
+name: CI
 
 on:
   push
 
 jobs:
-  check:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix develop .#ci -c just lint
+
+  flake-check:
     strategy:
       fail-fast: false
       matrix:
@@ -16,7 +24,7 @@ jobs:
           - runner: macos-latest
             system: aarch64-darwin
 
-    name: check (${{ matrix.system }})
+    name: flake-check (${{ matrix.system }})
     runs-on: ${{ matrix.runner }}
 
     steps:
@@ -30,4 +38,4 @@ jobs:
           echo "Nix system: $actual"
           test "$actual" = "${{ matrix.system }}"
 
-      - run: nix develop -c just check
+      - run: nix develop .#ci -c just flake-check

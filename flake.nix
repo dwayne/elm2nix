@@ -23,18 +23,25 @@
           default = pkgs.mkShell {
             name = "elm2nix";
 
-            inputsFrom =
-              let
-                elm2nix = self.packages.${system}.elm2nix;
-                elm2nixEnv = (pkgs.haskell.lib.doCheck elm2nix).env;
-              in
-              [ elm2nixEnv ];
+            inputsFrom = [ self.packages.${system}.elm2nixWithCheck.env ];
 
             packages = [
               pkgs.actionlint
               pkgs.cabal2nix
               pkgs.cabal-install
               pkgs.elmPackages.elm
+              pkgs.hlint
+              pkgs.just
+            ];
+          };
+
+          ci = pkgs.mkShell {
+            name = "elm2nix-ci";
+
+            inputsFrom = [ self.packages.${system}.elm2nixWithCheck.env ];
+
+            packages = [
+              pkgs.actionlint
               pkgs.hlint
               pkgs.just
             ];
@@ -47,9 +54,13 @@
       );
 
       packages = forAllSystems (system: pkgs:
-        {
-          default = self.packages.${system}.elm2nix;
+        let
           elm2nix = (self.lib.mkLib pkgs).elm2nix;
+        in
+        {
+          inherit elm2nix;
+          default = elm2nix;
+          elm2nixWithCheck = pkgs.haskell.lib.doCheck elm2nix;
         }
       );
 
@@ -66,7 +77,7 @@
 
       checks = forAllSystems (system: _:
         {
-          elm2nix = self.packages.${system}.elm2nix;
+          elm2nixWithCheck = self.packages.${system}.elm2nixWithCheck;
         }
       );
 
