@@ -38,4 +38,5 @@ jobs:
           echo "Nix system: $actual"
           test "$actual" = "${{ matrix.system }}"
 
-      - run: nix develop .#ci -c just flake-check
+      - run: nix flake check -L
+      - run: nix flake check ./example -L
