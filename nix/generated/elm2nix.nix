@@ -4,7 +4,7 @@
 }:
 mkDerivation {
   pname = "elm2nix";
-  version = "0.2.0.0";
+  version = "0.3";
   src = ../..;
   isLibrary = true;
   isExecutable = true;
