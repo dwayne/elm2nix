@@ -9,10 +9,10 @@ lib.makeScope newScope (self: {
   elm = elmPackages.elm;
   elmVersion = self.elm.version;
 
-  haskellPackagesExtension = self.callPackage ./haskell-packages-extension.nix {};
-  baseHaskellPackages = haskell.packages.ghc9103;
-  haskellPackages = self.baseHaskellPackages.extend self.haskellPackagesExtension;
   elm2nix = self.haskellPackages.elm2nix;
+  haskellPackages = self.baseHaskellPackages.extend self.haskellPackagesExtension;
+  baseHaskellPackages = haskell.packages.ghc9103;
+  haskellPackagesExtension = self.callPackage ./haskell-packages-extension.nix {};
 
   buildElmApplication = lib.makeOverridable (self.callPackage ./build-elm-application.nix {});
   generateRegistryDat = self.callPackage ./generate-registry-dat.nix {};
