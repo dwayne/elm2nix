@@ -1,14 +1,17 @@
 # elm2nix
 
-A rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) with major changes and improvements.
+It provides a **CLI tool** and **build helper** for packaging [Elm](https://elm-lang.org/) applications with [Nix](https://nixos.org/).
 
-These are some of the notable differences:
+This started off as a backward-compatible rewrite of [`cachix/elm2nix`](https://github.com/cachix/elm2nix) for the purposes of learning Haskell and Nix but with all the major changes and improvements that were made it grew into an independent project.
 
-1. You can input one or more `elm.json` files to create the lock file.
-2. It uses a JSON formatted lock file that has support for multiple versions of the same package.
-3. You don't have to manually generate a `registry.dat` file since it's automatically handled for you.
-4. You can display any `registry.dat` file as JSON using `elm2nix registry view`.
-5. There is a `buildElmApplication` build helper that allows you to build an Elm application in a variety of ways by setting options. For e.g.
+These are some of its notable features:
+
+1. It supports Elm 0.19.1, 0.19.2, and 0.19.3.
+2. You can provide one or more `elm.json` files to create the lock file.
+3. It uses a JSON formatted lock file that has support for multiple versions of the same package.
+4. You don't have to manually generate a `registry.dat` file since it's automatically handled for you.
+5. You can display any `registry.dat` file as JSON using `elm2nix registry view`.
+6. There is a `buildElmApplication` build helper that allows you to build an Elm application in a variety of ways by setting options. For e.g.
     - Turn on the time-travelling debugger
     - Fail the build if your Elm source code is improperly formatted
     - Fail the build if your Elm tests fail
@@ -20,7 +23,7 @@ These are some of the notable differences:
     - [Show a report](https://guide.elm-lang.org/optimization/asset_size#scripts) about the changes in your file size due to minification and compression
     - Enable content hashing for cache busting purposes
     - Or completely customize portions of the build to your liking if you know how [`stdenv.mkDerivation`](https://nixos.org/manual/nixpkgs/stable/#chap-stdenv) works
-6. You can easily use [`lydell/elm-safe-virtual-dom`](https://github.com/lydell/elm-safe-virtual-dom) in your projects. More generally you can patch any published Elm package and make use of them in your projects.
+7. You can easily use [`lydell/elm-safe-virtual-dom`](https://github.com/lydell/elm-safe-virtual-dom) in your projects. More generally you can patch any published Elm package and make use of them in your projects.
 
 ## Usage
 
@@ -40,30 +43,39 @@ The lock file is used by a build helper, called `buildElmApplication`, to build 
 inputs.elm2nix.url = "github:dwayne/elm2nix";
 ```
 
-2. Add it's default package to your development shell.
+2. Add the default overlay.
 
 ```nix
-outputs = { self, nixpkgs, flake-utils, elm2nix }:
-    flake-utils.lib.eachDefaultSystem(system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
-        devShells.default = pkgs.mkShell {
-          packages = [
-            elm2nix.packages.${system}.default
-            ...
-          ];
-
-          ...
-        };
-
-        ...
-      }
-    );
+pkgs = import nixpkgs {
+  inherit system;
+  overlays = [ elm2nix.overlays.default ];
+};
 ```
 
-3. Use the `elm2nix` program to generate the `elm.lock` file from your Elm application's `elm.json`.
+The overlay provides the Elm 0.19.3 derivation along with an appropriate version of `elm-test` needed to work with it.
+
+3. Make the library.
+
+```nix
+elm2nixLib = elm2nix.lib.mkLib pkgs;
+```
+
+`elm2nixLib.elm2nix` is the CLI tool and `elm2nixLib.buildElmApplication` is the build helper. Other attributes are provided for advanced usage scenarios.
+
+4. Add the CLI tool to the dev shell.
+
+```nix
+devShells.default = pkgs.mkShell {
+  packages = [
+    elm2nixLib.elm2nix
+    # ...
+  ];
+
+  # ...
+};
+```
+
+5. Use the `elm2nix` CLI tool to generate the `elm.lock` file from your Elm application's `elm.json`.
 
 ```bash
 nix develop
@@ -72,27 +84,23 @@ elm2nix lock
 
 See `elm2nix lock --help` for more details.
 
-4. Use `buildElmApplication` to build your Elm application.
+4. Use the `buildElmApplication` build helper to package your Elm application with Nix.
 
 ```nix
-outputs = { self, nixpkgs, flake-utils, elm2nix }:
-    flake-utils.lib.eachDefaultSystem(system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-        inherit (elm2nix.lib.elm2nix pkgs) buildElmApplication;
+let
+  myApp = elm2nixLib.buildElmApplication {
+    name = "my-app";
+    src = ./.;
+    elmLock = ./elm.lock;
+  };
 
-        myApp = buildElmApplication {
-          name = "my-app";
-          src = ./.;
-          elmLock = ./elm.lock;
-        };
-      in
-      {
-        packages.myApp = myApp;
+  # ...
+in
+{
+  packages.myApp = myApp;
 
-        ...
-      }
-    );
+  # ...
+}
 ```
 
 5. Build your Elm application.
