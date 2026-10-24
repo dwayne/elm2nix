@@ -1,25 +1,27 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nix-utils-src = { url = "github:dwayne/nix-utils"; flake = false; };
+    elm2nix-src = { url = ./.; flake = false; };
+  };
 
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, nix-utils-src, elm2nix-src }:
     let
       lib = nixpkgs.lib;
-
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
-      forAllSystems = f:
-        lib.genAttrs supportedSystems (system:
-          let
-            pkgs = import nixpkgs {
-              inherit system;
-              overlays = [ self.overlays.default ];
-            };
-          in
-          f system pkgs
-        );
+      nixUtils = import nix-utils-src lib;
+      elm2nix = import elm2nix-src;
     in
-    {
-      devShells = forAllSystems (system: pkgs:
-        {
+    nixUtils.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+          overlays = [ elm2nix.overlays.default ];
+        };
+
+        elm2nixLib = elm2nix.lib.mkLib pkgs;
+      in
+      {
+        devShells = {
           default = pkgs.mkShell {
             name = "elm2nix";
 
@@ -50,50 +52,26 @@
               HSPEC_SKIP = "(skip:network)";
             };
           };
-        }
-      );
+        };
 
-      packages = forAllSystems (system: pkgs:
-        let
-          elm2nix = (self.lib.mkLib pkgs).elm2nix;
-        in
-        {
-          inherit elm2nix;
-          default = elm2nix;
-          elm2nixWithCheck = pkgs.haskell.lib.doCheck elm2nix;
-        }
-      );
+        packages = {
+          default = elm2nixLib.elm2nix;
+          elm2nix = elm2nixLib.elm2nix;
+          elm2nixWithCheck = pkgs.haskell.lib.doCheck elm2nixLib.elm2nix;
+        };
 
-      apps = forAllSystems (system: pkgs:
-        {
+        apps = {
           default = self.apps.${system}.elm2nix;
           elm2nix = {
             type = "app";
             program = lib.getExe self.packages.${system}.elm2nix;
             meta.description = "The elm2nix CLI application";
           };
-        }
-      );
-
-      checks = forAllSystems (system: _:
-        {
-          elm2nixWithCheck = self.packages.${system}.elm2nixWithCheck;
-        }
-      );
-
-      lib =
-        rec {
-          mkLib = pkgs: pkgs.callPackage ./nix {};
-
-          elmPackagePatches = import ./nix/elm-package-patches.nix;
-          elmSafeVirtualDomPatches = import ./nix/elm-safe-virtual-dom-patches.nix;
         };
 
-      overlays.default = final: prev: {
-        elmPackages = prev.elmPackages.overrideScope (efinal: eprev: {
-          elm = efinal.callPackage ./nix/elm-packages/elm.nix {};
-          elm-test = efinal.callPackage ./nix/elm-packages/elm-test.nix {};
-        });
-      };
-    };
+        checks = {
+          elm2nixWithCheck = self.packages.${system}.elm2nixWithCheck;
+        };
+      }
+    ) // elm2nix;
 }

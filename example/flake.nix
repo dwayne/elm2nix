@@ -1,23 +1,23 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-
-    elm2nix = {
-      url = "./..";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nix-utils-src = { url = "github:dwayne/nix-utils"; flake = false; };
+    elm2nix-src = { url = ./..; flake = false; };
   };
 
-  outputs = { self, nixpkgs, flake-utils, elm2nix }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs = { self, nixpkgs, nix-utils-src, elm2nix-src }:
+    let
+      lib = nixpkgs.lib;
+      nixUtils = import nix-utils-src lib;
+      elm2nix = import elm2nix-src;
+    in
+    nixUtils.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ elm2nix.overlays.default ];
         };
 
-        lib = nixpkgs.lib;
         fs = lib.fileset;
 
         elm2nixLib = elm2nix.lib.mkLib pkgs;
