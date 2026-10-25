@@ -2,26 +2,31 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-utils-src = { url = "github:dwayne/nix-utils"; flake = false; };
-    elm2nix-src = { url = ./..; flake = false; };
+    flake-elm2nix = {
+      url = ./..;
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        nix-utils-src.follows = "nix-utils-src";
+      };
+    };
   };
 
-  outputs = { self, nixpkgs, nix-utils-src, elm2nix-src }:
+  outputs = { self, nixpkgs, nix-utils-src, flake-elm2nix }:
     let
       lib = nixpkgs.lib;
       nixUtils = import nix-utils-src lib;
-      elm2nix = import elm2nix-src;
     in
     nixUtils.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [ elm2nix.overlays.default ];
+          overlays = [ flake-elm2nix.overlays.default ];
         };
 
         fs = lib.fileset;
 
-        elm2nixLib = elm2nix.lib.mkLib pkgs;
-        inherit (elm2nixLib)
+        inherit (pkgs.elm2nixPackages)
+          elm2nix
           buildElmApplication
           generateRegistryDat
           prepareElmHomeScript
@@ -56,10 +61,10 @@
           inherit elmLock registryDat;
         };
 
-        lydellBrowser = mkPatch elm2nix.lib.elmPackagePatches.lydellBrowser;
-        lydellHtml = mkPatch elm2nix.lib.elmPackagePatches.lydellHtml;
-        lydellVirtualDom = mkPatch elm2nix.lib.elmPackagePatches.lydellVirtualDom;
-        omnibsElmCss = mkPatch elm2nix.lib.elmPackagePatches.omnibsElmCss;
+        lydellBrowser = mkPatch flake-elm2nix.lib.elmPackagePatches.lydellBrowser;
+        lydellHtml = mkPatch flake-elm2nix.lib.elmPackagePatches.lydellHtml;
+        lydellVirtualDom = mkPatch flake-elm2nix.lib.elmPackagePatches.lydellVirtualDom;
+        omnibsElmCss = mkPatch flake-elm2nix.lib.elmPackagePatches.omnibsElmCss;
 
         installLydellBrowserScript = installPatchScript lydellBrowser;
         installLydellHtmlScript = installPatchScript lydellHtml;
@@ -107,7 +112,7 @@
           name = "example";
 
           packages = [
-            elm2nixLib.elm2nix
+            elm2nix
             pkgs.elmPackages.elm
             pkgs.elmPackages.elm-format
             pkgs.elmPackages.elm-json
@@ -170,7 +175,7 @@
             #
             # Try using only the arguments to mkPatch
             #
-            elmPackagePatches = elm2nix.lib.elmSafeVirtualDomPatches.elmCss;
+            elmPackagePatches = flake-elm2nix.lib.elmSafeVirtualDomPatches.elmCss;
           };
 
           testedExample = formattingCheckedExample.override {

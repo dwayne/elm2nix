@@ -40,7 +40,7 @@ The lock file is used by a build helper, called `buildElmApplication`, to build 
 1. Add `dwayne/elm2nix` as an input to your flake.
 
 ```nix
-inputs.elm2nix.url = "github:dwayne/elm2nix";
+inputs.flake-elm2nix.url = "github:dwayne/elm2nix";
 ```
 
 2. Add the default overlay.
@@ -48,26 +48,20 @@ inputs.elm2nix.url = "github:dwayne/elm2nix";
 ```nix
 pkgs = import nixpkgs {
   inherit system;
-  overlays = [ elm2nix.overlays.default ];
+  overlays = [ flake-elm2nix.overlays.default ];
 };
 ```
 
-The overlay provides the Elm 0.19.3 derivation along with an appropriate version of `elm-test` needed to work with it.
+The overlay provides `elm2nixPackages`, Elm 0.19.3, and `elm-test` 0.19.3-0.
 
-3. Make the library.
+`elm2nixPackages.elm2nix` is the CLI tool and `elm2nixPackages.buildElmApplication` is the build helper. Other attributes are provided for advanced usage scenarios.
 
-```nix
-elm2nixLib = elm2nix.lib.mkLib pkgs;
-```
-
-`elm2nixLib.elm2nix` is the CLI tool and `elm2nixLib.buildElmApplication` is the build helper. Other attributes are provided for advanced usage scenarios.
-
-4. Add the CLI tool to the dev shell.
+3. Add the CLI tool to the dev shell.
 
 ```nix
 devShells.default = pkgs.mkShell {
   packages = [
-    elm2nixLib.elm2nix
+    pkgs.elm2nixPackages.elm2nix
     # ...
   ];
 
@@ -75,7 +69,7 @@ devShells.default = pkgs.mkShell {
 };
 ```
 
-5. Use the `elm2nix` CLI tool to generate the `elm.lock` file from your Elm application's `elm.json`.
+4. Use the `elm2nix` CLI tool to generate the `elm.lock` file from your Elm application's `elm.json`.
 
 ```bash
 nix develop
@@ -84,11 +78,11 @@ elm2nix lock
 
 See `elm2nix lock --help` for more details.
 
-4. Use the `buildElmApplication` build helper to package your Elm application with Nix.
+5. Use the `elm2nixPackages.buildElmApplication` build helper to package your Elm application with Nix.
 
 ```nix
 let
-  myApp = elm2nixLib.buildElmApplication {
+  myApp = pkgs.elm2nixPackages.buildElmApplication {
     name = "my-app";
     src = ./.;
     elmLock = ./elm.lock;
@@ -103,7 +97,7 @@ in
 }
 ```
 
-5. Build your Elm application.
+6. Build your Elm application.
 
 ```bash
 nix build .#myApp
@@ -111,7 +105,7 @@ nix build .#myApp
 
 This will generate a `result/` directory containing your compiled application in `elm.js`.
 
-6. That's it.
+7. That's it.
 
 You can view a full working example in the [`example/`](./example) directory.
 
