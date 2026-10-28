@@ -85,6 +85,7 @@
       overlays.default = final: prev: {
         elmPackages = prev.elmPackages.overrideScope (efinal: eprev: {
           elm = efinal.callPackage ./nix/elm-packages/elm.nix {};
+          elm-json = efinal.callPackage ./nix/elm-packages/elm-json { inherit (eprev) elm-json; };
           elm-test = efinal.callPackage ./nix/elm-packages/elm-test.nix {};
         });
 

@@ -1,0 +1,50 @@
+From 38b9dbf3a6292de9ce142cb7760127a854f4092e Mon Sep 17 00:00:00 2001
+From: Dwayne Crooks <me@dwaynecrooks.com>
+Date: Wed, 28 Oct 2026 08:46:43 -0400
+Subject: [PATCH] Add support for 0.19.2 and 0.19.3
+
+---
+ src/lib/package/retriever.rs | 2 ++
+ src/lib/project/mod.rs       | 6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib/package/retriever.rs b/src/lib/package/retriever.rs
+index 048ffe1..9a814ef 100644
+--- a/src/lib/package/retriever.rs
++++ b/src/lib/package/retriever.rs
+@@ -170,6 +170,8 @@ impl Retriever {
+                 Version::new(0, 18, 0),
+                 Version::new(0, 19, 0),
+                 Version::new(0, 19, 1),
++                Version::new(0, 19, 2),
++                Version::new(0, 19, 3),
+             ],
+         );
+
+diff --git a/src/lib/project/mod.rs b/src/lib/project/mod.rs
+index d1a145c..813fd1b 100644
+--- a/src/lib/project/mod.rs
++++ b/src/lib/project/mod.rs
+@@ -150,11 +150,11 @@ impl Application {
+         let mut direct = BTreeMap::new();
+         direct.insert(
+             package::Name::new("elm", "core").unwrap(),
+-            Version::new(1, 0, 3),
++            Version::new(1, 0, 5),
+         );
+         direct.insert(
+             package::Name::new("elm", "json").unwrap(),
+-            Version::new(1, 1, 3),
++            Version::new(1, 1, 4),
+         );
+         let deps = AppDependencies {
+             direct,
+@@ -163,7 +163,7 @@ impl Application {
+
+         Self {
+             source_directories: vec!["src".to_string()],
+-            elm_version: Version::new(0, 19, 1),
++            elm_version: Version::new(0, 19, 3),
+             dependencies: deps,
+             test_dependencies: AppDependencies::new(),
+             other: BTreeMap::new(),

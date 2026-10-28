@@ -52,7 +52,7 @@ pkgs = import nixpkgs {
 };
 ```
 
-The overlay provides `elm2nixPackages`, Elm 0.19.3, and `elm-test` 0.19.3-0.
+The overlay provides `elm2nixPackages`, Elm 0.19.3, an `elm-json` that works with Elm 0.19.2/0.19.3 projects, and `elm-test` 0.19.3-0.
 
 `elm2nixPackages.elm2nix` is the CLI tool and `elm2nixPackages.buildElmApplication` is the build helper. Other attributes are provided for advanced usage scenarios.
 
