@@ -87,6 +87,7 @@
           elm = efinal.callPackage ./nix/elm-packages/elm.nix {};
           elm-json = efinal.callPackage ./nix/elm-packages/elm-json { inherit (eprev) elm-json; };
           elm-test = efinal.callPackage ./nix/elm-packages/elm-test.nix {};
+          elm-test-rs = efinal.callPackage ./nix/elm-packages/elm-test-rs.nix { inherit (eprev) elm-test-rs; };
         });
 
         elm2nixPackages = final.callPackage ./nix {};
